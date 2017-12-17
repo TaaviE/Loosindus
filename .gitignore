@@ -107,3 +107,7 @@ graph.json
 ids.json
 notes
 __pycache__
+venv
+
+# IntelliJ and PyCharm
+.idea

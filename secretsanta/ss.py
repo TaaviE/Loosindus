@@ -1,15 +1,15 @@
-import sys
-import random
-import secretsanta as ss
 import datetime as dt
+import sys
+
+import secretsanta as ss
 
 # CSV column mappings 
-FAM_MEMBER_COL  = 0
-FAM_FAMILY_COL  = 1
+FAM_MEMBER_COL = 0
+FAM_FAMILY_COL = 1
 
 CONN_SOURCE_COL = 0
 CONN_TARGET_COL = 1
-CONN_YEAR_COL   = 2
+CONN_YEAR_COL = 2
 
 
 def loadFamilyMembers(csvPath):
@@ -27,7 +27,7 @@ def loadFamilyMembers(csvPath):
             data = line.strip().split(',')
             member = data[FAM_MEMBER_COL]
             family = data[FAM_FAMILY_COL]
-            
+
             families[member] = family
             if family not in members:
                 members[family] = set()
@@ -38,7 +38,6 @@ def loadFamilyMembers(csvPath):
 
 def loadConnections(csvPath, families, members):
     with open(csvPath, 'r') as file:
-
         connections = ss.ConnectionGraph(families,
                                          members)
 
@@ -46,7 +45,7 @@ def loadConnections(csvPath, families, members):
             data = line.strip().split(',')
             source = data[CONN_SOURCE_COL]
             target = data[CONN_TARGET_COL]
-            year   = data[CONN_YEAR_COL]
+            year = data[CONN_YEAR_COL]
 
             connections.add(source, target, year)
 
@@ -55,7 +54,6 @@ def loadConnections(csvPath, families, members):
 
 def saveConnections(csvPath, connections):
     with open(csvPath, 'w') as file:
-        
         file.write('giver,receiver,year,weight\n')
 
         for conn in connections:
@@ -68,11 +66,10 @@ def saveConnections(csvPath, connections):
 
 
 def main():
-
     argc = len(sys.argv)
     if argc != 4 and argc != 5:
         print('usage: ss.py <familyFile> <oldConnFile> ' +
-                           '<newConnFile> [<connYear>]')
+              '<newConnFile> [<connYear>]')
         exit(1)
 
     familyFile = sys.argv[1]
@@ -91,12 +88,10 @@ def main():
 
     totalWeight = sum(conn.weight for conn in newConnections)
     print('Generated new connections for %d with total weight %d'
-         % (connYear, totalWeight))
+          % (connYear, totalWeight))
 
     saveConnections(newConnFile, newConnections)
 
 
 if __name__ == '__main__':
     main()
-
-
