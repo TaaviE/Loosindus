@@ -511,6 +511,7 @@ def rerendernamegraph():
 
 
 def save_graph(passed_graph, file_name, colored=False):
+    # This function just saves a networkx graph into a .png file without any GUI(!)
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
     plotlib.axis("off")
     fig = plotlib.figure(1)
