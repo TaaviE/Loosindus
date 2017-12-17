@@ -1,7 +1,8 @@
 import datetime as dt
 import sys
-import secretsanta.secretsanta as ss
+
 import secretsanta
+import secretsanta.secretsanta as ss
 
 # CSV column mappings 
 FAM_MEMBER_COL = 0
@@ -18,12 +19,12 @@ def load_family_members(csv_path):
     associated families_members, and families_to_members, a map of
     families_members to a set of its families_to_members.
     """
-    with open(csv_path, 'r') as file:
+    with open(csv_path, "r") as file:
         families_to_members = {}
         members_to_families = {}
 
         for line in file:
-            data = line.strip().split(',')
+            data = line.strip().split(",")
             member = data[FAM_MEMBER_COL]
             family = data[FAM_FAMILY_COL]
 
@@ -36,7 +37,7 @@ def load_family_members(csv_path):
 
 
 def load_connections(csv_path, families, members):
-    with open(csv_path, 'r') as file:
+    with open(csv_path, "r") as file:
         connections = secretsanta.ConnectionGraph.ConnectionGraph(families, members)
 
         for line in file:
@@ -51,23 +52,23 @@ def load_connections(csv_path, families, members):
 
 
 def save_connections(csv_path, connections):
-    with open(csv_path, 'w') as file:
-        file.write('giver,receiver,year,weight\n')
+    with open(csv_path, "w") as file:
+        file.write("giver,receiver,year,weight\n")
 
         for conn in connections:
-            file.write(','.join([
+            file.write(",".join([
                 conn.source,
                 conn.target,
                 str(conn.year),
                 str(conn.weight)
-            ]) + '\n')
+            ]) + "\n")
 
 
 def main():
     argc = len(sys.argv)
     if argc != 4 and argc != 5:
-        print('usage: ss.py <familyFile> <old_conn_file> ' +
-              '<new_conn_file> [<conn_year>]')
+        print("usage: ss.py <familyFile> <old_conn_file> " +
+              "<new_conn_file> [<conn_year>]")
         exit(1)
 
     family_file = sys.argv[1]
@@ -85,11 +86,11 @@ def main():
     new_connections = santa.generate_connections(conn_year)
 
     total_weight = sum(conn.weight for conn in new_connections)
-    print('Generated new connections for %d with total weight %d'
+    print("Generated new connections for %d with total weight %d"
           % (conn_year, total_weight))
 
     save_connections(new_conn_file, new_connections)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

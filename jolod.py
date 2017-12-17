@@ -2,18 +2,19 @@
 # coding=utf-8
 # author=Taavi Eomäe
 import json
+
 import matplotlib as pylab
-pylab.use("Agg")
+
+pylab.use("Agg")  # Because we won't have a GUI on the server itself
 from flask import Flask, request, render_template, Response
 import matplotlib.pyplot as plotlib
 import networkx as netx
-import random
 import copy
 import secretsanta
 import datetime
 
 app = Flask(__name__)
-debug = True  # If debugging is enabled
+debug = True  # Enable debugging
 
 # Contains placeholder names (with ids) and members_to_families that are going to
 # be written into a file on first launch, after that it's
@@ -39,13 +40,13 @@ shuffled_ids = {}
 
 # Just for assigning members_to_families a few colors, if you have more than five members_to_families, add more
 chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
+person_colors = {}
 
 
 def load_forms():
     global names_proper
     try:  # Load user names in genitive form from file
         print("Trying to load user names in genitive form from file")
-        tmp_names_proper = {}
         with open("./genitive.json", "r") as file:
             tmp_names_proper = eval(str(json.load(file)))
             if len(tmp_names_proper) <= 0:
@@ -58,9 +59,6 @@ def load_forms():
         with open("./genitive.json", "w") as file:
             file.write(json.dumps(str(names_proper)))
             print("Wrote user names in genitive form to file")
-
-
-load_forms()
 
 
 def load_mapping():
@@ -79,17 +77,15 @@ def load_mapping():
     except Exception as e:
         print("Loading failed:", e)
         print("Generating user IDs")
-        person_id = 0  # Assign IDs for every person
-        for family in families:
-            for person in family:
-                family[person] = person_id
-                person_id += 1
+        current_person_id = 0  # Start from 0
+        for current_family in families:
+            for current_person in current_family:  # Assign ID for every person
+                current_family[current_person] = current_person_id
+                current_person_id += 1
         with open("./ids.json", "w") as file:
             file.write(json.dumps(str(families)))
             print("Wrote user IDs to file")
 
-
-load_mapping()
 
 def load_shuffling():
     global shuffled_ids
@@ -101,44 +97,43 @@ def load_shuffling():
         for key in shuffled_ids_tmp:  # Need to fix json not storing integers
             shuffled_ids[int(key)] = shuffled_ids_tmp[key]
         print("Loaded shuffle from file")
-    except:
+    except Exception:
         print("No shuffle exists! Generate one!")
 
 
-load_shuffling()
-
-person_colors = {}
-for family_id, family in enumerate(families):
-    for person, person_id in family.items():
-        person_colors[person_id] = chistmasy_colors[family_id]
+def load_colors():
+    global person_colors
+    for family_id, family in enumerate(families):
+        for person, person_id in family.items():
+            person_colors[person_id] = chistmasy_colors[family_id]
 
 
 def getpersonid(name):
-    for family in families:
-        for person in family:
-            if person.lower() == name.lower():
-                return family[person]
+    for current_family in families:
+        for current_person in current_family:
+            if current_person.lower() == name.lower():
+                return current_family[current_person]
 
 
 def getfamilyid(passed_person_id):
-    person_id = int(passed_person_id)
-    for family_id, family in enumerate(families):
-        for person in family:
+    searched_person_id = int(passed_person_id)
+    for current_family_id, current_family in enumerate(families):
+        for current_person in current_family:
             # print(person, family[person], passed_person_id)
-            if family[person] == person_id:
+            if current_family[current_person] == searched_person_id:
                 # print(person_id, family[person])
                 # print("Found person with this "+str(passed_person_id)+" person_id")
-                return family_id
+                return current_family_id
 
 
 def getpersonname(passed_person_id):
-    person_id = int(passed_person_id)
-    for family in families:
-        for person in family:
+    current_person_id = int(passed_person_id)
+    for current_family in families:
+        for current_person in current_family:
             # print(person, family[person], passed_person_id)
-            if family[person] == person_id:
+            if current_family[current_person] == current_person_id:
                 # print("Found person with this "+str(passed_person_id)+" person_id")
-                return person
+                return current_person
 
 
 def gettargetname(passed_person_id):
@@ -171,16 +166,16 @@ def shuffle():
 def notes():
     username = request.authorization.username
     useridno = str(getpersonid(username))
-    notes = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
+    notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
     try:
         with open("./notes/" + useridno) as file:
-            notes = json.load(file)
+            notes_from_file = json.load(file)
     except Exception as e:
         print(e)
 
-    if len(notes) <= 0:
-        notes = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
-    return render_template("notes.html", list=notes)
+    if len(notes_from_file) <= 0:
+        notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
+    return render_template("notes.html", list=notes_from_file)
 
 
 @app.route("/createnote", methods=["GET"])
@@ -228,8 +223,8 @@ def editnote():
     currentnotes = []
     print("Trying to remove a note:", request.args["id"])
     try:
-        int(request.args["id"])
-    except:
+        int(request.args["id"])  # Just check if the id passed can be converted to an integer
+    except Exception:
         return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
 
     try:
@@ -283,7 +278,7 @@ def deletenote():
 
     try:
         currentnotes.pop(int(request.args["id"]))
-    except:
+    except Exception:
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid")
 
     with open("./notes/" + useridno, "w") as file:
@@ -306,10 +301,10 @@ def dumpinfo():
     return render_template("error.html", message=str([str(shuffled_names), str(families)]))
 
 
-def check_if_admin(request):
-    requester = request.authorization.username.lower()
+def check_if_admin(passed_request):
+    requester = passed_request.authorization.username.lower()
     if requester != "admin" and requester != "taavi":
-        return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
+        return render_template("error.html", message="Pls no hax " + passed_request.authorization.username + "!!")
     else:
         return None
 
@@ -325,28 +320,30 @@ def regraph():
     if check is not None:
         return check
 
-    families_list_copy = copy.deepcopy(families)
-
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
-    for index, family in enumerate(families_give_copy):
+    for family_index, family in enumerate(families_give_copy):
         for person in family:
-            families_give_copy[index][person] = True
+            families_give_copy[family_index][person] = True
 
     families_take_copy = copy.deepcopy(families)  # Does the person need to take a gift
-    for index, family in enumerate(families_take_copy):
+    for family_index, family in enumerate(families_take_copy):
         for person in family:
-            families_take_copy[index][person] = True
+            families_take_copy[family_index][person] = True
 
     families_shuf_nam = {}
     families_shuf_ids = {}
     #    print("Starting finding matches")
     """""
+    # This comment block contains self-written algorithm that isn't as robust as the library's solution
+    # Thus this is not used for now
+    
     for index, family in enumerate(families_list_copy):  # For each family among every family
         for person in family:  # For each person in given family
             if families_give_copy[index][person] == True:  # If person needs to gift
                 #                print("Looking for a match for:", person, getpersonid(person))
                 familynumbers = list(range(0, index))
-                familynumbers.extend(range(index + 1, len(members_to_families) - 1))
+                familynumbers.extend(range(index + 1, len(family) - 1))
+                
                 random.shuffle(familynumbers)
                 for number in familynumbers:
                     receiving_family_index = number
@@ -356,14 +353,15 @@ def regraph():
                     for receiving_person in receiving_family:  # For each person in other family
                         if families_take_copy[receiving_family_index][receiving_person] == True and \
                                 families_give_copy[index][person] == True:  # If person needs to receive
-                            families_take_copy[receiving_family_index][
-                                receiving_person] = False  # ; print("Receiving:", receiving_family_index, receiving_person)
+                            families_take_copy[receiving_family_index][receiving_person] = False  
+                            #print("Receiving:", receiving_family_index, receiving_person)
                             families_give_copy[index][person] = False  # ; print("Giving:", index, person)
                             families_shuf_nam[person] = receiving_person
                             families_shuf_ids[getpersonid(person)] = getpersonid(receiving_person)
                             #                             print("Breaking")
                             break
     """""
+
     members_to_families = {}
     for family_id, family in enumerate(families):
         for person, person_id in family.items():
@@ -371,13 +369,16 @@ def regraph():
 
     families_to_members = {}
     for family_id, family in enumerate(families):
+        families_to_members[family_id] = set()
         for person, person_id in family.items():
-            families_to_members[family_id] = person_id
+            currentset = families_to_members[family_id]
+            currentset.update([person_id])
 
     last_connections = secretsanta.ConnectionGraph.ConnectionGraph(members_to_families, families_to_members)
     # connections.add(source, target, year)
     current_year = datetime.datetime.now().year
     print(current_year, "is the year of Linux Desktop")
+
     santa = secretsanta.secretsanta.SecretSanta(families_to_members, members_to_families, last_connections)
     new_connections = santa.generate_connections(current_year)
 
@@ -394,10 +395,9 @@ def regraph():
     shuffled_ids = copy.deepcopy(families_shuf_ids)
 
     for key, value in shuffled_ids.items():
-        shuffled_ids_str[key] = value
-        print(shuffled_names)
-        print(shuffled_ids)
-    return None
+        shuffled_ids_str[str(key)] = str(value)
+    #    print(shuffled_names)
+    #    print(shuffled_ids)
 
     with open("./graph.json", "w") as file:
         file.write(json.dumps([shuffled_names, shuffled_ids_str]))
@@ -405,15 +405,15 @@ def regraph():
 
     # graph=nx.Graph(k=2)
     #    print(shuffled_ids)
-    graph = netx.DiGraph(iterations=100, scale=2)
-    graph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
+    digraph = netx.DiGraph(iterations=10000, scale=2)
+    digraph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
     # for number in range(0, 10):
     #    graph.remove_node(number)
     #    print(shuffled_ids)
     for source, destination in copy.deepcopy(shuffled_ids).items():
         #        print("Source:", source, ", side:", destination)
-        graph.add_edges_from([(source, destination)])
-    save_graph(graph, "./static/graph.png")
+        digraph.add_edges_from([(source, destination)])
+    save_graph(digraph, "./static/graph.png")
     #    print(shuffled_ids)
     return render_template("success.html", action="Genereeritud")
 
@@ -444,16 +444,16 @@ def rerendernamegraph():
     if check is not None:
         return check
     #    print(shuffled_ids)
-    graph = netx.DiGraph(iterations=100000000, scale=2)
-    
-    for person_id in copy.deepcopy(shuffled_ids).keys():
-        graph.add_node(person_id)
+    digraph = netx.DiGraph(iterations=100000000, scale=2)
+
+    for shuffled_ids_id in copy.deepcopy(shuffled_ids).keys():
+        digraph.add_node(shuffled_ids_id)
         # graph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
         # print(shuffled_ids)
     for source, destination in copy.deepcopy(shuffled_ids).items():
         #        print(source, destination)
-        graph.add_edges_from([(source, destination)])
-    save_graph(graph, "./static/graph.png", colored=True)
+        digraph.add_edges_from([(source, destination)])
+    save_graph(digraph, "./static/graph.png", colored=True)
 
     return render_template("success.html", action="Genereeritud")
 
@@ -483,8 +483,11 @@ def save_graph(passed_graph, file_name, colored=False):
         netx.draw_networkx_nodes(passed_graph, pos, node_size=1500, node_color=chistmasy_colors[0])
 
     netx.draw_networkx_edges(passed_graph, pos)
-    netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
 
+    if colored:
+        netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
+    else:
+        netx.draw_networkx_labels(passed_graph, pos)
     cut = 0
     xmax = 1.1 + cut * max(xx for xx, yy in pos.values())
     ymax = 1.1 + cut * max(yy for xx, yy in pos.values())
@@ -511,7 +514,7 @@ def giftingto():
         value = int(useridno)
         if value < 0:
             raise Exception
-    except:
+    except Exception:
         return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
 
     currentnotes = ["Praegu on siin ainult veel tühjus"]
@@ -521,10 +524,11 @@ def giftingto():
             currentnotes = json.load(file)
     except Exception as e:
         print(e)
-    print(useridno, getpersonname(useridno))
+
+    # print(useridno, getpersonname(useridno))
     try:
         return render_template("show_notes.html", notes=currentnotes, target=names_proper[getpersonname(useridno)])
-    except:
+    except Exception:
         return render_template("show_notes.html", notes=currentnotes, target=getpersonname(useridno))
 
 
@@ -534,7 +538,7 @@ def login():
         try:
             print("Now", request.authorization.username.lower(), "has a header.")
             return render_template("success.html", action="Sisse logitud")
-        except:
+        except Exception:
             return Response(
                 'This setup is in DEBUG MODE!\n'
                 'This page only exists to give you a random cookie', 401,
@@ -544,6 +548,11 @@ def login():
 
 
 if __name__ == "__main__":
+    load_forms()
+    load_mapping()
+    load_shuffling()
+    load_colors()
+
     if debug:
         print("Starting in debug!!!")
         app.run(debug=True, use_evalex=False, host="192.168.0.100", port=5000)

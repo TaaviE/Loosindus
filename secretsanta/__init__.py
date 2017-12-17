@@ -1,3 +1,3 @@
-from secretsanta import secretsanta
-from secretsanta import ConnectionGraph
-from secretsanta import Connection
+import secretsanta.Connection as Connection
+import secretsanta.ConnectionGraph as ConnectionGraph
+import secretsanta.secretsanta as secretsanta

@@ -1,17 +1,16 @@
-import random
 import collections
+import random
 
 
 class SecretSanta:
-    def __init__(self, families, members, old_connections):
-        self.families = families
-        self.members = members
+    def __init__(self, families_to_members, members_to_families, old_connections):
+        self.members_to_families = members_to_families
+        self.families_to_members = families_to_members
         self.oldConnections = old_connections
 
     def connection_is_valid(self, conn, connections):
-
-        source_fam = self.families[conn.source]
-        target_fam = self.families[conn.target]
+        source_fam = self.members_to_families[conn.source]
+        target_fam = self.members_to_families[conn.target]
 
         return (source_fam != target_fam
                 and not self.oldConnections.has(
@@ -69,8 +68,8 @@ class SecretSanta:
 
     def generate_connections(self, year):
         connections = set()
-
-        members = list(self.families.keys())
+        members_keys = self.members_to_families.keys()
+        members = list(members_keys)
         random.shuffle(members)
         source_queue = collections.deque(members)
         random.shuffle(members)

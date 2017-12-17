@@ -1,9 +1,20 @@
-import secretsanta.secretsanta
+import secretsanta.Connection as SantaConnection
+
 
 class ConnectionGraph:
-    def __init__(self, families, members):
-        self.members_to_families = families
-        self.families_to_members = members
+    def __init__(self, members_to_families, families_to_members):
+        # Sanity check
+        if len(members_to_families) > 0:
+            if len(families_to_members) > 0:
+                if isinstance(type(families_to_members[0]), type(set())):
+                    raise Exception("Mapping from families to members does not contain sets")
+            else:
+                raise Exception("Mapping from families to members size is 0")
+        else:
+            raise Exception("Mapping from members to families size is 0")
+
+        self.members_to_families = members_to_families
+        self.families_to_members = families_to_members
         self.vertices = {}
 
     def __repr__(self):
@@ -31,7 +42,6 @@ class ConnectionGraph:
                 and year in self.vertices[source][target])
 
     def make_weighted_conn(self, source, target, year):
-
         weight = 0
         source_family = self.members_to_families[source]
         target_family = self.members_to_families[target]
@@ -46,4 +56,4 @@ class ConnectionGraph:
                 if vertice in self.members_to_families and source_family == self.members_to_families[vertice]:
                     weight += len(self.vertices[target])
 
-        return secretsanta.Connection.Connection(source, target, year, weight)
+        return SantaConnection.Connection(source, target, year, weight)
