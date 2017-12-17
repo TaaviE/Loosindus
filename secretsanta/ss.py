@@ -14,26 +14,25 @@ CONN_YEAR_COL = 2
 
 def load_family_members(csv_path):
     """
-    Returns families, a map of members to their
-    associated families, and members, a map of
-    families to a set of its members.
+    Returns families_members, a map of families_to_members to their
+    associated families_members, and families_to_members, a map of
+    families_members to a set of its families_to_members.
     """
     with open(csv_path, 'r') as file:
-
-        families = {}
-        members = {}
+        families_to_members = {}
+        members_to_families = {}
 
         for line in file:
             data = line.strip().split(',')
             member = data[FAM_MEMBER_COL]
             family = data[FAM_FAMILY_COL]
 
-            families[member] = family
-            if family not in members:
-                members[family] = set()
-            members[family].add(member)
+            families_to_members[member] = family
+            if family not in members_to_families:
+                members_to_families[family] = set()
+            members_to_families[family].add(member)
 
-    return families, members
+    return families_to_members, members_to_families
 
 
 def load_connections(csv_path, families, members):
@@ -76,20 +75,20 @@ def main():
     new_conn_file = sys.argv[3]
     conn_year = int(sys.argv[4]) if argc == 5 else dt.datetime.now().year
 
-    families, members = load_family_members(family_file)
-    oldConnections = load_connections(old_conn_file,
-                                      families,
-                                      members)
+    families_to_members, members_to_families = load_family_members(family_file)
+    old_connections = load_connections(old_conn_file,
+                                       families_to_members,
+                                       members_to_families)
 
-    santa = ss.SecretSanta(families, members, oldConnections)
+    santa = ss.SecretSanta(families_to_members, members_to_families, old_connections)
 
-    newConnections = santa.generate_connections(conn_year)
+    new_connections = santa.generate_connections(conn_year)
 
-    totalWeight = sum(conn.weight for conn in newConnections)
+    total_weight = sum(conn.weight for conn in new_connections)
     print('Generated new connections for %d with total weight %d'
-          % (conn_year, totalWeight))
+          % (conn_year, total_weight))
 
-    save_connections(new_conn_file, newConnections)
+    save_connections(new_conn_file, new_connections)
 
 
 if __name__ == '__main__':

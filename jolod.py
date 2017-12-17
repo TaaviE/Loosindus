@@ -10,11 +10,12 @@ import networkx as netx
 import random
 import copy
 import secretsanta
+import datetime
 
 app = Flask(__name__)
 debug = True  # If debugging is enabled
 
-# Contains placeholder names and families that are going to 
+# Contains placeholder names (with ids) and members_to_families that are going to
 # be written into a file on first launch, after that it's
 # going to be loaded from there and these lines could be removed
 fam_1 = {"Fam1_1": 0, "Fam1_2": 0, "Fam1_3": 0, "Fam1_4": 0}
@@ -36,7 +37,7 @@ names_proper = {
 shuffled_names = {}  # Will contain the shuffled names and IDs
 shuffled_ids = {}
 
-# Just for assigning families a few colors, if you have more than five families, add more
+# Just for assigning members_to_families a few colors, if you have more than five members_to_families, add more
 chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
 
@@ -72,13 +73,13 @@ def load_mapping():
                 if len(tmp_families[1]) < 1:
                     raise Exception("2nd family 2spooky4me!")
             else:
-                raise Exception("Not enough families!")
+                raise Exception("Not enough members_to_families!")
         families = tmp_families
         print("Loaded user IDs from file")
     except Exception as e:
         print("Loading failed:", e)
         print("Generating user IDs")
-        person_id = 1  # Assign IDs for every person, let admin user keep it's 0
+        person_id = 0  # Assign IDs for every person
         for family in families:
             for person in family:
                 family[person] = person_id
@@ -119,32 +120,32 @@ def getpersonid(name):
                 return family[person]
 
 
-def getfamilyid(person_person_id):
-    person_id = int(person_person_id)
+def getfamilyid(passed_person_id):
+    person_id = int(passed_person_id)
     for family_id, family in enumerate(families):
         for person in family:
-            # print(person, family[person], person_person_id)
+            # print(person, family[person], passed_person_id)
             if family[person] == person_id:
                 # print(person_id, family[person])
-                # print("Found person with this "+str(person_person_id)+" person_id")
+                # print("Found person with this "+str(passed_person_id)+" person_id")
                 return family_id
 
 
-def getpersonname(person_person_id):
-    person_id = int(person_person_id)
+def getpersonname(passed_person_id):
+    person_id = int(passed_person_id)
     for family in families:
         for person in family:
-            # print(person, family[person], person_person_id)
+            # print(person, family[person], passed_person_id)
             if family[person] == person_id:
-                # print("Found person with this "+str(person_person_id)+" person_id")
+                # print("Found person with this "+str(passed_person_id)+" person_id")
                 return person
 
 
-def gettargetname(person_person_id):
+def gettargetname(passed_person_id):
     try:
         print("Found target: ")
-        return shuffled_ids[int(person_person_id)]
-    except:
+        return shuffled_ids[int(passed_person_id)]
+    except Exception:
         print(shuffled_ids)
         print("DID NOT FIND TARGET FOR PERSON!")
         return 0
@@ -317,6 +318,7 @@ def check_if_admin(request):
 def setup():
     return None
 
+
 @app.route("/recreategraph")
 def regraph():
     check = check_if_admin(request)
@@ -338,17 +340,18 @@ def regraph():
     families_shuf_nam = {}
     families_shuf_ids = {}
     #    print("Starting finding matches")
+    """""
     for index, family in enumerate(families_list_copy):  # For each family among every family
         for person in family:  # For each person in given family
             if families_give_copy[index][person] == True:  # If person needs to gift
                 #                print("Looking for a match for:", person, getpersonid(person))
                 familynumbers = list(range(0, index))
-                familynumbers.extend(range(index + 1, len(families) - 1))
+                familynumbers.extend(range(index + 1, len(members_to_families) - 1))
                 random.shuffle(familynumbers)
                 for number in familynumbers:
                     receiving_family_index = number
                     receiving_family = families_take_copy[number]  # For each receiving family
-                    #                    print("Looking at other families:", receiving_family)
+                    #                    print("Looking at other members_to_families:", receiving_family)
 
                     for receiving_person in receiving_family:  # For each person in other family
                         if families_take_copy[receiving_family_index][receiving_person] == True and \
@@ -360,17 +363,42 @@ def regraph():
                             families_shuf_ids[getpersonid(person)] = getpersonid(receiving_person)
                             #                             print("Breaking")
                             break
+    """""
+    members_to_families = {}
+    for family_id, family in enumerate(families):
+        for person, person_id in family.items():
+            members_to_families[person_id] = family_id
+
+    families_to_members = {}
+    for family_id, family in enumerate(families):
+        for person, person_id in family.items():
+            families_to_members[family_id] = person_id
+
+    last_connections = secretsanta.ConnectionGraph.ConnectionGraph(members_to_families, families_to_members)
+    # connections.add(source, target, year)
+    current_year = datetime.datetime.now().year
+    print(current_year, "is the year of Linux Desktop")
+    santa = secretsanta.secretsanta.SecretSanta(families_to_members, members_to_families, last_connections)
+    new_connections = santa.generate_connections(current_year)
+
+    shuffled_ids_str = {}
+    for connection in new_connections:
+        families_shuf_ids[connection.source] = connection.target
+        families_shuf_nam[getpersonname(connection.source)] = getpersonname(connection.target)
+        shuffled_ids_str[str(connection.source)] = str(connection.target)
 
     # Store the values globally
     global shuffled_names
     global shuffled_ids
     shuffled_names = copy.deepcopy(families_shuf_nam)
     shuffled_ids = copy.deepcopy(families_shuf_ids)
-    shuffled_ids_str = {}
+
     for key, value in shuffled_ids.items():
         shuffled_ids_str[key] = value
-    #    print(shuffled_names)
-    #    print(shuffled_ids)
+        print(shuffled_names)
+        print(shuffled_ids)
+    return None
+
     with open("./graph.json", "w") as file:
         file.write(json.dumps([shuffled_names, shuffled_ids_str]))
         print("Wrote shuffle to file")
@@ -454,10 +482,8 @@ def save_graph(passed_graph, file_name, colored=False):
     else:
         netx.draw_networkx_nodes(passed_graph, pos, node_size=1500, node_color=chistmasy_colors[0])
 
-
     netx.draw_networkx_edges(passed_graph, pos)
     netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
-
 
     cut = 0
     xmax = 1.1 + cut * max(xx for xx, yy in pos.values())
