@@ -7,31 +7,29 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-96x96.png') }}" sizes="96x96">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-196x196.png') }}" sizes="196x196">
-    <link rel="apple-touch-icon"                 href="{{ url_for('static', filename='favicon-120x120.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon-120x120.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon-180x180.png') }}">
     <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon-152x152.png') }}">
     <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='favicon-167x167.png') }}">
-    <html lang="en">
-    <title>{{title}} 🎄</title>
+    <html lang="et"></html>
+    <title>🎄 {{ title }} 🎄</title>
 </head>
 
 <body>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    <div class="container">
-        <header>
-            <h4>{{title}}</h4>
-        </header>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class="container">
+    <header>
+        <h4>{{ title }}</h4>
+    </header>
 
-        <div id="content">
-<!--            <a class="button" href="./">Tagasi</a> -->
-            <a class="button" href="./notes">Vaata kõiki (tagasi)</a>
-            <form method="post">
-                 <textarea class="u-full-width" value="{{placeholder}}" name="note">{{placeholder}}</textarea>
-<!--                 <input type="text" name="note" value="{{placeholder}}"></input> -->
-                 <input type="submit" value="Saada"></input>
-            </form>
-        </div>
+    <div id="content">
+        <a class="button" href="./notes">Vaata kõiki (tagasi)</a>
+        <form method="post">
+            <textarea class="u-full-width" value="{{ placeholder }}" name="note">{{ placeholder }}</textarea>
+            <input type="submit" value="Saada"></input>
+        </form>
     </div>
+</div>
 </body>
 </html>
 

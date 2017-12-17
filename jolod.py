@@ -57,7 +57,7 @@ def load_forms():
         print("Loading failed:", e)
         print("Writing names in genitive form to file")
         with open("./genitive.json", "w") as file:
-            file.write(json.dumps(str(names_proper)))
+            file.write(json.dumps(names_proper))
             print("Wrote user names in genitive form to file")
 
 
@@ -83,7 +83,7 @@ def load_mapping():
                 current_family[current_person] = current_person_id
                 current_person_id += 1
         with open("./ids.json", "w") as file:
-            file.write(json.dumps(str(families)))
+            file.write(json.dumps(families))
             print("Wrote user IDs to file")
 
 
@@ -213,7 +213,7 @@ def createnote_add():
 
     with open("./notes/" + useridno, "w") as file:
         file.write(json.dumps(currentnotes))
-    return render_template("success.html", action="Lisatud")
+    return render_template("success.html", action="Lisatud", link="./notes")
 
 
 @app.route("/editnote", methods=["GET"])
@@ -260,7 +260,7 @@ def editnote_edit():
 
     with open("./notes/" + useridno, "w") as file:
         file.write(json.dumps(currentnotes))
-    return render_template("success.html", action="Muudetud")
+    return render_template("success.html", action="Muudetud", link="./notes")
 
 
 @app.route("/removenote")
@@ -284,12 +284,24 @@ def deletenote():
     with open("./notes/" + useridno, "w") as file:
         file.write(json.dumps(currentnotes))
     print("Removed", username, "note with ID", request.args["id"])
-    return render_template("success.html", action="Eemaldatud")
+    return render_template("success.html", action="Eemaldatud", link="./notes")
 
 
 @app.route("/graph")
 def graph():
-    return render_template("graph.html", id=str(getpersonid(request.authorization.username)))
+    return render_template("graph.html",
+                           id="number " + str(getpersonid(request.authorization.username)),
+                           image="graph.png")
+
+
+@app.route("/secretgraph")
+def secretgraph():
+    check = check_if_admin(request)
+    if check is not None:
+        return check
+    return render_template("graph.html",
+                           id=str(request.authorization.username),
+                           image="secretgraph.png")
 
 
 @app.route("/dumpinfo")
@@ -311,7 +323,50 @@ def check_if_admin(passed_request):
 
 @app.route("/setup")
 def setup():
-    return None
+    check = check_if_admin(request)
+    if check is not None:
+        return check
+    return render_template("createfamilies.html")
+
+
+@app.route("/setup", methods=["POST"])
+def setup_post():
+    try:
+        check = check_if_admin(request)
+        if check is not None:
+            return check
+    except Exception:
+        return login()
+
+    input_families = []
+    for family_index, family in enumerate(request.form):
+        input_families.insert(family_index, {})
+        for member in request.form[family].split(","):
+            member = member.strip().capitalize()
+            input_families[family_index][member] = 0
+
+    print("Generating user IDs based on setup input table")
+    current_person_id = 0  # Start from 0
+    for current_family in input_families:
+        for current_person in current_family:  # Assign ID for every person
+            current_family[current_person] = current_person_id
+            current_person_id += 1
+    with open("./ids.json", "w") as file:
+        file.write(json.dumps(input_families))
+        print("Wrote user IDs to file")
+
+    return render_template("success.html", action="Genereeritud", link="./reload")
+
+
+@app.route("/reload")
+def kill():
+    check = check_if_admin(request)
+    if check is not None:
+        return check
+    func = request.environ.get("werkzeug.server.shutdown")
+    if func is None:
+        raise RuntimeError("Not running with the Werkzeug Server")
+    func()
 
 
 @app.route("/recreategraph")
@@ -403,19 +458,17 @@ def regraph():
         file.write(json.dumps([shuffled_names, shuffled_ids_str]))
         print("Wrote shuffle to file")
 
-    # graph=nx.Graph(k=2)
-    #    print(shuffled_ids)
     digraph = netx.DiGraph(iterations=10000, scale=2)
     digraph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
-    # for number in range(0, 10):
-    #    graph.remove_node(number)
-    #    print(shuffled_ids)
+
     for source, destination in copy.deepcopy(shuffled_ids).items():
-        #        print("Source:", source, ", side:", destination)
         digraph.add_edges_from([(source, destination)])
+
     save_graph(digraph, "./static/graph.png")
-    #    print(shuffled_ids)
-    return render_template("success.html", action="Genereeritud")
+    del digraph
+    rerendernamegraph()  # create the graph with names
+
+    return render_template("success.html", action="Genereeritud", link="./notes")
 
 
 @app.route("/rerendergraph")
@@ -425,15 +478,15 @@ def rerender():
     check = check_if_admin(request)
     if check is not None:
         return check
-    #    print(shuffled_ids)
+
     digraph = netx.DiGraph(iterations=100000000, scale=2)
     digraph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
-    #    print(shuffled_ids)
+
     for source, destination in copy.deepcopy(shuffled_ids).items():
-        #        print(source, destination)
         digraph.add_edges_from([(source, destination)])
+
     save_graph(digraph, "./static/graph.png")
-    return render_template("success.html", action="Genereeritud")
+    return render_template("success.html", action="Genereeritud", link="./notes")
 
 
 @app.route("/rerendernamegraph")
@@ -443,26 +496,23 @@ def rerendernamegraph():
     check = check_if_admin(request)
     if check is not None:
         return check
-    #    print(shuffled_ids)
+
     digraph = netx.DiGraph(iterations=100000000, scale=2)
 
     for shuffled_ids_id in copy.deepcopy(shuffled_ids).keys():
         digraph.add_node(shuffled_ids_id)
-        # graph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
-        # print(shuffled_ids)
-    for source, destination in copy.deepcopy(shuffled_ids).items():
-        #        print(source, destination)
-        digraph.add_edges_from([(source, destination)])
-    save_graph(digraph, "./static/graph.png", colored=True)
 
-    return render_template("success.html", action="Genereeritud")
+    for source, destination in copy.deepcopy(shuffled_ids).items():
+        digraph.add_edges_from([(source, destination)])
+
+    save_graph(digraph, "./static/secretgraph.png", colored=True)
+
+    return render_template("success.html", action="Genereeritud", link="./graph")
 
 
 def save_graph(passed_graph, file_name, colored=False):
-    # initialze Figure
-    # print(graph.nodes())
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
-    plotlib.axis('off')
+    plotlib.axis("off")
     fig = plotlib.figure(1)
     pos = netx.circular_layout(passed_graph)
 
@@ -505,12 +555,14 @@ def save_graph(passed_graph, file_name, colored=False):
 @app.route("/giftingto")
 def giftingto():
     check = check_if_admin(request)
-    if check is not None:
+    if check is not None:  # Let's not let everyone read everyone's lists
         if request.args["id"] != str(gettargetname(getpersonid(request.authorization.username.lower()))):
             return check
+
     print("Trying to display notes of:", request.args["id"])
     useridno = request.args["id"]
-    try:
+
+    try:  # Yeah, only valid IDs please
         value = int(useridno)
         if value < 0:
             raise Exception
@@ -525,8 +577,7 @@ def giftingto():
     except Exception as e:
         print(e)
 
-    # print(useridno, getpersonname(useridno))
-    try:
+    try:  # Not the prettiest, but tries to display names in the correct form
         return render_template("show_notes.html", notes=currentnotes, target=names_proper[getpersonname(useridno)])
     except Exception:
         return render_template("show_notes.html", notes=currentnotes, target=getpersonname(useridno))
@@ -536,15 +587,18 @@ def giftingto():
 def login():
     if debug:
         try:
+            check = check_if_admin(request)
+            if check is not None:
+                return check
             print("Now", request.authorization.username.lower(), "has a header.")
-            return render_template("success.html", action="Sisse logitud")
+            return render_template("success.html", action="Sisse logitud", link="./setup")
         except Exception:
             return Response(
                 'This setup is in DEBUG MODE!\n'
                 'This page only exists to give you a random cookie', 401,
                 {'WWW-Authenticate': 'Basic realm="Login Required"'})
     else:
-        render_template("error.html", message="Pls no hax!!")
+        render_template("error.html", message="Pls no try hax!!")
 
 
 if __name__ == "__main__":

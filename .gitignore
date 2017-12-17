@@ -105,6 +105,8 @@ ENV/
 genitive.json
 graph.json
 ids.json
+graph.png
+secretgraph.png
 notes
 __pycache__
 venv

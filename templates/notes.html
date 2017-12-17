@@ -7,45 +7,46 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-96x96.png') }}" sizes="96x96">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-196x196.png') }}" sizes="196x196">
-    <link rel="apple-touch-icon"                 href="{{ url_for('static', filename='favicon-120x120.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon-120x120.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon-180x180.png') }}">
     <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon-152x152.png') }}">
     <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='favicon-167x167.png') }}">
-    <html lang="en">
+    <html lang="et"></html>
     <title>Nimekiri 🎄 </title>
 </head>
 
 <body>
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-    <div class="container">
-        <header>
-             <h1>Nimekiri</h1>
-        </header>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class="container">
+    <header>
+        <h1>Nimekiri</h1>
+    </header>
 
-        <div id="content">
-             <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult jõuluvana 🎄</p>
-             <a class="button button-primary" href="./createnote">Lisa uus</a>
-             <a class="button" href="./">Tagasi</a>
-             <table class="u-full-width">
-                 <thead>
-                     <tr>
-                         <th>Kirjeldus</th>
-                         <th>Kustuta</th>
-                         <th>Muuda</th>
-                     </tr>
-                </thead>
-                <tbody>
-             {% for item in list %}
-                     <tr>
-                         <td>{{ item }}</td>
-                         <td><a class="button" href="./removenote?id={{ loop.index0 }}">Kustuta</a></td> 
-                         <td><a class="button" href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
-                     </tr>
-             {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div id="content">
+        <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
+            jõuluvana 🎄</p>
+        <a class="button button-primary" href="./createnote">Lisa uus</a>
+        <a class="button" href="./">Tagasi</a>
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Kirjeldus</th>
+                <th>Kustuta</th>
+                <th>Muuda</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in list %}
+                <tr>
+                    <td>{{ item }}</td>
+                    <td><a class="button" href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
+                    <td><a class="button" href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 </body>
 </html>
 

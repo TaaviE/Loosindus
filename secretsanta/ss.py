@@ -1,3 +1,5 @@
+# coding=utf-8
+# Small python script to show how the graphing algorith works
 import datetime as dt
 import sys
 
