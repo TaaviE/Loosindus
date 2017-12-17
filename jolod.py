@@ -9,6 +9,7 @@ import matplotlib.pyplot as plotlib
 import networkx as netx
 import random
 import copy
+import secretsanta
 
 app = Flask(__name__)
 debug = True  # If debugging is enabled
@@ -312,6 +313,10 @@ def check_if_admin(request):
         return None
 
 
+@app.route("/setup")
+def setup():
+    return None
+
 @app.route("/recreategraph")
 def regraph():
     check = check_if_admin(request)
@@ -420,12 +425,12 @@ def rerendernamegraph():
     for source, destination in copy.deepcopy(shuffled_ids).items():
         #        print(source, destination)
         graph.add_edges_from([(source, destination)])
-    save_graph(graph, "./static/graph.png")
+    save_graph(graph, "./static/graph.png", colored=True)
 
     return render_template("success.html", action="Genereeritud")
 
 
-def save_graph(passed_graph, file_name):
+def save_graph(passed_graph, file_name, colored=False):
     # initialze Figure
     # print(graph.nodes())
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
@@ -434,14 +439,22 @@ def save_graph(passed_graph, file_name):
     pos = netx.circular_layout(passed_graph)
 
     name_id_lookup_dict = {}  # Let's create a name-id mapping
+
     for name in shuffled_names.keys():
         name_id_lookup_dict[getpersonid(name)] = name
 
+    if colored:
+        for node in passed_graph:
+            if node in person_colors:
+                node_color = person_colors[node]
+            else:
+                node_color = chistmasy_colors[0]
 
-    for node in passed_graph:
-        node_color = person_colors[node]
-        print(node_color)
-        netx.draw_networkx_nodes([node], pos, node_size=1000, node_color=node_color)
+            netx.draw_networkx_nodes([node], pos, node_size=1500, node_color=node_color)
+    else:
+        netx.draw_networkx_nodes(passed_graph, pos, node_size=1500, node_color=chistmasy_colors[0])
+
+
     netx.draw_networkx_edges(passed_graph, pos)
     netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
 
@@ -489,9 +502,19 @@ def giftingto():
         return render_template("show_notes.html", notes=currentnotes, target=getpersonname(useridno))
 
 
-@app.route("/reconfigurefamilies")
-def reconfigurefamilies():
-    return None
+@app.route("/login")
+def login():
+    if debug:
+        try:
+            print("Now", request.authorization.username.lower(), "has a header.")
+            return render_template("success.html", action="Sisse logitud")
+        except:
+            return Response(
+                'This setup is in DEBUG MODE!\n'
+                'This page only exists to give you a random cookie', 401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    else:
+        render_template("error.html", message="Pls no hax!!")
 
 
 if __name__ == "__main__":

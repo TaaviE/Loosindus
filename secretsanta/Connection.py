@@ -1,10 +1,8 @@
-
 class Connection:
-
-    def __init__(self, source, target, year, weight = 0):
+    def __init__(self, source, target, year, weight=0):
         self.source = source
         self.target = target
-        self.year   = year
+        self.year = year
         self.weight = weight
 
     def __str__(self):
@@ -26,4 +24,3 @@ class Connection:
                           self.source,
                           self.year,
                           self.weight)
-

@@ -1,7 +1,7 @@
 import datetime as dt
 import sys
-
-import secretsanta as ss
+import secretsanta.secretsanta as ss
+import secretsanta
 
 # CSV column mappings 
 FAM_MEMBER_COL = 0
@@ -12,13 +12,13 @@ CONN_TARGET_COL = 1
 CONN_YEAR_COL = 2
 
 
-def loadFamilyMembers(csvPath):
-    '''
+def load_family_members(csv_path):
+    """
     Returns families, a map of members to their
-    associated families, and members, a map of 
+    associated families, and members, a map of
     families to a set of its members.
-    '''
-    with open(csvPath, 'r') as file:
+    """
+    with open(csv_path, 'r') as file:
 
         families = {}
         members = {}
@@ -36,10 +36,9 @@ def loadFamilyMembers(csvPath):
     return families, members
 
 
-def loadConnections(csvPath, families, members):
-    with open(csvPath, 'r') as file:
-        connections = ss.ConnectionGraph(families,
-                                         members)
+def load_connections(csv_path, families, members):
+    with open(csv_path, 'r') as file:
+        connections = secretsanta.ConnectionGraph.ConnectionGraph(families, members)
 
         for line in file:
             data = line.strip().split(',')
@@ -52,8 +51,8 @@ def loadConnections(csvPath, families, members):
     return connections
 
 
-def saveConnections(csvPath, connections):
-    with open(csvPath, 'w') as file:
+def save_connections(csv_path, connections):
+    with open(csv_path, 'w') as file:
         file.write('giver,receiver,year,weight\n')
 
         for conn in connections:
@@ -68,29 +67,29 @@ def saveConnections(csvPath, connections):
 def main():
     argc = len(sys.argv)
     if argc != 4 and argc != 5:
-        print('usage: ss.py <familyFile> <oldConnFile> ' +
-              '<newConnFile> [<connYear>]')
+        print('usage: ss.py <familyFile> <old_conn_file> ' +
+              '<new_conn_file> [<conn_year>]')
         exit(1)
 
-    familyFile = sys.argv[1]
-    oldConnFile = sys.argv[2]
-    newConnFile = sys.argv[3]
-    connYear = int(sys.argv[4]) if argc == 5 else dt.datetime.now().year
+    family_file = sys.argv[1]
+    old_conn_file = sys.argv[2]
+    new_conn_file = sys.argv[3]
+    conn_year = int(sys.argv[4]) if argc == 5 else dt.datetime.now().year
 
-    families, members = loadFamilyMembers(familyFile)
-    oldConnections = loadConnections(oldConnFile,
-                                     families,
-                                     members)
+    families, members = load_family_members(family_file)
+    oldConnections = load_connections(old_conn_file,
+                                      families,
+                                      members)
 
     santa = ss.SecretSanta(families, members, oldConnections)
 
-    newConnections = santa.genConnections(connYear)
+    newConnections = santa.generate_connections(conn_year)
 
     totalWeight = sum(conn.weight for conn in newConnections)
     print('Generated new connections for %d with total weight %d'
-          % (connYear, totalWeight))
+          % (conn_year, totalWeight))
 
-    saveConnections(newConnFile, newConnections)
+    save_connections(new_conn_file, newConnections)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,4 @@
-from connection import Connection
-
 class ConnectionGraph:
-
     def __init__(self, families, members):
         self.families = families
         self.members = members
@@ -12,25 +9,25 @@ class ConnectionGraph:
 
     def add(self, source, target, year):
         if source not in self.vertices:
-            self.vertices[source] = { target: set([year]) }
+            self.vertices[source] = {target: {year}}
         elif target not in self.vertices[source]:
-            self.vertices[source][target] = set([year])
+            self.vertices[source][target] = {year}
         else:
             self.vertices[source][target].add(year)
-        
+
     def has(self, source, target):
         return (source in self.vertices
-           and  target in self.vertices[source])
+                and target in self.vertices[source])
 
-    def hasInYear(self, source, target, year):
+    def has_in_year(self, source, target, year):
         return (source in self.vertices
-           and  target in self.vertices[source]
-           and  year   in self.vertices[source][target])
+                and target in self.vertices[source]
+                and year in self.vertices[source][target])
 
-    def makeWeightedConn(self, source, target, year):
+    def make_weighted_conn(self, source, target, year):
 
         weight = 0
-        sourceFam = self.families[source]        
+        sourceFam = self.families[source]
         targetFam = self.families[target]
 
         if source in self.vertices:
