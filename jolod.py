@@ -12,28 +12,38 @@ import networkx as netx
 import copy
 import secretsanta
 import datetime
+from flask_sqlalchemy import SQLAlchemy
+from models import notes_model
+from config import Config
 
 app = Flask(__name__)
-debug = True  # Enable debugging
+app.config.from_object("config.DevelopmentConfig")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db = SQLAlchemy(app)
+debug = Config.DEBUG
 
+# These lines that are commented out are one way to initially define the values you wish to use
+#
 # Contains placeholder names (with ids) and members_to_families that are going to
 # be written into a file on first launch, after that it's
 # going to be loaded from there and these lines could be removed
-fam_1 = {"Fam1_1": 0, "Fam1_2": 0, "Fam1_3": 0, "Fam1_4": 0}
-fam_2 = {"Fam2_1": 0, "Fam2_2": 0, "Fam2_3": 0}
-fam_3 = {"Fam3_1": 0, "Fam3_2": 0}
-fam_4 = {"Fam4_1": 0, "Fam4_2": 0, "Fam4_3": 0, "Fam4_4": 0}
-fam_5 = {"Fam5_1": 0, "Fam5_2": 0}
+# fam_1 = {"Fam1_1": 0, "Fam1_2": 0, "Fam1_3": 0, "Fam1_4": 0}
+# fam_2 = {"Fam2_1": 0, "Fam2_2": 0, "Fam2_3": 0}
+# fam_3 = {"Fam3_1": 0, "Fam3_2": 0}
+# fam_4 = {"Fam4_1": 0, "Fam4_2": 0, "Fam4_3": 0, "Fam4_4": 0}
+# fam_5 = {"Fam5_1": 0, "Fam5_2": 0}
 
-families = [fam_1, fam_2, fam_3, fam_4, fam_5]
+# families = [fam_1, fam_2, fam_3, fam_4, fam_5]
 
-names_proper = {
-    # As the software displays messages in estonian it'd be
-    # better if names had an genitive form to look up, feel free
-    # to remove this list, it is saved into a file on first launch
-    # and then loaded from there on future launches
-    "Fam1_1": "Fam_1_1i"
-}
+# names_proper = {
+#
+# As the software displays messages in estonian it'd be
+# better if names had an genitive form to look up, feel free
+# to remove this list, it is saved into a file on first launch
+# and then loaded from there on future launches
+#
+#    "Fam1_1": "Fam_1_1i"
+# }
 
 shuffled_names = {}  # Will contain the shuffled names and IDs
 shuffled_ids = {}
@@ -165,11 +175,14 @@ def shuffle():
 @app.route("/notes")
 def notes():
     username = request.authorization.username
-    useridno = str(getpersonid(username))
+    useridno = int(getpersonid(username))
     notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
     try:
-        with open("./notes/" + useridno) as file:
-            notes_from_file = json.load(file)
+        db_notes = notes_model.Notes.query.get(useridno)
+        #    with open("./notes/" + useridno) as file:
+        #        notes_from_file = json.load(file)
+        if db_notes is not None:  # Don't want to display None
+            notes_from_file = db_notes.notes
     except Exception as e:
         print(e)
 
@@ -201,8 +214,11 @@ def createnote_add():
     print("Trying to add a note:", addednote)
     try:
         print("Opening file", useridno)
-        with open("./notes/" + useridno, "r") as file:
-            currentnotes = json.load(file)
+        #    with open("./notes/" + useridno, "r") as file:
+        #        currentnotes = json.load(file)
+        db_notes = notes_model.Notes.query.get(useridno)
+        if db_notes is not None:  # Don't want to display None
+            currentnotes = db_notes.notes
     except Exception as e:
         print(e)
     if len(currentnotes) == 999:
@@ -211,8 +227,14 @@ def createnote_add():
 
     currentnotes.append(addednote)
 
-    with open("./notes/" + useridno, "w") as file:
-        file.write(json.dumps(currentnotes))
+    #    with open("./notes/" + useridno, "w") as file:
+    #        file.write(json.dumps(currentnotes))
+    db_entry_notes = notes_model.Notes(
+        user_id=useridno,
+        notes=currentnotes,
+    )
+    db.session.add(db_entry_notes)
+    db.session.commit()
     return render_template("success.html", action="Lisatud", link="./notes")
 
 
@@ -229,8 +251,11 @@ def editnote():
 
     try:
         print("Opening file", useridno)
-        with open("./notes/" + useridno, "r") as file:
-            currentnotes = json.load(file)
+        #        with open("./notes/" + useridno, "r") as file:
+        #            currentnotes = json.load(file)
+        db_notes = notes_model.Notes.query.get(useridno)
+        if db_notes is not None:  # Don't want to display None
+            currentnotes = db_notes.notes
     except Exception as e:
         print(e)
 
@@ -251,15 +276,24 @@ def editnote_edit():
     print("Trying to add a note:", addednote)
     try:
         print("Opening file", useridno)
-        with open("./notes/" + useridno, "r") as file:
-            currentnotes = json.load(file)
+        #        with open("./notes/" + useridno, "r") as file:
+        #            currentnotes = json.load(file)
+        db_notes = notes_model.Notes.query.get(useridno)
+        if db_notes is not None:  # Don't want to display None
+            currentnotes = db_notes.notes
     except Exception as e:
         print(e)
 
     currentnotes[int(request.args["id"])] = addednote
 
-    with open("./notes/" + useridno, "w") as file:
-        file.write(json.dumps(currentnotes))
+    #    with open("./notes/" + useridno, "w") as file:
+    #        file.write(json.dumps(currentnotes))
+    db_entry_notes = notes_model.Notes(
+        user_id=useridno,
+        notes=currentnotes,
+    )
+    db.session.add(db_entry_notes)
+    db.session.commit()
     return render_template("success.html", action="Muudetud", link="./notes")
 
 
@@ -271,8 +305,11 @@ def deletenote():
     print("Trying to remove a note:", request.args["id"])
     try:
         print("Opening file", useridno)
-        with open("./notes/" + useridno, "r") as file:
-            currentnotes = json.load(file)
+        #        with open("./notes/" + useridno, "r") as file:
+        #            currentnotes = json.load(file)
+        db_notes = notes_model.Notes.query.get(useridno)
+        if db_notes is not None:  # Don't want to display None
+            currentnotes = db_notes.notes
     except Exception as e:
         print(e)
 
@@ -281,8 +318,14 @@ def deletenote():
     except Exception:
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid")
 
-    with open("./notes/" + useridno, "w") as file:
-        file.write(json.dumps(currentnotes))
+    #    with open("./notes/" + useridno, "w") as file:
+    #        file.write(json.dumps(currentnotes))
+    db_entry_notes = notes_model.Notes(
+        user_id=useridno,
+        notes=currentnotes,
+    )
+    db.session.add(db_entry_notes)
+    db.session.commit()
     print("Removed", username, "note with ID", request.args["id"])
     return render_template("success.html", action="Eemaldatud", link="./notes")
 
@@ -355,10 +398,10 @@ def setup_post():
         file.write(json.dumps(input_families))
         print("Wrote user IDs to file")
 
-    return render_template("success.html", action="Genereeritud", link="./reload")
+    return render_template("success.html", action="Genereeritud", link="./kill")
 
 
-@app.route("/reload")
+@app.route("/kill")
 def kill():
     check = check_if_admin(request)
     if check is not None:
@@ -389,8 +432,8 @@ def regraph():
     families_shuf_ids = {}
     #    print("Starting finding matches")
     """""
-    # This comment block contains self-written algorithm that isn't as robust as the library's solution
-    # Thus this is not used for now
+    # This comment block contains self-written algorithm that isn't as robust 
+    # as the library's solution thus this is not used for now
     
     for index, family in enumerate(families_list_copy):  # For each family among every family
         for person in family:  # For each person in given family
@@ -497,7 +540,7 @@ def rerendernamegraph():
     if check is not None:
         return check
 
-    digraph = netx.DiGraph(iterations=100000000, scale=2)
+    digraph = netx.DiGraph(iterations=100000000, scale=2)  # This is probably a horrible idea with more nodes
 
     for shuffled_ids_id in copy.deepcopy(shuffled_ids).keys():
         digraph.add_node(shuffled_ids_id)
@@ -512,7 +555,7 @@ def rerendernamegraph():
 
 def save_graph(passed_graph, file_name, colored=False):
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
-    plotlib.axis("off")
+    plotlib.axis("off")  # Turn off the axis display
     fig = plotlib.figure(1)
     pos = netx.circular_layout(passed_graph)
 
@@ -521,7 +564,7 @@ def save_graph(passed_graph, file_name, colored=False):
     for name in shuffled_names.keys():
         name_id_lookup_dict[getpersonid(name)] = name
 
-    if colored:
+    if colored:  # Try to properly color the nodes
         for node in passed_graph:
             if node in person_colors:
                 node_color = person_colors[node]
