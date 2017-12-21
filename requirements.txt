@@ -2,6 +2,7 @@ psycopg2
 matplotlib
 Flask
 Flask-SqlAlchemy
+sqlalchemy
 Flask-Security
 Flask-Script
 networkx

@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # coding=utf-8
 # author=Taavi Eomäe
-import json
-
 import matplotlib as pylab
+
+pylab.use("Agg")  # Because we won't have a GUI on the server itself
 
 #####
 # TODO:
@@ -11,22 +11,58 @@ import matplotlib as pylab
 # * Add support for multiple shufflings in one instance
 ####
 
-pylab.use("Agg")  # Because we won't have a GUI on the server itself
-from flask import Flask, request, render_template, Response
+# Flask
+from flask import Flask, request, render_template, Response, session
+from flask_security import Security, login_required, SQLAlchemyUserDatastore
+from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
+from config import Config
+# Graphing
 import matplotlib.pyplot as plotlib
 import networkx as netx
-import copy
 import secretsanta
-import datetime
-from flask_sqlalchemy import SQLAlchemy
-from models import notes_model
-from config import Config
 
+# Utilities
+import copy
+import datetime
+import json
+
+# App related config
 app = Flask(__name__)
 app.config.from_object("config.DevelopmentConfig")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+mail = Mail(app)
 debug = Config.DEBUG
+
+# Setup Flask-Security
+userroles = db.Table(
+    "roles_users",
+    db.Column("id", db.Integer(), db.ForeignKey("user.id")),
+    db.Column("role_id", db.Integer(), db.ForeignKey("role.id"))
+)
+
+from models import users_model, notes_model
+
+user_datastore = SQLAlchemyUserDatastore(db,
+                                         users_model.User,
+                                         users_model.Role)
+security = Security(app, user_datastore)
+user_datastore.create_user(email="avamander@gmail.com", password="test1234")
+
+
+# Views
+@app.route("/test")
+@login_required
+def test():
+    return render_template("error.html", error="Here you go!")
+
+
+@app.route("/register", methods=['GET'])
+def register():
+    return render_template("security/register_user.html")
+
 
 # These lines that are commented out are one way to initially define the values you wish to use
 #
@@ -50,6 +86,7 @@ debug = Config.DEBUG
 #
 #    "Fam1_1": "Fam_1_1i"
 # }
+
 
 shuffled_names = {}  # Will contain the shuffled names and IDs
 shuffled_ids = {}
@@ -163,15 +200,21 @@ def gettargetname(passed_person_id):
 
 
 @app.route("/")
+@login_required
 def index():
-    username = request.authorization.username
+    #    username = request.authorization.username
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     return render_template("index.html", auth=username)
 
 
 @app.route("/shuffle")
+@login_required
 def shuffle():
-    print(request.authorization.username)
-    gifter = getpersonid(request.authorization.username)
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
+    print(username)
+    gifter = getpersonid(username)
     print(gifter)
     giftee = gettargetname(gifter)
     print(giftee)
@@ -179,12 +222,13 @@ def shuffle():
 
 
 @app.route("/notes")
+@login_required
 def notes():
-    username = request.authorization.username
-    useridno = int(getpersonid(username))
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
     try:
-        db_notes = notes_model.Notes.query.get(useridno)
+        db_notes = notes_model.Notes.query.get(user_id)
         #    with open("./notes/" + useridno) as file:
         #        notes_from_file = json.load(file)
         if db_notes is not None:  # Don't want to display None
@@ -198,45 +242,47 @@ def notes():
 
 
 @app.route("/createnote", methods=["GET"])
+@login_required
 def createnote():
     return render_template("createnote.html", title="Lisa uus")
 
 
 @app.route("/createnote", methods=["POST"])
+@login_required
 def createnote_add():
     print("Got a post request to add a note")
-    username = request.authorization.username
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     print("Found user:", username)
-    useridno = str(getpersonid(username))
-    print("Found user id:", useridno)
+    print("Found user id:", user_id)
     currentnotes = []
     addednote = request.form["note"]
 
     if len(addednote) > 1000:
-        return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
+        return render_template("error.html", message="Pls no hax " + username + "!!")
     elif len(addednote) <= 0:
         return render_template("error.html",
-                               message="Jõuluvana tühjust tuua ei saa, " + request.authorization.username + "!")
+                               message="Jõuluvana tühjust tuua ei saa, " + username + "!")
     print("Trying to add a note:", addednote)
     try:
-        print("Opening file", useridno)
+        print("Opening file", user_id)
         #    with open("./notes/" + useridno, "r") as file:
         #        currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(useridno)
+        db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
     except Exception as e:
         print(e)
     if len(currentnotes) == 999:
         return render_template("error.html",
-                               message="Soovinimekiri muutuks liiga pikaks, " + request.authorization.username + "")
+                               message="Soovinimekiri muutuks liiga pikaks, " + username + "")
 
     currentnotes.append(addednote)
 
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
     db_entry_notes = notes_model.Notes(
-        user_id=useridno,
+        user_id=user_id,
         notes=currentnotes,
     )
     db.session.add(db_entry_notes)
@@ -245,21 +291,22 @@ def createnote_add():
 
 
 @app.route("/editnote", methods=["GET"])
+@login_required
 def editnote():
-    username = request.authorization.username
-    useridno = str(getpersonid(username))
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     currentnotes = []
     print("Trying to remove a note:", request.args["id"])
     try:
         int(request.args["id"])  # Just check if the id passed can be converted to an integer
     except Exception:
-        return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
+        return render_template("error.html", message="Pls no hax " + username + "!!")
 
     try:
-        print("Opening file", useridno)
+        print("Opening file", user_id)
         #        with open("./notes/" + useridno, "r") as file:
         #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(useridno)
+        db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
     except Exception as e:
@@ -271,20 +318,20 @@ def editnote():
 
 
 @app.route("/editnote", methods=["POST"])
+@login_required
 def editnote_edit():
     print("Got a post request to edit a note")
-    username = request.authorization.username
-    print("Found user:", username)
-    useridno = str(getpersonid(username))
-    print("Found user id:", useridno)
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
+    print("Found user id:", user_id)
     currentnotes = []
     addednote = request.form["note"]
     print("Trying to add a note:", addednote)
     try:
-        print("Opening file", useridno)
-        #        with open("./notes/" + useridno, "r") as file:
+        print("Opening file", user_id)
+        #        with open("./notes/" + user_id, "r") as file:
         #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(useridno)
+        db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
     except Exception as e:
@@ -292,10 +339,10 @@ def editnote_edit():
 
     currentnotes[int(request.args["id"])] = addednote
 
-    #    with open("./notes/" + useridno, "w") as file:
+    #    with open("./notes/" + user_id, "w") as file:
     #        file.write(json.dumps(currentnotes))
     db_entry_notes = notes_model.Notes(
-        user_id=useridno,
+        user_id=user_id,
         notes=currentnotes,
     )
     db.session.add(db_entry_notes)
@@ -304,16 +351,17 @@ def editnote_edit():
 
 
 @app.route("/removenote")
+@login_required
 def deletenote():
-    username = request.authorization.username
-    useridno = str(getpersonid(username))
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     currentnotes = []
     print("Trying to remove a note:", request.args["id"])
     try:
-        print("Opening file", useridno)
+        print("Opening file", user_id)
         #        with open("./notes/" + useridno, "r") as file:
         #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(useridno)
+        db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
     except Exception as e:
@@ -327,7 +375,7 @@ def deletenote():
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
     db_entry_notes = notes_model.Notes(
-        user_id=useridno,
+        user_id=user_id,
         notes=currentnotes,
     )
     db.session.add(db_entry_notes)
@@ -337,23 +385,26 @@ def deletenote():
 
 
 @app.route("/graph")
+@login_required
 def graph():
     return render_template("graph.html",
-                           id="number " + str(getpersonid(request.authorization.username)),
+                           id="number " + str(session["user_id"]),
                            image="graph.png")
 
 
 @app.route("/secretgraph")
+@login_required
 def secretgraph():
     check = check_if_admin(request)
     if check is not None:
         return check
     return render_template("graph.html",
-                           id=str(request.authorization.username),
+                           id=str(getpersonname(session["user_id"])),
                            image="secretgraph.png")
 
 
 @app.route("/dumpinfo")
+@login_required
 def dumpinfo():
     check = check_if_admin(request)
     if check is not None:
@@ -363,14 +414,16 @@ def dumpinfo():
 
 
 def check_if_admin(passed_request):
-    requester = passed_request.authorization.username.lower()
+    user_id = session["user_id"]
+    requester = getpersonname(user_id)
     if requester != "admin" and requester != "taavi":
-        return render_template("error.html", message="Pls no hax " + passed_request.authorization.username + "!!")
+        return render_template("error.html", message="Pls no hax " + requester + "!!")
     else:
         return None
 
 
 @app.route("/setup")
+@login_required
 def setup():
     check = check_if_admin(request)
     if check is not None:
@@ -379,6 +432,7 @@ def setup():
 
 
 @app.route("/setup", methods=["POST"])
+@login_required
 def setup_post():
     try:
         check = check_if_admin(request)
@@ -408,6 +462,7 @@ def setup_post():
 
 
 @app.route("/kill")
+@login_required
 def kill():
     check = check_if_admin(request)
     if check is not None:
@@ -419,6 +474,7 @@ def kill():
 
 
 @app.route("/recreategraph")
+@login_required
 def regraph():
     check = check_if_admin(request)
     if check is not None:
@@ -521,6 +577,7 @@ def regraph():
 
 
 @app.route("/rerendergraph")
+@login_required
 def rerender():
     global shuffled_names
     global shuffled_ids
@@ -539,6 +596,7 @@ def rerender():
 
 
 @app.route("/rerendernamegraph")
+@login_required
 def rerendernamegraph():
     global shuffled_names
     global shuffled_ids
@@ -603,34 +661,34 @@ def save_graph(passed_graph, file_name, colored=False):
 
 
 @app.route("/giftingto")
+@login_required
 def giftingto():
     check = check_if_admin(request)
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
     if check is not None:  # Let's not let everyone read everyone's lists
-        if request.args["id"] != str(gettargetname(getpersonid(request.authorization.username.lower()))):
+        if request.args["id"] != str(gettargetname(user_id)):
             return check
 
-    print("Trying to display notes of:", request.args["id"])
-    useridno = request.args["id"]
-
     try:  # Yeah, only valid IDs please
-        value = int(useridno)
+        value = int(user_id)
         if value < 0:
             raise Exception
     except Exception:
-        return render_template("error.html", message="Pls no hax " + request.authorization.username + "!!")
+        return render_template("error.html", message="Pls no hax " + username + "!!")
 
     currentnotes = ["Praegu on siin ainult veel tühjus"]
     try:
-        print("Opening file:", useridno)
-        with open("./notes/" + useridno, "r") as file:
+        print("Opening file:", user_id)
+        with open("./notes/" + user_id, "r") as file:
             currentnotes = json.load(file)
     except Exception as e:
         print(e)
 
     try:  # Not the prettiest, but tries to display names in the correct form
-        return render_template("show_notes.html", notes=currentnotes, target=names_proper[getpersonname(useridno)])
+        return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     except Exception:
-        return render_template("show_notes.html", notes=currentnotes, target=getpersonname(useridno))
+        return render_template("show_notes.html", notes=currentnotes, target=getpersonname(user_id))
 
 
 @app.route("/login")
