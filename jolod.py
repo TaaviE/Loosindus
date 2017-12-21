@@ -395,7 +395,7 @@ def graph():
 @app.route("/secretgraph")
 @login_required
 def secretgraph():
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
     return render_template("graph.html",
@@ -406,14 +406,14 @@ def secretgraph():
 @app.route("/dumpinfo")
 @login_required
 def dumpinfo():
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
 
     return render_template("error.html", message=str([str(shuffled_names), str(families)]))
 
 
-def check_if_admin(passed_request):
+def check_if_admin():
     user_id = session["user_id"]
     requester = getpersonname(user_id)
     if requester != "admin" and requester != "taavi":
@@ -425,7 +425,7 @@ def check_if_admin(passed_request):
 @app.route("/setup")
 @login_required
 def setup():
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
     return render_template("createfamilies.html")
@@ -435,7 +435,7 @@ def setup():
 @login_required
 def setup_post():
     try:
-        check = check_if_admin(request)
+        check = check_if_admin()
         if check is not None:
             return check
     except Exception:
@@ -464,7 +464,7 @@ def setup_post():
 @app.route("/kill")
 @login_required
 def kill():
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
     func = request.environ.get("werkzeug.server.shutdown")
@@ -476,7 +476,7 @@ def kill():
 @app.route("/recreategraph")
 @login_required
 def regraph():
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
 
@@ -581,7 +581,7 @@ def regraph():
 def rerender():
     global shuffled_names
     global shuffled_ids
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
 
@@ -600,7 +600,7 @@ def rerender():
 def rerendernamegraph():
     global shuffled_names
     global shuffled_ids
-    check = check_if_admin(request)
+    check = check_if_admin()
     if check is not None:
         return check
 
