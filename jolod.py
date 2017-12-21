@@ -5,6 +5,12 @@ import json
 
 import matplotlib as pylab
 
+#####
+# TODO:
+# * Migrate to Flask-Security from basic HTTP auth
+# * Add support for multiple shufflings in one instance
+####
+
 pylab.use("Agg")  # Because we won't have a GUI on the server itself
 from flask import Flask, request, render_template, Response
 import matplotlib.pyplot as plotlib
