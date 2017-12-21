@@ -1,7 +1,7 @@
 from flask_script import Manager
-from flask_script import Manager
-from yetanotherpaste import app
-from yetanotherpaste import db
+
+from jolod import app
+from jolod import db
 
 app.config.from_object("config.DevelopmentConfig")
 
