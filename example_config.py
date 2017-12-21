@@ -4,11 +4,19 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
-    DEBUG = True
-    TESTING = True
+    DEBUG =
+    TESTING =
     CSRF_ENABLED = True
-    SECRET_KEY = "key"
-    SQLALCHEMY_DATABASE_URI = "postgresql://username:password@host:port/database"
+    SECRET_KEY =
+    SQLALCHEMY_DATABASE_URI =
+    MAIL_SERVER =
+    MAIL_PORT =
+    MAIL_USE_SSL =
+    MAIL_USERNAME =
+    MAIL_PASSWORD =
+    SECURITY_PASSWORD_HASH =
+    SECURITY_PASSWORD_SALT =
+    SECURITY_REGISTERABLE =
 
 
 class ProductionConfig(Config):
