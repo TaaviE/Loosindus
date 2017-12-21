@@ -107,6 +107,7 @@ graph.json
 ids.json
 graph.png
 secretgraph.png
+config.py
 notes
 __pycache__
 venv
