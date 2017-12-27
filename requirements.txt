@@ -6,3 +6,4 @@ sqlalchemy
 Flask-Security
 Flask-Script
 networkx
+bcrypt

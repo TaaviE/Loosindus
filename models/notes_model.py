@@ -1,6 +1,6 @@
 from sqlalchemy.dialects.postgresql import JSON
 
-from jolod import db
+from config import db
 
 
 class Notes(db.Model):

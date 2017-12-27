@@ -1,55 +1,29 @@
 #!/usr/bin/python3
 # coding=utf-8
 # author=Taavi Eomäe
-import matplotlib as pylab
-
-pylab.use("Agg")  # Because we won't have a GUI on the server itself
 
 #####
 # TODO:
 # * Migrate to Flask-Security from basic HTTP auth
 # * Add support for multiple shufflings in one instance
+# * Add marking gifts as bougth
 ####
-
-# Flask
-from flask import Flask, request, render_template, Response, session
-from flask_security import Security, login_required, SQLAlchemyUserDatastore
-from flask_sqlalchemy import SQLAlchemy
-from flask_mail import Mail
-from config import Config
-# Graphing
-import matplotlib.pyplot as plotlib
-import networkx as netx
-import secretsanta
 
 # Utilities
 import copy
 import datetime
 import json
+import random
 
-# App related config
-app = Flask(__name__)
-app.config.from_object("config.DevelopmentConfig")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+# Flask
+from flask import request, render_template, session
+from flask_security import login_required
 
-mail = Mail(app)
+from config import Config, db, app, plotlib, netx, secretsanta
+
 debug = Config.DEBUG
 
-# Setup Flask-Security
-userroles = db.Table(
-    "roles_users",
-    db.Column("id", db.Integer(), db.ForeignKey("user.id")),
-    db.Column("role_id", db.Integer(), db.ForeignKey("role.id"))
-)
-
-from models import users_model, notes_model
-
-user_datastore = SQLAlchemyUserDatastore(db,
-                                         users_model.User,
-                                         users_model.Role)
-security = Security(app, user_datastore)
-user_datastore.create_user(email="avamander@gmail.com", password="test1234")
+from models import users_model, notes_model, family_model, shuffles_model
 
 
 # Views
@@ -57,11 +31,6 @@ user_datastore.create_user(email="avamander@gmail.com", password="test1234")
 @login_required
 def test():
     return render_template("error.html", error="Here you go!")
-
-
-@app.route("/register", methods=['GET'])
-def register():
-    return render_template("security/register_user.html")
 
 
 # These lines that are commented out are one way to initially define the values you wish to use
@@ -87,116 +56,29 @@ def register():
 #    "Fam1_1": "Fam_1_1i"
 # }
 
-
-shuffled_names = {}  # Will contain the shuffled names and IDs
-shuffled_ids = {}
-
 # Just for assigning members_to_families a few colors, if you have more than five members_to_families, add more
 chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
-person_colors = {}
-
-
-def load_forms():
-    global names_proper
-    try:  # Load user names in genitive form from file
-        print("Trying to load user names in genitive form from file")
-        with open("./genitive.json", "r") as file:
-            tmp_names_proper = eval(str(json.load(file)))
-            if len(tmp_names_proper) <= 0:
-                raise Exception
-        names_proper = tmp_names_proper
-        print("Loaded user names in genitive form from file")
-    except Exception as e:
-        print("Loading failed:", e)
-        print("Writing names in genitive form to file")
-        with open("./genitive.json", "w") as file:
-            file.write(json.dumps(names_proper))
-            print("Wrote user names in genitive form to file")
-
-
-def load_mapping():
-    global families
-    try:  # Load the person_id mapping from file
-        with open("./ids.json", "r") as file:
-            tmp_families_json = json.load(file)
-            tmp_families = eval(str(tmp_families_json))
-            if len(tmp_families) >= 1:
-                if len(tmp_families[1]) < 1:
-                    raise Exception("2nd family 2spooky4me!")
-            else:
-                raise Exception("Not enough members_to_families!")
-        families = tmp_families
-        print("Loaded user IDs from file")
-    except Exception as e:
-        print("Loading failed:", e)
-        print("Generating user IDs")
-        current_person_id = 0  # Start from 0
-        for current_family in families:
-            for current_person in current_family:  # Assign ID for every person
-                current_family[current_person] = current_person_id
-                current_person_id += 1
-        with open("./ids.json", "w") as file:
-            file.write(json.dumps(families))
-            print("Wrote user IDs to file")
-
-
-def load_shuffling():
-    global shuffled_ids
-    global shuffled_names
-
-    try:  # Load the shuffling mapping from file
-        with open("./graph.json", "r") as file:
-            [shuffled_names, shuffled_ids_tmp] = json.load(file)
-        for key in shuffled_ids_tmp:  # Need to fix json not storing integers
-            shuffled_ids[int(key)] = shuffled_ids_tmp[key]
-        print("Loaded shuffle from file")
-    except Exception:
-        print("No shuffle exists! Generate one!")
-
-
-def load_colors():
-    global person_colors
-    for family_id, family in enumerate(families):
-        for person, person_id in family.items():
-            person_colors[person_id] = chistmasy_colors[family_id]
 
 
 def getpersonid(name):
-    for current_family in families:
-        for current_person in current_family:
-            if current_person.lower() == name.lower():
-                return current_family[current_person]
+    return users_model.User.query.filter(users_model.User.username == name).first().id
 
 
 def getfamilyid(passed_person_id):
-    searched_person_id = int(passed_person_id)
-    for current_family_id, current_family in enumerate(families):
-        for current_person in current_family:
-            # print(person, family[person], passed_person_id)
-            if current_family[current_person] == searched_person_id:
-                # print(person_id, family[person])
-                # print("Found person with this "+str(passed_person_id)+" person_id")
-                return current_family_id
+    return users_model.User.query.get(passed_person_id).family_id
 
 
 def getpersonname(passed_person_id):
-    current_person_id = int(passed_person_id)
-    for current_family in families:
-        for current_person in current_family:
-            # print(person, family[person], passed_person_id)
-            if current_family[current_person] == current_person_id:
-                # print("Found person with this "+str(passed_person_id)+" person_id")
-                return current_person
+    return users_model.User.query.get(passed_person_id).username
 
 
 def gettargetname(passed_person_id):
     try:
         print("Found target: ")
-        return shuffled_ids[int(passed_person_id)]
+        return shuffles_model.Shuffle.query.get(passed_person_id).getter
     except Exception:
-        print(shuffled_ids)
         print("DID NOT FIND TARGET FOR PERSON!")
-        return 0
+        return -1
 
 
 @app.route("/")
@@ -403,16 +285,6 @@ def secretgraph():
                            image="secretgraph.png")
 
 
-@app.route("/dumpinfo")
-@login_required
-def dumpinfo():
-    check = check_if_admin()
-    if check is not None:
-        return check
-
-    return render_template("error.html", message=str([str(shuffled_names), str(families)]))
-
-
 def check_if_admin():
     user_id = session["user_id"]
     requester = getpersonname(user_id)
@@ -422,7 +294,7 @@ def check_if_admin():
         return None
 
 
-@app.route("/setup")
+"""@app.route("/setup")
 @login_required
 def setup():
     check = check_if_admin()
@@ -454,6 +326,7 @@ def setup_post():
         for current_person in current_family:  # Assign ID for every person
             current_family[current_person] = current_person_id
             current_person_id += 1
+
     with open("./ids.json", "w") as file:
         file.write(json.dumps(input_families))
         print("Wrote user IDs to file")
@@ -471,14 +344,36 @@ def kill():
     if func is None:
         raise RuntimeError("Not running with the Werkzeug Server")
     func()
+"""
+
+
+@app.route("/family")
+@login_required
+def family():
+    user_id = session["user_id"]
+    family_id = users_model.User.query.get(user_id).family_id
+    family_members = users_model.User.query.filter(users_model.User.family_id == family_id).all()
+    family_member_names = []
+    for member in family_members:
+        family_member_names.append(member.username)
+    return render_template("show_family.html", names=family_member_names)
 
 
 @app.route("/recreategraph")
 @login_required
 def regraph():
-    check = check_if_admin()
-    if check is not None:
-        return check
+    #    check = check_if_admin()
+    #    if check is not None:
+    #        return check
+
+    user_id = session["user_id"]
+    family_id = users_model.User.query.get(user_id).family_id
+    family_obj = family_model.Family.query.get(family_id)
+    if family_obj is None:
+        return None
+    family_group = family_obj.group
+    database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
+    families = database_families
 
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
     for family_index, family in enumerate(families_give_copy):
@@ -548,11 +443,6 @@ def regraph():
         families_shuf_nam[getpersonname(connection.source)] = getpersonname(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
-    # Store the values globally
-    global shuffled_names
-    global shuffled_ids
-    shuffled_names = copy.deepcopy(families_shuf_nam)
-    shuffled_ids = copy.deepcopy(families_shuf_ids)
 
     for key, value in shuffled_ids.items():
         shuffled_ids_str[str(key)] = str(value)
@@ -579,8 +469,6 @@ def regraph():
 @app.route("/rerendergraph")
 @login_required
 def rerender():
-    global shuffled_names
-    global shuffled_ids
     check = check_if_admin()
     if check is not None:
         return check
@@ -598,8 +486,6 @@ def rerender():
 @app.route("/rerendernamegraph")
 @login_required
 def rerendernamegraph():
-    global shuffled_names
-    global shuffled_ids
     check = check_if_admin()
     if check is not None:
         return check
@@ -631,11 +517,7 @@ def save_graph(passed_graph, file_name, colored=False):
 
     if colored:  # Try to properly color the nodes
         for node in passed_graph:
-            if node in person_colors:
-                node_color = person_colors[node]
-            else:
-                node_color = chistmasy_colors[0]
-
+            node_color = random.choice(chistmasy_colors)
             netx.draw_networkx_nodes([node], pos, node_size=1500, node_color=node_color)
     else:
         netx.draw_networkx_nodes(passed_graph, pos, node_size=1500, node_color=chistmasy_colors[0])
@@ -663,7 +545,7 @@ def save_graph(passed_graph, file_name, colored=False):
 @app.route("/giftingto")
 @login_required
 def giftingto():
-    check = check_if_admin(request)
+    check = check_if_admin()
     user_id = session["user_id"]
     username = getpersonname(user_id)
     if check is not None:  # Let's not let everyone read everyone's lists
@@ -685,36 +567,39 @@ def giftingto():
     except Exception as e:
         print(e)
 
-    try:  # Not the prettiest, but tries to display names in the correct form
-        return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
-    except Exception:
-        return render_template("show_notes.html", notes=currentnotes, target=getpersonname(user_id))
+    # try:  # Not the prettiest, but tries to display names in the correct form
+    #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
+    # except Exception:
+    return render_template("show_notes.html", notes=currentnotes, target=getpersonname(user_id))
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET"])
 def login():
-    if debug:
-        try:
-            check = check_if_admin(request)
-            if check is not None:
-                return check
-            print("Now", request.authorization.username.lower(), "has a header.")
-            return render_template("success.html", action="Sisse logitud", link="./setup")
-        except Exception:
-            return Response(
-                'This setup is in DEBUG MODE!\n'
-                'This page only exists to give you a random cookie', 401,
-                {'WWW-Authenticate': 'Basic realm="Login Required"'})
-    else:
-        render_template("error.html", message="Pls no try hax!!")
+    render_template("security/login_user.html")
+
+
+@app.route("/register", methods=["GET"])
+def register():
+    render_template("security/register_user.html")
+
+
+@app.route("/change", methods=["GET"])
+@login_required
+def change():
+    render_template("security/change_password.html")
+
+
+@app.route("/reset", methods=["GET"])
+def reset():
+    render_template("security/reset_password.html")
+
+
+@app.route("/confirm", methods=["GET"])
+def confirmation():
+    render_template("security/send_confirmation.html")
 
 
 if __name__ == "__main__":
-    load_forms()
-    load_mapping()
-    load_shuffling()
-    load_colors()
-
     if debug:
         print("Starting in debug!!!")
         app.run(debug=True, use_evalex=False, host="192.168.0.100", port=5000)
