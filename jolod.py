@@ -7,7 +7,20 @@
 # * Migrate to Flask-Security from basic HTTP auth
 # * Add support for multiple shufflings in one instance
 # * Add marking gifts as bougth
+#
+# Known flaws:
+# * SecretSanta can't match less than two people or people from less than one family
 ####
+
+# Plotting
+import matplotlib as pylab
+
+pylab.use("Agg")  # Because we won't have a GUI on the server itself
+import matplotlib.pyplot as plotlib
+import networkx as netx
+
+# Graphing
+import secretsanta
 
 # Utilities
 import copy
@@ -19,11 +32,15 @@ import random
 from flask import request, render_template, session
 from flask_security import login_required
 
-from config import Config, db, app, plotlib, netx, secretsanta
+# App specific config
+from config import Config, db, app
 
-debug = Config.DEBUG
-
+# Database models
 from models import users_model, notes_model, family_model, shuffles_model
+
+import sys
+
+sys.setrecursionlimit(2000)
 
 
 # Views
@@ -269,10 +286,22 @@ def deletenote():
 @app.route("/graph")
 @login_required
 def graph():
+    user_id = session["user_id"]
+    family_id = users_model.User.query.get(user_id).family_id
+    family_obj = family_model.Family.query.get(family_id)
+    family_group = family_obj.group
     return render_template("graph.html",
                            id="number " + str(session["user_id"]),
-                           image="graph.png")
+                           image=str(family_group) + ".png")
 
+
+@app.route("/settings")
+def settings():
+    user_id = session["user_id"]
+    family_id = users_model.User.query.get(user_id).family_id
+    family_obj = family_model.Family.query.get(family_id)
+    family_group = family_obj.group
+    return render_template("settings.html")
 
 @app.route("/secretgraph")
 @login_required
@@ -369,11 +398,21 @@ def regraph():
     user_id = session["user_id"]
     family_id = users_model.User.query.get(user_id).family_id
     family_obj = family_model.Family.query.get(family_id)
-    if family_obj is None:
-        return None
     family_group = family_obj.group
+
     database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
-    families = database_families
+    database_all_families_with_members = []
+    for db_family in database_families:
+        database_family_members = users_model.User.query.filter(users_model.User.family_id == db_family.id).all()
+        database_all_families_with_members.append(database_family_members)
+
+    families = []
+    family_ids_map = {}
+    for family_index, list_family in enumerate(database_all_families_with_members):
+        families.insert(family_index, {})
+        for person_index, person in enumerate(list_family):
+            family_ids_map[family_index] = person.family_id
+            families[family_index][person.username] = person.id
 
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
     for family_index, family in enumerate(families_give_copy):
@@ -443,23 +482,30 @@ def regraph():
         families_shuf_nam[getpersonname(connection.source)] = getpersonname(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
+        #    print(shuffled_names)
+        #    print(shuffled_ids)
 
-    for key, value in shuffled_ids.items():
-        shuffled_ids_str[str(key)] = str(value)
-    #    print(shuffled_names)
-    #    print(shuffled_ids)
-
-    with open("./graph.json", "w") as file:
-        file.write(json.dumps([shuffled_names, shuffled_ids_str]))
-        print("Wrote shuffle to file")
+    for giver, getter in families_shuf_ids.items():
+        db_entry_shuffle = shuffles_model.Shuffle(
+            giver=giver,
+            getter=getter,
+        )
+        try:
+            db.session.add(db_entry_shuffle)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            row = shuffles_model.Shuffle.query.get(giver)
+            row.getter = getter
+            db.session.commit()
 
     digraph = netx.DiGraph(iterations=10000, scale=2)
-    digraph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
+    digraph.add_nodes_from(copy.deepcopy(families_shuf_ids).keys())
 
-    for source, destination in copy.deepcopy(shuffled_ids).items():
+    for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
-    save_graph(digraph, "./static/graph.png")
+    save_graph(digraph, "./static/" + str(family_group) + ".png")
     del digraph
     rerendernamegraph()  # create the graph with names
 
@@ -474,9 +520,9 @@ def rerender():
         return check
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)
-    digraph.add_nodes_from(copy.deepcopy(shuffled_ids).keys())
+    digraph.add_nodes_from(copy.deepcopy(families_shuf_ids).keys())
 
-    for source, destination in copy.deepcopy(shuffled_ids).items():
+    for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
     save_graph(digraph, "./static/graph.png")
@@ -492,10 +538,10 @@ def rerendernamegraph():
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)  # This is probably a horrible idea with more nodes
 
-    for shuffled_ids_id in copy.deepcopy(shuffled_ids).keys():
+    for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
         digraph.add_node(shuffled_ids_id)
 
-    for source, destination in copy.deepcopy(shuffled_ids).items():
+    for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
     save_graph(digraph, "./static/secretgraph.png", colored=True)
@@ -510,11 +556,6 @@ def save_graph(passed_graph, file_name, colored=False):
     fig = plotlib.figure(1)
     pos = netx.circular_layout(passed_graph)
 
-    name_id_lookup_dict = {}  # Let's create a name-id mapping
-
-    for name in shuffled_names.keys():
-        name_id_lookup_dict[getpersonid(name)] = name
-
     if colored:  # Try to properly color the nodes
         for node in passed_graph:
             node_color = random.choice(chistmasy_colors)
@@ -525,6 +566,11 @@ def save_graph(passed_graph, file_name, colored=False):
     netx.draw_networkx_edges(passed_graph, pos)
 
     if colored:
+        name_id_lookup_dict = {}  # Let's create a name-id mapping
+
+        for name in shuffled_names.keys():
+            name_id_lookup_dict[getpersonid(name)] = name
+
         netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
     else:
         netx.draw_networkx_labels(passed_graph, pos)
@@ -600,9 +646,9 @@ def confirmation():
 
 
 if __name__ == "__main__":
-    if debug:
-        print("Starting in debug!!!")
-        app.run(debug=True, use_evalex=False, host="192.168.0.100", port=5000)
+    if Config.DEBUG:
+        print("Starting in debug!")
+        app.run(debug=Config.DEBUG, use_evalex=False, host="192.168.0.100", port=5000)
     else:
         print("Starting in production.")
-        app.run(debug=False, use_evalex=False, host="127.0.0.1")
+        app.run(debug=Config.DEBUG, use_evalex=False, host="127.0.0.1")

@@ -1,17 +1,14 @@
 CREATE TABLE wishlist
 (
-  user_id INTEGER NOT NULL
-    CONSTRAINT jolod_pkey
+  user_id SERIAL NOT NULL
+    CONSTRAINT wishlist_user_id_pk
     PRIMARY KEY,
-  notes   JSON    NOT NULL
+  notes   JSON
 );
-
-CREATE UNIQUE INDEX jolod_user_id_uindex
-  ON wishlist (user_id);
 
 CREATE TABLE role
 (
-  id          INTEGER NOT NULL
+  id          SERIAL NOT NULL
     CONSTRAINT role_pkey
     PRIMARY KEY,
   name        VARCHAR(80),
@@ -26,15 +23,17 @@ CREATE UNIQUE INDEX role_name_uindex
 
 CREATE TABLE "user"
 (
-  id           SERIAL NOT NULL
+  id                SERIAL NOT NULL
     CONSTRAINT user_id_pk
     PRIMARY KEY,
-  email        VARCHAR(255),
-  password     VARCHAR(255),
-  confirmed_at TIMESTAMP,
-  active       BOOLEAN,
-  username     VARCHAR(255),
-  family_id    INTEGER
+  email             VARCHAR(255),
+  password          VARCHAR(255),
+  confirmed_at      TIMESTAMP,
+  active            BOOLEAN,
+  username          VARCHAR(255),
+  family_id         INTEGER,
+  admin_of_groups   INTEGER [],
+  admin_of_families INTEGER []
 );
 
 CREATE UNIQUE INDEX user_id_uindex
@@ -45,6 +44,10 @@ CREATE UNIQUE INDEX user_email_uindex
 
 CREATE UNIQUE INDEX user_username_uindex
   ON "user" (username);
+
+ALTER TABLE wishlist
+  ADD CONSTRAINT wishlist_user_id_fkey
+FOREIGN KEY (user_id) REFERENCES "user";
 
 CREATE TABLE roles_users
 (
