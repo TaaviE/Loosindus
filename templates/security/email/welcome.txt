@@ -1,7 +1,7 @@
-{{ _('Welcome %(email)s!', email=user.email) }}
+Tere  {{ user.email }}
 
 {% if security.confirmable %}
-{{ _('You can confirm your email through the link below:') }}
+Saad enda konto kinnitada allpool asuva lingi kaudu:
 
 {{ confirmation_link }}
 {% endif %}

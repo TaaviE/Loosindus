@@ -8,3 +8,4 @@ Flask-Script
 networkx
 bcrypt
 Flask-Mail
+Flask-WTF
