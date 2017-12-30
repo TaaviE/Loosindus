@@ -1,11 +1,12 @@
-psycopg2
-matplotlib
 Flask
 Flask-SqlAlchemy
-sqlalchemy
 Flask-Security
 Flask-Script
-networkx
-bcrypt
 Flask-Mail
 Flask-WTF
+Flask-Admin
+networkx
+bcrypt
+sqlalchemy
+psycopg2
+matplotlib

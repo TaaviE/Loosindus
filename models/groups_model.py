@@ -2,14 +2,23 @@ from config import db
 
 
 class Groups(db.Model):
+    """
+    Specifies how groups are modeled in the database
+
+    @type  group_id: int
+    @param group_id: group's ID
+    @type  group_name: int
+    @param group_name: 255 letter name of the group
+    """
     __tablename__ = "groups"
 
-    id = db.Column(db.Integer, primary_key=True)
-    admin = db.Column(db.Integer, db.ForeignKey("user.id"))
+    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    admin = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    description = db.Column(db.VARCHAR(255), nullable=True)
 
-    def __init__(self, id, admin):
-        self.id = id
-        self.admin = admin
+    def __init__(self, group_id, group_name):
+        self.id = group_id
+        self.admin = group_name
 
     def __repr__(self):
         return "<id {}>".format(self.id)

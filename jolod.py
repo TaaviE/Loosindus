@@ -49,30 +49,7 @@ def test():
     return render_template("error.html", error="Here you go!")
 
 
-# These lines that are commented out are one way to initially define the values you wish to use
-#
-# Contains placeholder names (with ids) and members_to_families that are going to
-# be written into a file on first launch, after that it's
-# going to be loaded from there and these lines could be removed
-# fam_1 = {"Fam1_1": 0, "Fam1_2": 0, "Fam1_3": 0, "Fam1_4": 0}
-# fam_2 = {"Fam2_1": 0, "Fam2_2": 0, "Fam2_3": 0}
-# fam_3 = {"Fam3_1": 0, "Fam3_2": 0}
-# fam_4 = {"Fam4_1": 0, "Fam4_2": 0, "Fam4_3": 0, "Fam4_4": 0}
-# fam_5 = {"Fam5_1": 0, "Fam5_2": 0}
-
-# families = [fam_1, fam_2, fam_3, fam_4, fam_5]
-
-# names_proper = {
-#
-# As the software displays messages in estonian it'd be
-# better if names had an genitive form to look up, feel free
-# to remove this list, it is saved into a file on first launch
-# and then loaded from there on future launches
-#
-#    "Fam1_1": "Fam_1_1i"
-# }
-
-# Just for assigning members_to_families a few colors, if you have more than five members_to_families, add more
+# Just for assigning members_to_families a few colors
 chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
 
@@ -100,7 +77,6 @@ def gettargetname(passed_person_id):
 @app.route("/")
 @login_required
 def index():
-    #    username = request.authorization.username
     user_id = session["user_id"]
     username = getpersonname(user_id)
     return render_template("index.html", auth=username)
@@ -299,21 +275,25 @@ def settings():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
     user_family_id = user_obj.family_id
-    user_family = family_model.Family.query.get(user_family_id)
-    user_family_group = user_family.group
-
-    db_families = family_model.Family.query.filter(family_model.Family.id == user_family_id)
-    families = {}
-    for family in db_families:
-        families[family.name] = {}
-        people_in_family = users_model.User.query.filter(family_model.Family.id == family.id)
-
-        for member in people_in_family:
-            families[family.name][member.username] = member.id
-
     is_family_admin = False
-    if len(families) > 0:
-        is_family_admin = True
+    try:
+        user_family = family_model.Family.query.get(user_family_id)
+        user_family_group = user_family.group
+
+        db_families = family_model.Family.query.filter(family_model.Family.id == user_family_id)
+        user_admin_families = {}
+        for family in db_families:
+            user_admin_families[family.name] = {}
+            people_in_family = users_model.User.query.filter(family_model.Family.id == family.id)
+
+            for member in people_in_family:
+                user_admin_families[family.name][member.username] = member.id
+
+        if len(user_admin_families) > 0:
+            is_family_admin = True
+
+    except Exception:
+        user_admin_families = {"Error retrieving": -1}
 
     db_groups = groups_model.Groups.query.filter(groups_model.Groups.admin == user_id)
     groups = {}
@@ -327,18 +307,27 @@ def settings():
     if len(groups) > 0:
         is_group_admin = True
 
-    families = {}
-    families_in_group = family_model.Family.query.filter(family_model.Family.group == user_family_group)
-    for group_family in families_in_group:
-        families[group_family.name] = group_family.id
+    user_admin_families = {}
+    try:
+        families_in_group = family_model.Family.query.filter(family_model.Family.group == user_family_group)
+        for group_family in families_in_group:
+            user_admin_families[group_family.name] = group_family.id
+    except Exception:
+        user_admin_families = {"Error fetching groups": {"": ""}}
 
     return render_template("settings.html",
                            user_id=user_id,
                            user_name=user_obj.username,
                            family_admin=is_family_admin,
                            group_admin=is_group_admin,
-                           families=families,
+                           families=user_admin_families,
                            groups=groups)
+
+
+@app.route("/profile")
+def profile():
+
+    return render_template("profile.html")
 
 
 @app.route("/secretgraph")
@@ -349,7 +338,7 @@ def secretgraph():
         return check
     return render_template("graph.html",
                            id=str(getpersonname(session["user_id"])),
-                           image="secretgraph.png")
+                           image="s"+str(request.args["id"])+".png")
 
 
 def check_if_admin():
@@ -359,59 +348,6 @@ def check_if_admin():
         return render_template("error.html", message="Pls no hax " + requester + "!!")
     else:
         return None
-
-
-"""@app.route("/setup")
-@login_required
-def setup():
-    check = check_if_admin()
-    if check is not None:
-        return check
-    return render_template("createfamilies.html")
-
-
-@app.route("/setup", methods=["POST"])
-@login_required
-def setup_post():
-    try:
-        check = check_if_admin()
-        if check is not None:
-            return check
-    except Exception:
-        return login()
-
-    input_families = []
-    for family_index, family in enumerate(request.form):
-        input_families.insert(family_index, {})
-        for member in request.form[family].split(","):
-            member = member.strip().capitalize()
-            input_families[family_index][member] = 0
-
-    print("Generating user IDs based on setup input table")
-    current_person_id = 0  # Start from 0
-    for current_family in input_families:
-        for current_person in current_family:  # Assign ID for every person
-            current_family[current_person] = current_person_id
-            current_person_id += 1
-
-    with open("./ids.json", "w") as file:
-        file.write(json.dumps(input_families))
-        print("Wrote user IDs to file")
-
-    return render_template("success.html", action="Genereeritud", link="./kill")
-
-
-@app.route("/kill")
-@login_required
-def kill():
-    check = check_if_admin()
-    if check is not None:
-        return check
-    func = request.environ.get("werkzeug.server.shutdown")
-    if func is None:
-        raise RuntimeError("Not running with the Werkzeug Server")
-    func()
-"""
 
 
 @app.route("/family")
