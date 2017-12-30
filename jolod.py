@@ -4,8 +4,6 @@
 
 #####
 # TODO:
-# * Migrate to Flask-Security from basic HTTP auth
-# * Add support for multiple shufflings in one instance
 # * Add marking gifts as bougth
 #
 # Known flaws:
