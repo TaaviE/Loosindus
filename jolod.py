@@ -36,7 +36,7 @@ from flask_security import login_required
 from config import Config, db, app
 
 # Database models
-from models import users_model, notes_model, family_model, shuffles_model
+from models import users_model, notes_model, family_model, shuffles_model, groups_model
 
 import sys
 
@@ -298,10 +298,49 @@ def graph():
 @app.route("/settings")
 def settings():
     user_id = session["user_id"]
-    family_id = users_model.User.query.get(user_id).family_id
-    family_obj = family_model.Family.query.get(family_id)
-    family_group = family_obj.group
-    return render_template("settings.html")
+    user_obj = users_model.User.query.get(user_id)
+    user_family_id = user_obj.family_id
+    user_family = family_model.Family.query.get(user_family_id)
+    user_family_group = user_family.group
+
+    db_families = family_model.Family.query.filter(family_model.Family.id == user_family_id)
+    families = {}
+    for family in db_families:
+        families[family.name] = {}
+        people_in_family = users_model.User.query.filter(family_model.Family.id == family.id)
+
+        for member in people_in_family:
+            families[family.name][member.username] = member.id
+
+    is_family_admin = False
+    if len(families) > 0:
+        is_family_admin = True
+
+    db_groups = groups_model.Groups.query.filter(groups_model.Groups.admin == user_id)
+    groups = {}
+    for group in db_groups:
+        groups[group.description] = {}
+        group_families = family_model.Family.query.filter(family_model.Family.group == group.id)
+        for g_family in group_families:
+            groups[group.description][g_family.name] = g_family.id
+
+    is_group_admin = False
+    if len(groups) > 0:
+        is_group_admin = True
+
+    families = {}
+    families_in_group = family_model.Family.query.filter(family_model.Family.group == user_family_group)
+    for group_family in families_in_group:
+        families[group_family.name] = group_family.id
+
+    return render_template("settings.html",
+                           user_id=user_id,
+                           user_name=user_obj.username,
+                           family_admin=is_family_admin,
+                           group_admin=is_group_admin,
+                           families=families,
+                           groups=groups)
+
 
 @app.route("/secretgraph")
 @login_required
@@ -415,13 +454,13 @@ def regraph():
             families[family_index][person.username] = person.id
 
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
-    for family_index, family in enumerate(families_give_copy):
-        for person in family:
+    for family_index, family_members in enumerate(families_give_copy):
+        for person in family_members:
             families_give_copy[family_index][person] = True
 
     families_take_copy = copy.deepcopy(families)  # Does the person need to take a gift
-    for family_index, family in enumerate(families_take_copy):
-        for person in family:
+    for family_index, family_members in enumerate(families_take_copy):
+        for person in family_members:
             families_take_copy[family_index][person] = True
 
     families_shuf_nam = {}
@@ -457,14 +496,14 @@ def regraph():
     """""
 
     members_to_families = {}
-    for family_id, family in enumerate(families):
-        for person, person_id in family.items():
+    for family_id, family_members in enumerate(families):
+        for person, person_id in family_members.items():
             members_to_families[person_id] = family_id
 
     families_to_members = {}
-    for family_id, family in enumerate(families):
+    for family_id, family_members in enumerate(families):
         families_to_members[family_id] = set()
-        for person, person_id in family.items():
+        for person, person_id in family_members.items():
             currentset = families_to_members[family_id]
             currentset.update([person_id])
 

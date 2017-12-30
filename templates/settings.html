@@ -19,11 +19,64 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class="container">
     <header>
-        <h4>Teise 🎅 nimekiri</h4>
+        <h4>Sinu seaded</h4>
     </header>
     <div id="content">
         <p><a class="button button-primary" href="./shuffle">Tagasi</a></p>
+        <p>Sinu ID: {{ user_id }}</p>
+        <p>Sinu nimi: {{ user_name }}</p>
 
+        {% if family_admin %}
+            <p><a class="button" href="./addmem">Lisa</a></p>
+        {% else %}
+            <p>Ei ole perekonnapea, muudatused perekonnas ei ole lubatud</p>
+        {% endif %}
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Perekonnaliige</th>
+                <th>ID</th>
+                <th>Kustuta</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for name, family in families.items() %}
+                {% for key, value in family.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value }}</td>
+                        <td><a class="button" href="./removemem?id={{ value }}">Kustuta</a></td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if group_admin %}
+            <p><a class="button" href="./addmem">Lisa</a></p>
+        {% else %}
+            <p>Ei ole grupijuht, muudatused ei ole lubatud</p>
+        {% endif %}
+        <table class="u-full-width">
+            <thead>
+            <tr>
+                <th>Perekond</th>
+                <th>ID</th>
+                <th>Kustuta</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for name, group in groups.items() %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                    <td><a class="button" href="./removefam?id={{ value }}">Kustuta</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 </div>

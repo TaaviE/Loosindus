@@ -1,9 +1,10 @@
 CREATE TABLE wishlist
 (
-  user_id SERIAL NOT NULL
+  user_id         SERIAL NOT NULL
     CONSTRAINT wishlist_user_id_pk
     PRIMARY KEY,
-  notes   JSON
+  notes           JSON,
+  notes_purchased JSON
 );
 
 CREATE TABLE role
@@ -23,17 +24,15 @@ CREATE UNIQUE INDEX role_name_uindex
 
 CREATE TABLE "user"
 (
-  id                SERIAL NOT NULL
+  id           SERIAL NOT NULL
     CONSTRAINT user_id_pk
     PRIMARY KEY,
-  email             VARCHAR(255),
-  password          VARCHAR(255),
-  confirmed_at      TIMESTAMP,
-  active            BOOLEAN,
-  username          VARCHAR(255),
-  family_id         INTEGER,
-  admin_of_groups   INTEGER [],
-  admin_of_families INTEGER []
+  email        VARCHAR(255),
+  password     VARCHAR(255),
+  confirmed_at TIMESTAMP,
+  active       BOOLEAN,
+  username     VARCHAR(255),
+  family_id    INTEGER
 );
 
 CREATE UNIQUE INDEX user_id_uindex
@@ -64,8 +63,8 @@ CREATE TABLE families
   id      SERIAL  NOT NULL
     CONSTRAINT families_pkey
     PRIMARY KEY,
-  "group" INTEGER NOT NULL,
-  name    VARCHAR(255)
+  name    VARCHAR(255),
+  "group" INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX families_id_uindex
@@ -92,4 +91,22 @@ CREATE UNIQUE INDEX shuffles_giver_uindex
 
 CREATE UNIQUE INDEX shuffles_getter_uindex
   ON shuffles (getter);
+
+CREATE TABLE groups
+(
+  id          SERIAL  NOT NULL
+    CONSTRAINT groups_pkey
+    PRIMARY KEY,
+  admin       INTEGER NOT NULL
+    CONSTRAINT groups_admin_fkey
+    REFERENCES "user",
+  description VARCHAR(255)
+);
+
+CREATE UNIQUE INDEX groups_id_uindex
+  ON groups (id);
+
+ALTER TABLE families
+  ADD CONSTRAINT families_group_fkey
+FOREIGN KEY ("group") REFERENCES groups;
 

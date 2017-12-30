@@ -8,6 +8,7 @@ class Notes(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True)
     notes = db.Column(JSON)
+    notes_purchased = db.Column(JSON)
 
     def __init__(self, notes, user_id):
         self.user_id = user_id
