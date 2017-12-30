@@ -553,14 +553,16 @@ def regraph():
 
 
 @app.route("/testmail")
+@login_required
 def test_mail():
     with mail.connect() as conn:
         print(conn.configure_host().vrfy)
-        msg = Message(recipients="taavi.eomae@gmail.com",
+        msg = Message(recipients=["taavi.eomae@gmail.com"],
                       body="test",
                       subject="test2")
 
         conn.send(msg)
+    return render_template("success.html", action="Sent", link="./testmail")
 
 
 @app.route("/rerendergraph")

@@ -1,9 +1,10 @@
 {% extends "security/base.html" %}
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
+<div class="container">
 {% block content %}
-    {% include "security/_messages.html" %}
     <h1>{{ _('Login') }}</h1>
+    {% include "security/_messages.html" %}
     <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
         {{ login_user_form.hidden_tag() }}
         {{ render_field_with_errors(login_user_form.email) }}
@@ -14,3 +15,4 @@
     </form>
     {% include "security/_menu.html" %}
 {% endblock %}
+</div>
