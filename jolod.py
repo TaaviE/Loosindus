@@ -687,7 +687,7 @@ def confirmation():
 if __name__ == "__main__":
     if Config.DEBUG:
         print("Starting in debug!")
-        app.run(debug=Config.DEBUG, use_evalex=False, host="192.168.0.100", port=5000)
+        app.run(debug=Config.DEBUG, use_evalex=False, host="0.0.0.0", port=5000)
     else:
         print("Starting in production.")
         app.run(debug=Config.DEBUG, use_evalex=False, host="127.0.0.1")
