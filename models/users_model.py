@@ -1,5 +1,4 @@
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy.dialects.postgresql import ARRAY
 
 from config import db
 
@@ -31,5 +30,3 @@ class User(db.Model, UserMixin):
         backref=db.backref("User", lazy="dynamic")
     )
     family_id = db.Column(db.Integer, db.ForeignKey("families.id"))
-    admin_of_groups = db.Column(ARRAY(db.Integer))
-    admin_of_families = db.Column(ARRAY(db.Integer))
