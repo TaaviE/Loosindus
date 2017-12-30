@@ -31,9 +31,10 @@ import random
 # Flask
 from flask import request, render_template, session
 from flask_security import login_required
+from flask_mail import Message
 
 # App specific config
-from config import Config, db, app
+from config import Config, db, app, mail
 
 # Database models
 from models import users_model, notes_model, family_model, shuffles_model, groups_model
@@ -549,6 +550,17 @@ def regraph():
     rerendernamegraph()  # create the graph with names
 
     return render_template("success.html", action="Genereeritud", link="./notes")
+
+
+@app.route("/testmail")
+def test_mail():
+    with mail.connect() as conn:
+        print(conn.configure_host().vrfy)
+        msg = Message(recipients="taavi.eomae@gmail.com",
+                      body="test",
+                      subject="test2")
+
+        conn.send(msg)
 
 
 @app.route("/rerendergraph")

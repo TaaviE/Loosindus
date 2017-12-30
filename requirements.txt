@@ -7,3 +7,4 @@ Flask-Security
 Flask-Script
 networkx
 bcrypt
+Flask-Mail
