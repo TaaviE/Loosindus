@@ -2,7 +2,7 @@
 
 
 class Config(object):
-    DEBUG = False
+    """DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
     WTF_CSRF_ENABLED = True
@@ -28,7 +28,7 @@ class Config(object):
     SECURITY_RECOVERABLE = True
     SECURITY_CONFIRMABLE = True
     SECURITY_CHANGEABLE = True
-
+"""
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -82,7 +82,7 @@ user_datastore = SQLAlchemyUserDatastore(db,
 
 class RegistrationForm(forms.RegisterForm):
     username = forms.StringField("Eesnimi", [forms.Required()])
-    confirm_register_form = RecaptchaField()
+    recaptcha = RecaptchaField("Captcha", [forms.Required()])
 
 
 security = Security(app, user_datastore, confirm_register_form=RegistrationForm)
