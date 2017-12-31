@@ -267,7 +267,7 @@ def graph():
     family_group = family_obj.group
     return render_template("graph.html",
                            id="number " + str(session["user_id"]),
-                           image=str(family_group) + ".png")
+                           image="graph"+str(family_group) + ".png")
 
 
 @app.route("/settings")
@@ -479,7 +479,7 @@ def regraph():
     for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
-    save_graph(digraph, "./static/" + str(family_group) + ".png")
+    save_graph(digraph, "./static/graph" + str(family_group) + ".png")
     del digraph
     rerendernamegraph()  # create the graph with names
 
@@ -512,7 +512,7 @@ def rerender():
     for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
-    save_graph(digraph, "./static/graph.png")
+    save_graph(digraph, "./static/graph"".png")
     return render_template("success.html", action="Genereeritud", link="./notes")
 
 
