@@ -12,6 +12,7 @@
 
 # Plotting
 import matplotlib as pylab
+from flask_wtf import RecaptchaField
 
 pylab.use("Agg")  # Because we won't have a GUI on the server itself
 import matplotlib.pyplot as plotlib
@@ -28,26 +29,55 @@ import random
 
 # Flask
 from flask import request, render_template, session
-from flask_security import login_required
+from flask_security import login_required, SQLAlchemyUserDatastore, forms, Security
 from flask_mail import Message
 
 # App specific config
-from config import Config, db, app, mail
+from config import Config, db, app, mail, celery
 
 # Database models
-from models import users_model, notes_model, family_model, shuffles_model, groups_model
+from models import notes_model, family_model, shuffles_model, groups_model
 
 import sys
 
 sys.setrecursionlimit(2000)
 
+# Setup Flask-Security
+userroles = db.Table(
+    "roles_users",
+    db.Column("id", db.Integer(), db.ForeignKey("user.id")),
+    db.Column("role_id", db.Integer(), db.ForeignKey("role.id"))
+)
 
-# Views
-@app.route("/test")
-@login_required
-def test():
-    return render_template("error.html", error="Here you go!")
+from models import users_model
 
+user_datastore = SQLAlchemyUserDatastore(db,
+                                         users_model.User,
+                                         users_model.Role)
+
+
+class ExtendedRegistrerForm(forms.RegisterForm):
+    username = forms.StringField("Eesnimi", [forms.Required()])
+    recaptcha = RecaptchaField("Captcha")
+
+
+class ExtendedResetForm(forms.ResetPasswordForm):
+    recaptcha = RecaptchaField("Captcha")
+
+
+class ExtendedConfirmationForm(forms.SendConfirmationForm):
+    recaptcha = RecaptchaField("Captcha")
+
+
+class ExtendedForgotPasswordForm(forms.ForgotPasswordForm):
+    recaptcha = RecaptchaField("Captcha")
+
+
+security = Security(app, user_datastore,
+                    confirm_register_form=ExtendedRegistrerForm,
+                    reset_password_form=ExtendedResetForm,
+                    send_confirmation_form=ExtendedConfirmationForm,
+                    forgot_password_form=ExtendedForgotPasswordForm)
 
 # Just for assigning members_to_families a few colors
 chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
@@ -72,6 +102,23 @@ def gettargetname(passed_person_id):
     except Exception:
         print("DID NOT FIND TARGET FOR PERSON!")
         return -1
+
+
+@celery.task
+def send_celery_mail(msg):
+    mail.send(msg)
+
+
+@security.send_mail_task
+def delay_security_email(msg):
+    send_celery_mail.delay(msg)
+
+
+# Views
+@app.route("/test")
+@login_required
+def test():
+    return render_template("error.html", error="Here you go!")
 
 
 @app.route("/")
@@ -267,7 +314,7 @@ def graph():
     family_group = family_obj.group
     return render_template("graph.html",
                            id="number " + str(session["user_id"]),
-                           image="graph"+str(family_group) + ".png")
+                           image="graph" + str(family_group) + ".png")
 
 
 @app.route("/settings")
@@ -276,18 +323,19 @@ def settings():
     user_obj = users_model.User.query.get(user_id)
     user_family_id = user_obj.family_id
     is_family_admin = False
+    user_admin_families = {}
     try:
         user_family = family_model.Family.query.get(user_family_id)
         user_family_group = user_family.group
 
         db_families = family_model.Family.query.filter(family_model.Family.id == user_family_id)
         user_admin_families = {}
-        for family in db_families:
-            user_admin_families[family.name] = {}
-            people_in_family = users_model.User.query.filter(family_model.Family.id == family.id)
+        for db_family in db_families:
+            user_admin_families[db_family.name] = {}
+            people_in_family = users_model.User.query.filter(family_model.Family.id == db_family.id)
 
             for member in people_in_family:
-                user_admin_families[family.name][member.username] = member.id
+                user_admin_families[db_family.name][member.username] = member.id
 
         if len(user_admin_families) > 0:
             is_family_admin = True
@@ -326,7 +374,6 @@ def settings():
 
 @app.route("/profile")
 def profile():
-
     return render_template("profile.html")
 
 
@@ -338,7 +385,7 @@ def secretgraph():
         return check
     return render_template("graph.html",
                            id=str(getpersonname(session["user_id"])),
-                           image="s"+str(request.args["id"])+".png")
+                           image="s" + str(request.args["id"]) + ".png")
 
 
 def check_if_admin():

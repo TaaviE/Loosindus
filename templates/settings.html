@@ -1,37 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png') }}" sizes="16x16">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-96x96.png') }}" sizes="96x96">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-196x196.png') }}" sizes="196x196">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon-120x120.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon-180x180.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='favicon-152x152.png') }}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='favicon-167x167.png') }}">
-    <html lang="et"></html>
+    {% include "head_template.html" %}
     <title>Seaded</title>
 </head>
 
 <body>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+{% include "style.html" %}
 <div class="container">
     <header>
         <h4>Sinu seaded</h4>
     </header>
     <div id="content">
-        <p><a class="button button-primary" href="./shuffle">Tagasi</a></p>
+        <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
         <p>Sinu ID: {{ user_id }}</p>
         <p>Sinu nimi: {{ user_name }}</p>
 
         {% if family_admin %}
-            <p><a class="button" href="./addmem">Lisa</a></p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./addmem">Lisa</a></p>
         {% else %}
             <p>Ei ole perekonnapea, muudatused perekonnas ei ole lubatud</p>
         {% endif %}
-        <table class="u-full-width">
+        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
             <thead>
             <tr>
                 <th>Perekonnaliige</th>
@@ -46,7 +36,7 @@
                     <tr>
                         <td>{{ key }}</td>
                         <td>{{ value }}</td>
-                        <td><a class="button" href="./removemem?id={{ value }}">Kustuta</a></td>
+                        <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removemem?id={{ value }}">Kustuta</a></td>
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -54,7 +44,7 @@
         </table>
 
         {% if group_admin %}
-            <p><a class="button" href="./addmem">Lisa perekond gruppi</a></p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./addmem">Lisa perekond gruppi</a></p>
         {% else %}
             <p>Ei ole grupijuht, muudatused ei ole lubatud</p>
         {% endif %}
@@ -72,7 +62,7 @@
                 <tr>
                     <td>{{ key }}</td>
                     <td>{{ value }}</td>
-                    <td><a class="button" href="./removefam?id={{ value }}">Kustuta</a></td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removefam?id={{ value }}">Kustuta</a></td>
                 </tr>
             {% endfor %}
             </tbody>
