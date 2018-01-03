@@ -15,8 +15,8 @@
     <div id="content">
         <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
             jõuluvana 🎄</p>
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa uus</a>
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./">Tagasi</a>
+        <a class="mdc-button mdc-button--raised" href="./createnote">Lisa uus</a>
+        <a class="mdc-button mdc-button--raised" href="./">Tagasi</a>
         <table class="u-full-width">
             <thead>
             <tr>
@@ -29,8 +29,8 @@
             {% for item in list %}
                 <tr>
                     <td>{{ item }}</td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
+                    <td><a class="mdc-button mdc-button--raised" href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
+                    <td><a class="mdc-button mdc-button--raised" href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
                 </tr>
             {% endfor %}
             </tbody>

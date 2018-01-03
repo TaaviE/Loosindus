@@ -15,22 +15,34 @@
     <div id="content">
         <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
             jõuluvana 🎄</p>
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa uus</a>
-        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./">Tagasi</a>
+        <a class="mdc-button mdc-button--raised" href="./createnote">Lisa uus</a>
+        <a class="mdc-button mdc-button--raised" href="./">Tagasi</a>
         <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
             <thead>
             <tr>
                 <th>Kirjeldus</th>
-                <th>Kustuta</th>
-                <th>Muuda</th>
+                {% if not empty %}
+                    <th>Kustuta</th>
+                    <th>Muuda</th>
+                {% else %}
+                    <th></th>
+                    <th></th>
+                {% endif %}
             </tr>
             </thead>
             <tbody>
             {% for item in list %}
                 <tr>
                     <td>{{ item }}</td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
+                    {% if not empty %}
+                        <td><a class="mdc-button mdc-button--raised"
+                               href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
+                        <td><a class="mdc-button mdc-button--raised"
+                               href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>

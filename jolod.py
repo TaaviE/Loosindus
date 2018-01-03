@@ -147,7 +147,8 @@ def shuffle():
 def notes():
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
+    notes_from_file = []
+    empty = False
     try:
         db_notes = notes_model.Notes.query.get(user_id)
         #    with open("./notes/" + useridno) as file:
@@ -159,7 +160,8 @@ def notes():
 
     if len(notes_from_file) <= 0:
         notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
-    return render_template("notes.html", list=notes_from_file)
+        empty = True
+    return render_template("notes.html", list=notes_from_file, empty=empty)
 
 
 @app.route("/createnote", methods=["GET"])
@@ -309,12 +311,15 @@ def deletenote():
 @login_required
 def graph():
     user_id = session["user_id"]
-    family_id = users_model.User.query.get(user_id).family_id
-    family_obj = family_model.Family.query.get(family_id)
-    family_group = family_obj.group
-    return render_template("graph.html",
-                           id="number " + str(session["user_id"]),
-                           image="graph" + str(family_group) + ".png")
+    try:
+        family_id = users_model.User.query.get(user_id).family_id
+        family_obj = family_model.Family.query.get(family_id)
+        family_group = family_obj.group
+        return render_template("graph.html",
+                               id="number " + str(session["user_id"]),
+                               image="graph" + str(family_group) + ".png")
+    except:
+        return render_template("error.html", message="Loosimist ei ole administraatori poolt tehtud")
 
 
 @app.route("/settings")
@@ -628,18 +633,22 @@ def giftingto():
     check = check_if_admin()
     user_id = session["user_id"]
     username = getpersonname(user_id)
+
     if check is not None:  # Let's not let everyone read everyone's lists
         if request.args["id"] != str(gettargetname(user_id)):
             return check
 
     try:  # Yeah, only valid IDs please
-        value = int(user_id)
-        if value < 0:
-            raise Exception
+        value = int(request.args["id"])
+        if value == -1:
+            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud")
+        elif value < 0:
+            raise Exception()
     except Exception:
         return render_template("error.html", message="Pls no hax " + username + "!!")
 
     currentnotes = ["Praegu on siin ainult veel tühjus"]
+
     try:
         print("Opening file:", user_id)
         with open("./notes/" + user_id, "r") as file:

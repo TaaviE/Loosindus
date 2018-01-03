@@ -12,46 +12,34 @@
         <h4>Sinu seaded</h4>
     </header>
     <div id="content">
-        <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
+        <p><a class="mdc-button mdc-button--raised" href="./shuffle">Tagasi</a></p>
         <p>Sinu ID: {{ user_id }}</p>
         <p>Sinu nimi: {{ user_name }}</p>
 
-        {% if family_admin %}
-            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./addmem">Lisa</a></p>
-        {% else %}
-            <p>Ei ole perekonnapea, muudatused perekonnas ei ole lubatud</p>
-        {% endif %}
         <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
             <thead>
             <tr>
-                <th>Perekonnaliige</th>
+                <th>Perekond</th>
                 <th>ID</th>
-                <th>Kustuta</th>
+                <th>Muuda</th>
             </tr>
             </thead>
 
             <tbody>
             {% for name, family in families.items() %}
-                {% for key, value in family.items() %}
-                    <tr>
-                        <td>{{ key }}</td>
-                        <td>{{ value }}</td>
-                        <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removemem?id={{ value }}">Kustuta</a></td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ family }}</td>
+                    <td><a class="mdc-button mdc-button--raised" href="./editfam?id={{ value }}">Muuda</a></td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
 
-        {% if group_admin %}
-            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./addmem">Lisa perekond gruppi</a></p>
-        {% else %}
-            <p>Ei ole grupijuht, muudatused ei ole lubatud</p>
-        {% endif %}
         <table class="u-full-width">
             <thead>
             <tr>
-                <th>Perekond</th>
+                <th>Grupp</th>
                 <th>ID</th>
                 <th>Kustuta</th>
             </tr>
@@ -60,9 +48,9 @@
             <tbody>
             {% for name, group in groups.items() %}
                 <tr>
-                    <td>{{ key }}</td>
-                    <td>{{ value }}</td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./removefam?id={{ value }}">Kustuta</a></td>
+                    <td>{{ name }}</td>
+                    <td>{{ group }}</td>
+                    <td><a class="mdc-button mdc-button--raised" href="./editgroup?id={{ value }}">Muuda</a></td>
                 </tr>
             {% endfor %}
             </tbody>
