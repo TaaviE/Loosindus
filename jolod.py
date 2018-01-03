@@ -36,7 +36,7 @@ from flask_mail import Message
 from config import Config, db, app, mail, celery
 
 # Database models
-from models import notes_model, family_model, shuffles_model, groups_model
+from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, users_families_admins_model, users_model
 
 import sys
 
@@ -95,12 +95,10 @@ def getpersonname(passed_person_id):
     return users_model.User.query.get(passed_person_id).username
 
 
-def gettargetname(passed_person_id):
+def gettargetid(passed_person_id):
     try:
-        print("Found target: ")
         return shuffles_model.Shuffle.query.get(passed_person_id).getter
     except Exception:
-        print("DID NOT FIND TARGET FOR PERSON!")
         return -1
 
 
@@ -126,7 +124,10 @@ def test():
 def index():
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    return render_template("index.html", auth=username)
+    no_shuffle = False
+    if gettargetid(user_id) == -1:
+        no_shuffle = True
+    return render_template("index.html", auth=username, no_shuffle=no_shuffle)
 
 
 @app.route("/shuffle")
@@ -137,7 +138,7 @@ def shuffle():
     print(username)
     gifter = getpersonid(username)
     print(gifter)
-    giftee = gettargetname(gifter)
+    giftee = gettargetid(gifter)
     print(giftee)
     return render_template("shuffle.html", id=giftee)
 
@@ -326,60 +327,42 @@ def graph():
 def settings():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
-    user_family_id = user_obj.family_id
-    is_family_admin = False
-    user_admin_families = {}
-    try:
-        user_family = family_model.Family.query.get(user_family_id)
-        user_family_group = user_family.group
+    is_in_group = False
+    is_in_family = False
 
-        db_families = family_model.Family.query.filter(family_model.Family.id == user_family_id)
-        user_admin_families = {}
-        for db_family in db_families:
-            user_admin_families[db_family.name] = {}
-            people_in_family = users_model.User.query.filter(family_model.Family.id == db_family.id)
+    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.user_id == user_id).all()
 
-            for member in people_in_family:
-                user_admin_families[db_family.name][member.username] = member.id
+    user_families = {}
+    for family_relationship in db_families_user_has_conn:
+        family = family_model.Family.query.get(family_relationship.family_id)
+        user_families[family.name] = (family.id, family_relationship.admin)
+        is_in_family = True
 
-        if len(user_admin_families) > 0:
-            is_family_admin = True
+    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(users_groups_admins_model.UGARelationship.user_id == user_id).all()
 
-    except Exception:
-        user_admin_families = {"Error retrieving": -1}
-
-    db_groups = groups_model.Groups.query.filter(groups_model.Groups.admin == user_id)
-    groups = {}
-    for group in db_groups:
-        groups[group.description] = {}
-        group_families = family_model.Family.query.filter(family_model.Family.group == group.id)
-        for g_family in group_families:
-            groups[group.description][g_family.name] = g_family.id
-
-    is_group_admin = False
-    if len(groups) > 0:
-        is_group_admin = True
-
-    user_admin_families = {}
-    try:
-        families_in_group = family_model.Family.query.filter(family_model.Family.group == user_family_group)
-        for group_family in families_in_group:
-            user_admin_families[group_family.name] = group_family.id
-    except Exception:
-        user_admin_families = {"Error fetching groups": {"": ""}}
+    user_groups = {}
+    for group_relationship in db_groups_user_has_conn:
+        group = groups_model.Groups.query.get(group_relationship.group_id)
+        user_groups[group.description] = (group.id, group_relationship.admin)
+        is_in_group = True
 
     return render_template("settings.html",
                            user_id=user_id,
                            user_name=user_obj.username,
-                           family_admin=is_family_admin,
-                           group_admin=is_group_admin,
-                           families=user_admin_families,
-                           groups=groups)
+                           family_admin=is_in_family,
+                           group_admin=is_in_group,
+                           families=user_families,
+                           groups=user_groups)
 
 
-@app.route("/profile")
+@app.route("/editfam")
 def profile():
-    return render_template("profile.html")
+    return render_template("editfam.html")
+
+
+@app.route("/editgroup")
+def group():
+    return render_template("editgroup.html")
 
 
 @app.route("/secretgraph")
@@ -605,12 +588,13 @@ def save_graph(passed_graph, file_name, colored=False):
     netx.draw_networkx_edges(passed_graph, pos)
 
     if colored:
-        name_id_lookup_dict = {}  # Let's create a name-id mapping
+        raise Exception("Coloring nodes is not yet supported")
+        #name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
 
-        for name in shuffled_names.keys():
-            name_id_lookup_dict[getpersonid(name)] = name
+        #for name in shuffled_names.keys():
+        #    name_id_lookup_dict[getpersonid(name)] = name
 
-        netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
+        #netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
     else:
         netx.draw_networkx_labels(passed_graph, pos)
     cut = 0
@@ -635,7 +619,7 @@ def giftingto():
     username = getpersonname(user_id)
 
     if check is not None:  # Let's not let everyone read everyone's lists
-        if request.args["id"] != str(gettargetname(user_id)):
+        if request.args["id"] != str(gettargetid(user_id)):
             return check
 
     try:  # Yeah, only valid IDs please

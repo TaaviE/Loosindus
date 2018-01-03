@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include "head_template.html" %}
+    <title>Perekonna seaded</title>
+</head>
+<body>
+{% include "style.html" %}
+<table class="u-full-width">
+    <thead>
+    <tr>
+        <th>Liige</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for member in members %}
+        <tr>
+            <td>
+                {{ member }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

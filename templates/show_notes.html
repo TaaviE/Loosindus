@@ -7,6 +7,7 @@
 
 <body>
 {% include "style.html" %}
+{% include "style_data_tables.html" %}
 <div class="container">
     <header>
         <h4>Teise 🎅 nimekiri</h4>
@@ -14,7 +15,7 @@
     <div id="content">
         <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
         <p><a class="mdc-button mdc-button--raised" href="./shuffle">Tagasi</a></p>
-        <table class="u-full-width">
+        <table class="mdl-data-table">
             <thead>
             <tr>
                 <th>Kirjeldus</th>

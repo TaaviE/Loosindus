@@ -7,6 +7,7 @@
 
 <body>
 {% include "style.html" %}
+{% include "style_data_tables.html" %}
 <div class="container">
     <header>
         <h4>Sinu seaded</h4>
@@ -16,12 +17,13 @@
         <p>Sinu ID: {{ user_id }}</p>
         <p>Sinu nimi: {{ user_name }}</p>
 
-        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+        <p>Sinu perekonnad:</p>
+        <table class="mdl-data-table">
             <thead>
             <tr>
                 <th>Perekond</th>
                 <th>ID</th>
-                <th>Muuda</th>
+                <th>Valikud</th>
             </tr>
             </thead>
 
@@ -29,19 +31,22 @@
             {% for name, family in families.items() %}
                 <tr>
                     <td>{{ name }}</td>
-                    <td>{{ family }}</td>
-                    <td><a class="mdc-button mdc-button--raised" href="./editfam?id={{ value }}">Muuda</a></td>
+                    <td>{{ family[0] }}</td>
+                    {% if family[1] %}
+                        <td><a class="mdc-button mdc-button--raised" href="./editfam?id={{ family[0] }}">Muuda</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
 
-        <table class="u-full-width">
+        <p>Sinu grupid:</p>
+        <table class="mdl-data-table">
             <thead>
             <tr>
                 <th>Grupp</th>
                 <th>ID</th>
-                <th>Kustuta</th>
+                <th>Valikud</th>
             </tr>
             </thead>
 
@@ -49,8 +54,10 @@
             {% for name, group in groups.items() %}
                 <tr>
                     <td>{{ name }}</td>
-                    <td>{{ group }}</td>
-                    <td><a class="mdc-button mdc-button--raised" href="./editgroup?id={{ value }}">Muuda</a></td>
+                    <td>{{ group[0] }}</td>
+                    {% if group[1] %}
+                        <td><a class="mdc-button mdc-button--raised" href="./editgroup?id={{ group[0] }}">Muuda</a></td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>

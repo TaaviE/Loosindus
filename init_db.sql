@@ -31,8 +31,7 @@ CREATE TABLE "user"
   password     VARCHAR(255),
   confirmed_at TIMESTAMP,
   active       BOOLEAN,
-  username     VARCHAR(255),
-  family_id    INTEGER
+  username     VARCHAR(255)
 );
 
 CREATE UNIQUE INDEX user_id_uindex
@@ -70,10 +69,6 @@ CREATE TABLE families
 CREATE UNIQUE INDEX families_id_uindex
   ON families (id);
 
-ALTER TABLE "user"
-  ADD CONSTRAINT user_family_id_fkey
-FOREIGN KEY (family_id) REFERENCES families;
-
 CREATE TABLE shuffles
 (
   giver  INTEGER NOT NULL
@@ -94,12 +89,9 @@ CREATE UNIQUE INDEX shuffles_getter_uindex
 
 CREATE TABLE groups
 (
-  id          SERIAL  NOT NULL
+  id          SERIAL NOT NULL
     CONSTRAINT groups_pkey
     PRIMARY KEY,
-  admin       INTEGER NOT NULL
-    CONSTRAINT groups_admin_fkey
-    REFERENCES "user",
   description VARCHAR(255)
 );
 
@@ -109,4 +101,32 @@ CREATE UNIQUE INDEX groups_id_uindex
 ALTER TABLE families
   ADD CONSTRAINT families_group_fkey
 FOREIGN KEY ("group") REFERENCES groups;
+
+CREATE TABLE users_families_admins
+(
+  user_id   INTEGER NOT NULL
+    CONSTRAINT users_families_admins_pkey
+    PRIMARY KEY
+    CONSTRAINT users_families_admins_user_id_fkey
+    REFERENCES "user",
+  family_id INTEGER NOT NULL
+    CONSTRAINT users_families_admins_family_id_fkey
+    REFERENCES families,
+  admin     BOOLEAN NOT NULL
+);
+
+COMMENT ON TABLE users_families_admins IS 'Contains all user-family relationships and if the user is the admin of that family';
+
+CREATE TABLE users_groups_admins
+(
+  user_id  INTEGER NOT NULL
+    CONSTRAINT users_groups_admins_user_id_pk
+    PRIMARY KEY
+    CONSTRAINT users_groups_admins_user_id_fkey
+    REFERENCES "user",
+  group_id INTEGER NOT NULL
+    CONSTRAINT users_groups_admins_group_id_fkey
+    REFERENCES groups,
+  admin    BOOLEAN NOT NULL
+);
 

@@ -13,7 +13,6 @@ class Groups(db.Model):
     __tablename__ = "groups"
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
-    admin = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     description = db.Column(db.VARCHAR(255), nullable=True)
 
     def __init__(self, group_id, group_name):

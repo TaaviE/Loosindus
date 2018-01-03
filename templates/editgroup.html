@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include "head_template.html" %}
+    <title>Grupi seaded</title>
+</head>
+<body>
+{% include "style.html" %}
+<table class="u-full-width">
+    <thead>
+    <tr>
+        <th>Perekond</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for family in families %}
+        <tr>
+            <td>
+                {{ family }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

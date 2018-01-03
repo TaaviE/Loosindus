@@ -29,4 +29,3 @@ class User(db.Model, UserMixin):
         secondary="roles_users",
         backref=db.backref("User", lazy="dynamic")
     )
-    family_id = db.Column(db.Integer, db.ForeignKey("families.id"))
