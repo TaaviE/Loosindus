@@ -6,7 +6,8 @@
 </head>
 <body>
 {% include "style.html" %}
-<table class="u-full-width">
+{% include "style_data_tables.html" %}
+<table class="mdl-data-table">
     <thead>
     <tr>
         <th>Perekond</th>
@@ -16,7 +17,10 @@
     {% for family in families %}
         <tr>
             <td>
-                {{ family }}
+                {{ family[0] }}
+            </td>
+            <td>
+                {{ family[1] }}
             </td>
         </tr>
     {% endfor %}

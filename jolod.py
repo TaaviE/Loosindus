@@ -356,12 +356,27 @@ def settings():
 
 
 @app.route("/editfam")
-def profile():
-    return render_template("editfam.html")
+def editfamily():
+    user_id = session["user_id"]
+    user_obj = users_model.User.query.get(user_id)
+
+    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.user_id == user_id).all()
+
+    family = []
+    db_family = db_families_user_has_conn[int(request.args["id"])]
+    family_id = db_family.family_id
+    db_family_members = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.family_id == family_id).all()
+
+    for member in db_family_members:
+        family.append((getpersonname(member.user_id), member.user_id))
+
+    return render_template("editfam.html", family=family)
 
 
 @app.route("/editgroup")
-def group():
+def editgroup():
+    user_id = session["user_id"]
+    user_obj = users_model.User.query.get(user_id)
     return render_template("editgroup.html")
 
 

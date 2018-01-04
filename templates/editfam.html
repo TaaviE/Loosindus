@@ -6,17 +6,26 @@
 </head>
 <body>
 {% include "style.html" %}
-<table class="u-full-width">
+{% include "style_data_tables.html" %}
+<table class="mdl-data-table">
     <thead>
     <tr>
         <th>Liige</th>
+        <th>ID</th>
+        <th>Tegevused</th>
     </tr>
     </thead>
     <tbody>
-    {% for member in members %}
+    {% for member in family %}
         <tr>
             <td>
-                {{ member }}
+                {{ member[0] }}
+            </td>
+            <td>
+                {{ member[1] }}
+            </td>
+            <td>
+                {{ member[1] }}
             </td>
         </tr>
     {% endfor %}
