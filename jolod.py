@@ -24,7 +24,6 @@ import secretsanta
 # Utilities
 import copy
 import datetime
-import json
 import random
 
 # Flask
@@ -234,8 +233,14 @@ def createnote_add():
         user_id=user_id,
         notes=currentnotes,
     )
-    db.session.add(db_entry_notes)
-    db.session.commit()
+    try:
+        db.session.add(db_entry_notes)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        row = notes_model.Notes.query.get(user_id)
+        row.notes = currentnotes
+        db.session.commit()
     return render_template("success.html", action="Lisatud", link="./notes", title="Lisatud")
 
 
@@ -295,8 +300,14 @@ def editnote_edit():
         user_id=user_id,
         notes=currentnotes,
     )
-    db.session.add(db_entry_notes)
-    db.session.commit()
+    try:
+        db.session.add(db_entry_notes)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        row = notes_model.Notes.query.get(user_id)
+        row.notes = currentnotes
+        db.session.commit()
     return render_template("success.html", action="Muudetud", link="./notes", title="Muudetud")
 
 
@@ -328,8 +339,14 @@ def deletenote():
         user_id=user_id,
         notes=currentnotes,
     )
-    db.session.add(db_entry_notes)
-    db.session.commit()
+    try:
+        db.session.add(db_entry_notes)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        row = notes_model.Notes.query.get(user_id)
+        row.notes = currentnotes
+        db.session.commit()
     print("Removed", username, "note with ID", request.args["id"])
     return render_template("success.html", action="Eemaldatud", link="./notes", title="Eemaldatud")
 
@@ -692,8 +709,8 @@ def giftingto():
 
     try:
         print("Opening file:", user_id)
-        with open("./notes/" + user_id, "r") as file:
-            currentnotes = json.load(file)
+        row = notes_model.Notes.query.get(request_id)
+        currentnotes = row.notes
     except Exception as e:
         print(e)
 
