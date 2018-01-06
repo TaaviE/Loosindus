@@ -1,36 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>Perekonna seaded</title>
-</head>
-<body>
-{% include "style.html" %}
-{% include "style_data_tables.html" %}
-<table class="mdl-data-table">
-    <thead>
-    <tr>
-        <th>Liige</th>
-        <th>ID</th>
-        <th>Tegevused</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for member in family %}
-        <tr>
-            <td>
-                {{ member[0] }}
-            </td>
-            <td>
-                {{ member[1] }}
-            </td>
-            <td>
-                {{ member[1] }}
-            </td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <h3 class="mdc-typography--display1">{{ title }}</h3>
+    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+        <thead>
+        <tr>
+            <th>Liige</th>
+            <th>ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for member in family %}
+            <tr>
+                <td>
+                    {{ member[0] }}
+                </td>
+                <td>
+                    {{ member[1] }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

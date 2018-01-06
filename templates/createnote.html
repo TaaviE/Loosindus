@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>🎄 {{ title }} 🎄</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-<div class="container">
-    <header>
-        <h4>{{ title }}</h4>
-    </header>
+{% block title %}🎄 {{ title }}{% endblock %}
 
-    <div id="content">
-        <a class="mdc-button mdc-button--raised" href="./notes">Vaata kõiki (tagasi)</a>
-        <form method="post">
-            <textarea class="mdc-text-field__input" value="{{ placeholder }}" name="note">{{ placeholder }}</textarea>
-            <input type="submit" class="mdc-button mdc-button--raised" value="Saada"></input>
-        </form>
-    </div>
-</div>
-</body>
-</html>
+{% block content %}
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./notes">Vaata
+        kõiki (tagasi)</a>
+    <form method="post">
+                <textarea class="mdl-textfield__input" value="{{ placeholder }}"
+                          name="note">{{ placeholder }}</textarea>
+        <input type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               value="Saada"></input>
+    </form>
+{% endblock %}
 

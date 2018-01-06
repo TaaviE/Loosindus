@@ -1,70 +1,58 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>Seaded</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-{% include "style_data_tables.html" %}
-<div class="container">
-    <header>
-        <h4>Sinu seaded</h4>
-    </header>
-    <div id="content">
-        <p><a class="mdc-button mdc-button--raised" href="./shuffle">Tagasi</a></p>
-        <p>Sinu ID: {{ user_id }}</p>
-        <p>Sinu nimi: {{ user_name }}</p>
+{% block title %}🎄 {{ title }}{% endblock %}
 
-        <p>Sinu perekonnad:</p>
-        <table class="mdl-data-table">
-            <thead>
+{% block content %}
+    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
+    <p>Sinu ID: {{ user_id }}</p>
+    <p>Sinu nimi: {{ user_name }}</p>
+
+    <p>Sinu perekonnad:</p>
+    <table class="mdl-data-table">
+        <thead>
+        <tr>
+            <th>Perekond</th>
+            <th>ID</th>
+            <th>Valikud</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for name, family in families.items() %}
             <tr>
-                <th>Perekond</th>
-                <th>ID</th>
-                <th>Valikud</th>
+                <td>{{ name }}</td>
+                <td>{{ family[0] }}</td>
+                {% if family[1] %}
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./editfam?id={{ family[0] }}">Muuda</a>
+                    </td>
+                {% endif %}
             </tr>
-            </thead>
+        {% endfor %}
+        </tbody>
+    </table>
 
-            <tbody>
-            {% for name, family in families.items() %}
-                <tr>
-                    <td>{{ name }}</td>
-                    <td>{{ family[0] }}</td>
-                    {% if family[1] %}
-                        <td><a class="mdc-button mdc-button--raised" href="./editfam?id={{ family[0] }}">Muuda</a></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <p>Sinu grupid:</p>
+    <table class="mdl-data-table">
+        <thead>
+        <tr>
+            <th>Grupp</th>
+            <th>ID</th>
+            <th>Valikud</th>
+        </tr>
+        </thead>
 
-        <p>Sinu grupid:</p>
-        <table class="mdl-data-table">
-            <thead>
+        <tbody>
+        {% for name, group in groups.items() %}
             <tr>
-                <th>Grupp</th>
-                <th>ID</th>
-                <th>Valikud</th>
+                <td>{{ name }}</td>
+                <td>{{ group[0] }}</td>
+                {% if group[1] %}
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./editgroup?id={{ group[0] }}">Muuda</a>
+                    </td>
+                {% endif %}
             </tr>
-            </thead>
-
-            <tbody>
-            {% for name, group in groups.items() %}
-                <tr>
-                    <td>{{ name }}</td>
-                    <td>{{ group[0] }}</td>
-                    {% if group[1] %}
-                        <td><a class="mdc-button mdc-button--raised" href="./editgroup?id={{ group[0] }}">Muuda</a></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-</div>
-</body>
-</html>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
 

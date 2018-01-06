@@ -1,22 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>🎶</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-<div class="container">
-    <header>
-        <h5>Sa oled {{ id }}</h5>
-        <p>Nimesid ei ole põhjusega, joone jämedam ots tähistab saajat</p>
-    </header>
-    <div id="content">
-        <a class="mdc-button mdc-button--raised" href="../">Tagasi</a>
-        <p class="center"><img src="{{ url_for('static', filename=image) }}"/></p>
-    </div>
-</div>
-</body>
-</html>
+{% block title %}🎄 {{ title }}{% endblock %}
 
+{% block content %}
+        <header>
+            <h5>Sa oled {{ id }}</h5>
+            <p>Nimesid ei ole põhjusega, joone jämedam ots tähistab saajat</p>
+        </header>
+
+        <div>
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
+            <p class="center"><img src="{{ url_for('static', filename=image) }}"/></p>
+        </div>
+{% endblock %}

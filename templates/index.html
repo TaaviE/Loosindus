@@ -1,27 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>🎄</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-<div class="container">
-    <header>
-        <h3>Tere, {{ auth }}!</h3>
-    </header>
+{% block title %}🎄 {{ title }}{% endblock %}
 
-    <div id="content">
-        <p class="center">Hästi lihtne leht enda jõulunimekirja koostamise jaoks ja selle enda jõuluvanaga jagamiseks
-            🎅</p>
-        {% if no_shuffle %}
+{% block content %}
+    <p class="center">Hästi lihtne leht enda jõulunimekirja koostamise jaoks ja selle enda jõuluvanaga
+        jagamiseks
+        🎅</p>
+    {% if no_shuffle %}
         <h5>Loosimist ei ole veel administraatori poolt tehtud, funktsionaalsus on limiteeritud</h5>
-        {% endif %}
-        <a class="mdc-button mdc-button--raised" href="./notes">Minu nimekiri</a>
-        <a class="mdc-button mdc-button--raised" href="./shuffle" >Kinkimine</a>
-    </div>
-</div>
-</body>
-</html>
+    {% endif %}
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./notes">Minu nimekiri</a>
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Kinkimine</a>
+{% endblock %}
 

@@ -1,31 +1,39 @@
 {% block doc -%}
-    <!DOCTYPE html>
     <html{% block html_attribs %}{% endblock html_attribs %}>
     {%- block html %}
         <head>
             {%- block head %}
                 <title>{% block title %}{{ title|default }}{% endblock title %}</title>
-                {% include "head_template.html" %}
 
                 {%- block metas %}
                 {%- endblock metas %}
 
                 {%- block styles %}
                 {%- endblock styles %}
-            {%- endblock head %}
-        </head>
-        <body{% block body_attribs %}{% endblock body_attribs %}>
-        {% include "style.html" %}
-        <div class="container">
-            {% block body -%}
-                {% block navbar %}
-                {%- endblock navbar %}
-                {% block content -%}
-                {%- endblock content %}
 
-                {% block scripts %}
-                {%- endblock scripts %}
-            {%- endblock body %}
+            {%- endblock head %}
+
+            {% include "head_template.html" %}
+            {% include "style.html" %}
+        </head>
+
+        <body class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+        {% block title_bar %}
+            {% with title=self.title() %}
+                {% include "security/title_bar.html" %}
+            {% endwith %}
+        {% endblock %}
+
+        <div class="content">
+            {% block navbar %}
+            {%- endblock navbar %}
+
+            {% block content -%}
+            {%- endblock content %}
+
+            {% block scripts %}
+            {%- endblock scripts %}
         </div>
         </body>
     {%- endblock html %}

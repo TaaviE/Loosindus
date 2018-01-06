@@ -1,6 +1,8 @@
 {% extends "security/base.html" %}
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
+{% block title %}Register{% endblock %}
+
 {% block content %}
     <h1>{{ _("Register") }}</h1>
     {% include "security/_messages.html" %}

@@ -1,38 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>Teise 🎅 nimekiri</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-{% include "style_data_tables.html" %}
-<div class="container">
-    <header>
-        <h4>Teise 🎅 nimekiri</h4>
-    </header>
-    <div id="content">
-        <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
-        <p><a class="mdc-button mdc-button--raised" href="./shuffle">Tagasi</a></p>
-        <table class="mdl-data-table">
-            <thead>
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
+    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
+    <table class="mdl-data-table">
+        <thead>
+        <tr>
+            <th>Kirjeldus</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in notes %}
             <tr>
-                <th>Kirjeldus</th>
+                <td>
+                    {{ item }}
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            {% for item in notes %}
-                <tr>
-                    <td>
-                        {{ item }}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-</body>
-</html>
-
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

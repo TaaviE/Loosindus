@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>🔥 Viga! 🔥</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-<div class="container">
-    <header>
-        <h1>{{ message }}!</h1>
-    </header>
-    <a class="mdc-button mdc-button--raised" href="../">Tagasi</a>
-</div>
-</body>
-</html>
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <h4>{{ message }}</h4>
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
+{% endblock %}

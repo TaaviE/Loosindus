@@ -1,19 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    {% include "head_template.html" %}
-    <title>🌟 {{ action }} 🌟</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-{% include "style.html" %}
-<div class="container">
-    <header>
-        <h1>{{ action }}!</h1>
-    </header>
-    <div id="content">
-        <a class="mdc-button mdc-button--raised" href="{{ link }}">Vaata kõiki</a>
-    </div>
-</div>
-</body>
-</html>
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="{{ link }}">Vaata kõiki</a>
+{% endblock %}

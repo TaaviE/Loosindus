@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock title %}</title>
+    {% include "head_template.html" %}
+    {% include "style.html" %}
+</head>
+
+<body class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+{% block title_bar %}
+{% with title=self.title() %}
+    {% include "title_bar.html" %}
+{% endwith %}
+{% endblock %}
+
+    <div class="content">
+        <h3>{{ self.title() }}</h3>
+
+        {% block content -%}
+        {%- endblock content %}
+    </div>
+</body>
+</html>
