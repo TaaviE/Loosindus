@@ -28,8 +28,9 @@ import json
 import random
 
 # Flask
-from flask import request, render_template, session
-from flask_security import login_required, SQLAlchemyUserDatastore, forms, Security
+from flask import request, render_template, session, redirect
+from flask_security import login_required, logout_user, SQLAlchemyUserDatastore, forms, Security
+from flask_login import current_user
 from flask_mail import Message
 
 # App specific config
@@ -119,8 +120,6 @@ def test():
     return render_template("error.html", message="Here you go!", title="Error")
 
 
-@app.route("/")
-@login_required
 def index():
     user_id = session["user_id"]
     username = getpersonname(user_id)
@@ -128,6 +127,31 @@ def index():
     if gettargetid(user_id) == -1:
         no_shuffle = True
     return render_template("index.html", auth=username, no_shuffle=no_shuffle, title="Kodu")
+
+
+@app.route("/about")
+def about():
+    return render_template("home.html")
+
+
+@app.route("/")
+def home():
+    if current_user.is_authenticated:
+        return index()
+    else:
+        return about()
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 @app.route("/shuffle")
@@ -635,12 +659,17 @@ def giftingto():
     user_id = session["user_id"]
     username = getpersonname(user_id)
 
+    try:
+        request_id = request.args["id"]
+    except Exception:
+        request_id = "-1"
+
     if check is not None:  # Let's not let everyone read everyone's lists
-        if request.args["id"] != str(gettargetid(user_id)):
+        if request_id != str(gettargetid(user_id)):
             return check
 
     try:  # Yeah, only valid IDs please
-        value = int(request.args["id"])
+        value = int(request_id)
         if value == -1:
             return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud", title="Error")
         elif value < 0:
@@ -661,6 +690,7 @@ def giftingto():
     #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     # except Exception:
     return render_template("show_notes.html", notes=currentnotes, target=getpersonname(user_id), title="Kingisoovid")
+
 
 """
 @app.route("/login", methods=["GET"])

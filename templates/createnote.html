@@ -3,13 +3,18 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./notes">Vaata
-        kõiki (tagasi)</a>
     <form method="post">
-                <textarea class="mdl-textfield__input" value="{{ placeholder }}"
+        <textarea class="mdl-textfield__input" value="{{ placeholder }}"
                           name="note">{{ placeholder }}</textarea>
         <input type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               value="Saada"></input>
+               value="Saada">
     </form>
+{% endblock %}
+
+{% block buttons %}
+    <div class="mdl-card__actions mdl-card--border">
+        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+           href="./notes">Vaata kõiki (tagasi)</a>
+    </div>
 {% endblock %}
 

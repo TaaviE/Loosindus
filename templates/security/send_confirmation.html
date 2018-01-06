@@ -1,6 +1,8 @@
 {% extends "security/base.html" %}
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
+{% block title %}Confirmation{% endblock %}
+
 {% block content %}
     <h1>{{ _('Resend confirmation instructions') }}</h1>
     {% include "security/_messages.html" %}

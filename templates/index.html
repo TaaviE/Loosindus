@@ -3,13 +3,25 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <p class="center">Hästi lihtne leht enda jõulunimekirja koostamise jaoks ja selle enda jõuluvanaga
-        jagamiseks
-        🎅</p>
-    {% if no_shuffle %}
-        <h5>Loosimist ei ole veel administraatori poolt tehtud, funktsionaalsus on limiteeritud</h5>
-    {% endif %}
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./notes">Minu nimekiri</a>
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Kinkimine</a>
+    <h3>Tere, kumba nimekirja soovid vaadata?</h3>
 {% endblock %}
 
+{% block buttons %}
+    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+       href="./giftingto">Teise inimese
+    </a>
+
+    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+       href="./notes">Minu
+    </a>
+{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        {% if no_shuffle %}
+            <h5>Loosimist ei ole veel administraatori poolt tehtud, funktsionaalsus on limiteeritud</h5>
+        {% else %}
+             <h5>Probleemide korral kontakteeru koheselt!</h5>
+        {% endif %}
+    </div>
+{% endblock %}
