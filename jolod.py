@@ -132,7 +132,7 @@ def index():
 
 @app.route("/about")
 def about():
-    return render_template("home.html")
+    return render_template("home.html", no_sidebar=True)
 
 
 @app.route("/")
@@ -145,7 +145,7 @@ def home():
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html", no_sidebar=True)
 
 
 @app.route("/logout")
@@ -350,6 +350,7 @@ def graph():
 
 
 @app.route("/settings")
+@login_required
 def settings():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
@@ -385,6 +386,7 @@ def settings():
 
 
 @app.route("/editfam")
+@login_required
 def editfamily():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
@@ -405,6 +407,7 @@ def editfamily():
 
 
 @app.route("/editgroup")
+@login_required
 def editgroup():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)

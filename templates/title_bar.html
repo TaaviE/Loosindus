@@ -23,6 +23,7 @@
     </div>
 </header>
 
+{% if no_sidebar != True %}
 <div class="demo-drawer mdl-layout__drawer">
     <nav class="demo-navigation mdl-navigation">
         <a class="mdl-navigation__link" href="/notes">
@@ -36,3 +37,4 @@
             <i class="material-icons" role="presentation">power</i> Logi välja</a>
     </nav>
 </div>
+{% endif %}

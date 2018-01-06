@@ -11,7 +11,7 @@
 <div class="demo-layout mdl-layout mdl-js-layout {% if sidebar %}mdl-layout--fixed-drawer{% endif %} mdl-layout--fixed-header">
     {% block title_bar %}
         {% with title=self.title() %}
-            {% with sidebar=False %}
+            {% with no_sidebar=True %}
                 {% include "title_bar.html" %}
             {% endwith %}
         {% endwith %}
