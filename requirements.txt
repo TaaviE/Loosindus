@@ -9,4 +9,3 @@ bcrypt
 sqlalchemy
 psycopg2
 matplotlib
-Celery

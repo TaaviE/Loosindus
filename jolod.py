@@ -33,7 +33,7 @@ from flask_login import current_user
 from flask_mail import Message
 
 # App specific config
-from config import Config, db, app, mail, celery
+from config import Config, db, app, mail  # , celery
 
 # Database models
 from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, \
@@ -103,14 +103,14 @@ def gettargetid(passed_person_id):
         return -1
 
 
-@celery.task
-def send_celery_mail(msg):
-    mail.send(msg)
+# @celery.task(serializer="pickle")
+# def send_celery_mail(msg):
+#    mail.send(msg)
 
 
-@security.send_mail_task
-def delay_security_email(msg):
-    send_celery_mail.delay(msg)
+# @security.send_mail_task
+# def delay_security_email(msg):
+#    send_celery_mail.delay(msg)
 
 
 # Views
