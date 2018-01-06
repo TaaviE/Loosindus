@@ -1,5 +1,4 @@
 # coding=utf-8
-from celery import Celery
 
 
 class Config(object):
@@ -69,4 +68,3 @@ from werkzeug.contrib.fixers import ProxyFix
 ProxyFix(app, num_proxies=1)
 db = SQLAlchemy(app)
 mail = Mail(app)
-celery = Celery()

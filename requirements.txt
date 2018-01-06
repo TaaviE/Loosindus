@@ -9,3 +9,4 @@ bcrypt
 sqlalchemy
 psycopg2
 matplotlib
+werkzeug

@@ -103,16 +103,6 @@ def gettargetid(passed_person_id):
         return -1
 
 
-# @celery.task(serializer="pickle")
-# def send_celery_mail(msg):
-#    mail.send(msg)
-
-
-# @security.send_mail_task
-# def delay_security_email(msg):
-#    send_celery_mail.delay(msg)
-
-
 # Views
 @app.route("/test")
 @login_required
