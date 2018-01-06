@@ -37,7 +37,8 @@ from flask_mail import Message
 from config import Config, db, app, mail, celery
 
 # Database models
-from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, users_families_admins_model, users_model
+from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, \
+    users_families_admins_model
 
 import sys
 
@@ -262,7 +263,8 @@ def editnote():
 
     if int(request.args["id"]) >= len(currentnotes):
         return render_template("error.html", message="Ei leidnud seda, mida muuta tahtsid 🤔", title="Error")
-    return render_template("createnote.html", action="Muuda", title="Muuda" ,placeholder=currentnotes[int(request.args["id"])])
+    return render_template("createnote.html", action="Muuda", title="Muuda",
+                           placeholder=currentnotes[int(request.args["id"])])
 
 
 @app.route("/editnote", methods=["POST"])
@@ -354,7 +356,8 @@ def settings():
     is_in_group = False
     is_in_family = False
 
-    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.user_id == user_id).all()
+    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(
+        users_families_admins_model.UFARelationship.user_id == user_id).all()
 
     user_families = {}
     for family_relationship in db_families_user_has_conn:
@@ -362,7 +365,8 @@ def settings():
         user_families[family.name] = (family.id, family_relationship.admin)
         is_in_family = True
 
-    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(users_groups_admins_model.UGARelationship.user_id == user_id).all()
+    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(
+        users_groups_admins_model.UGARelationship.user_id == user_id).all()
 
     user_groups = {}
     for group_relationship in db_groups_user_has_conn:
@@ -385,12 +389,14 @@ def editfamily():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
 
-    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.user_id == user_id).all()
+    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(
+        users_families_admins_model.UFARelationship.user_id == user_id).all()
 
     family = []
     db_family = db_families_user_has_conn[int(request.args["id"])]
     family_id = db_family.family_id
-    db_family_members = users_families_admins_model.UFARelationship.query.filter(users_families_admins_model.UFARelationship.family_id == family_id).all()
+    db_family_members = users_families_admins_model.UFARelationship.query.filter(
+        users_families_admins_model.UFARelationship.family_id == family_id).all()
 
     for member in db_family_members:
         family.append((getpersonname(member.user_id), member.user_id))
@@ -438,6 +444,7 @@ def family():
     return render_template("show_family.html", names=family_member_names, title="Perekond")
 """
 
+
 def save_graph(passed_graph, file_name, colored=False):
     # This function just saves a networkx graph into a .png file without any GUI(!)
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
@@ -456,12 +463,12 @@ def save_graph(passed_graph, file_name, colored=False):
 
     if colored:
         raise Exception("Coloring nodes is not yet supported")
-        #name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
+        # name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
 
-        #for name in shuffled_names.keys():
+        # for name in shuffled_names.keys():
         #    name_id_lookup_dict[getpersonid(name)] = name
 
-        #netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
+        # netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
     else:
         netx.draw_networkx_labels(passed_graph, pos)
     cut = 0
@@ -597,7 +604,7 @@ def regraph():
 
     save_graph(digraph, "./static/graph" + str(family_group) + ".png")
     del digraph
-#    rerendernamegraph()  # create the graph with names
+    #    rerendernamegraph()  # create the graph with names
 
     return render_template("success.html", action="Genereeritud", link="./notes", title="Genereeritud")
 
@@ -623,10 +630,10 @@ def rerender():
         return check
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)
-#    digraph.add_nodes_from(copy.deepcopy(families_shuf_ids).keys())
+    #    digraph.add_nodes_from(copy.deepcopy(families_shuf_ids).keys())
 
-#    for source, destination in copy.deepcopy(families_shuf_ids).items():
-#        digraph.add_edges_from([(source, destination)])
+    #    for source, destination in copy.deepcopy(families_shuf_ids).items():
+    #        digraph.add_edges_from([(source, destination)])
 
     save_graph(digraph, "./static/graph"".png")
     return render_template("success.html", action="Genereeritud", link="./notes", title="Genereeritud")
@@ -641,10 +648,10 @@ def rerendernamegraph():
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)  # This is probably a horrible idea with more nodes
 
-    #for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
+    # for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
     #    digraph.add_node(shuffled_ids_id)
 
-    #for source, destination in copy.deepcopy(families_shuf_ids).items():
+    # for source, destination in copy.deepcopy(families_shuf_ids).items():
     #    digraph.add_edges_from([(source, destination)])
 
     save_graph(digraph, "./static/secretgraph.png", colored=True)
@@ -671,7 +678,8 @@ def giftingto():
     try:  # Yeah, only valid IDs please
         value = int(request_id)
         if value == -1:
-            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud", title="Error")
+            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud",
+                                   title="Error")
         elif value < 0:
             raise Exception()
     except Exception:

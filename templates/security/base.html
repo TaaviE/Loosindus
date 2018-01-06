@@ -1,41 +1,53 @@
-{% block doc -%}
-    <html{% block html_attribs %}{% endblock html_attribs %}>
-    {%- block html %}
-        <head>
-            {%- block head %}
-                <title>{% block title %}{{ title|default }}{% endblock title %}</title>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock title %}</title>
+    {% include "head_template.html" %}
+    {% include "style.html" %}
+</head>
 
-                {%- block metas %}
-                {%- endblock metas %}
 
-                {%- block styles %}
-                {%- endblock styles %}
-
-            {%- endblock head %}
-
-            {% include "head_template.html" %}
-            {% include "style.html" %}
-        </head>
-
-        <body class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-
-        {% block title_bar %}
-            {% with title=self.title() %}
-                {% include "security/title_bar.html" %}
+<body>
+<div class="demo-layout mdl-layout mdl-js-layout {% if sidebar %}mdl-layout--fixed-drawer{% endif %} mdl-layout--fixed-header">
+    {% block title_bar %}
+        {% with title=self.title() %}
+            {% with sidebar=False %}
+                {% include "title_bar.html" %}
             {% endwith %}
-        {% endblock %}
+        {% endwith %}
+    {% endblock %}
 
-        <div class="content">
-            {% block navbar %}
-            {%- endblock navbar %}
+    <main class="mdl-layout__content mdl-color--grey-100">
+        <div class="mdl-grid">
+            <!--<div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid"></div>-->
+            <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
+                <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                    {% block content %}{% endblock %}
+                    {% block navbar %}
+                    {%- endblock navbar %}
 
-            {% block content -%}
-            {%- endblock content %}
 
-            {% block scripts %}
-            {%- endblock scripts %}
+                    {% block scripts %}
+                    {%- endblock scripts %}
+                </div>
+                {% block buttons %}{% endblock %}
+            </div>
+            <div class="mdl-cell mdl-cell--4-col mdl-cell--8-col-tablet mdl-grid mdl-grid--no-spacing">
+                <div class="demo-updates mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col mdl-cell--4-col-tablet mdl-cell--12-col-desktop">
+                    <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
+                        <h2 class="mdl-card__title-text">Info</h2>
+                    </div>
+
+                    {% block updates %}{% endblock %}
+                    <!--<div class="mdl-card__actions mdl-card--border">
+                        <a href="#" class="mdl-button mdl-js-button mdl-js-ripple-effect">Read More</a>
+                    </div>-->
+                </div>
+                <div class="demo-separator mdl-cell--1-col"></div>
+            </div>
         </div>
-        </body>
-    {%- endblock html %}
-    </html>
-{% endblock doc -%}
+    </main>
+</div>
+{% include "footer.html" %}
+</body>
+</html>

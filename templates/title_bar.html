@@ -1,4 +1,4 @@
-<header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+<header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
         <span class="mdl-layout-title">{{ title }}</span>
         <div class="mdl-layout-spacer"></div>
@@ -23,6 +23,7 @@
     </div>
 </header>
 
+{% if sidebar %}
 <div class="demo-drawer mdl-layout__drawer">
     <nav class="demo-navigation mdl-navigation">
         <a class="mdl-navigation__link" href="/notes">
@@ -36,3 +37,4 @@
             <i class="material-icons" role="presentation">power</i> Logi välja</a>
     </nav>
 </div>
+{% endif %}
