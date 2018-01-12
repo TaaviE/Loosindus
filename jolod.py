@@ -122,7 +122,7 @@ def index():
     no_shuffle = False
     if gettargetid(user_id) == -1:
         no_shuffle = True
-    return render_template("index.html", auth=username, no_shuffle=no_shuffle, title="Kodu")
+    return render_template("index.html", auth=username, no_shuffle=no_shuffle, uid=user_id, title="Kodu")
 
 
 @app.route("/about")
