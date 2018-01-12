@@ -89,7 +89,13 @@ def getpersonid(name):
 
 
 def getfamilyid(passed_person_id):
-    return users_model.User.query.get(passed_person_id).family_id
+    passed_person_id = int(passed_person_id)
+    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(
+        users_families_admins_model.UFARelationship.user_id == passed_person_id).all()
+
+    db_family = db_families_user_has_conn[0]
+    family_id = db_family.family_id
+    return family_id
 
 
 def getpersonname(passed_person_id):
@@ -298,6 +304,7 @@ def editnote_edit():
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
         db.session.commit()
+
     return render_template("success.html", action="Muudetud", link="./notes", title="Muudetud")
 
 
@@ -337,6 +344,7 @@ def deletenote():
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
         db.session.commit()
+
     print("Removed", username, "note with ID", request.args["id"])
     return render_template("success.html", action="Eemaldatud", link="./notes", title="Eemaldatud")
 
@@ -346,7 +354,7 @@ def deletenote():
 def graph():
     user_id = session["user_id"]
     try:
-        family_id = users_model.User.query.get(user_id).family_id
+        family_id = getfamilyid(user_id)
         family_obj = family_model.Family.query.get(family_id)
         family_group = family_obj.group
         return render_template("graph.html",
@@ -413,12 +421,33 @@ def editfamily():
     return render_template("editfam.html", family=family, title="Muuda perekonda")
 
 
+@app.route("/editfam", methods=["POST"])
+@login_required
+def editfamily_with_action():
+    user_id = session["user_id"]
+    user_obj = users_model.User.query.get(user_id)
+    try:
+        action = request.args["action"]
+    except Exception:
+        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
+
+    return None
+
+
 @app.route("/editgroup")
 @login_required
 def editgroup():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
     return render_template("editgroup.html", title="Muuda gruppi")
+
+
+@app.route("/editgroup", methods=["POST"])
+@login_required
+def editgroup_with_action():
+    user_id = session["user_id"]
+    user_obj = users_model.User.query.get(user_id)
+    return None
 
 
 @app.route("/secretgraph")
@@ -496,21 +525,21 @@ def save_graph(passed_graph, file_name, colored=False):
 
 
 @app.route("/recreategraph")
-@login_required
 def regraph():
     #    check = check_if_admin()
     #    if check is not None:
     #        return check
 
     user_id = session["user_id"]
-    family_id = users_model.User.query.get(user_id).family_id
+    family_id = getfamilyid(user_id)
     family_obj = family_model.Family.query.get(family_id)
     family_group = family_obj.group
 
     database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
     database_all_families_with_members = []
     for db_family in database_families:
-        database_family_members = users_model.User.query.filter(users_model.User.family_id == db_family.id).all()
+        database_family_members = users_families_admins_model.UFARelationship.query.filter(
+            users_families_admins_model.UFARelationship.family_id == db_family.id).all()
         database_all_families_with_members.append(database_family_members)
 
     families = []
@@ -518,8 +547,8 @@ def regraph():
     for family_index, list_family in enumerate(database_all_families_with_members):
         families.insert(family_index, {})
         for person_index, person in enumerate(list_family):
-            family_ids_map[family_index] = person.family_id
-            families[family_index][person.username] = person.id
+            family_ids_map[family_index] = getfamilyid(person.user_id)
+            families[family_index][getpersonname(person.user_id)] = getfamilyid(person.user_id)
 
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
     for family_index, family_members in enumerate(families_give_copy):
@@ -677,12 +706,12 @@ def giftingto():
     username = getpersonname(user_id)
 
     try:
-        request_id = request.args["id"]
+        request_id = int(request.args["id"])
     except Exception:
-        request_id = "-1"
+        request_id = gettargetid(user_id)
 
     if check is not None:  # Let's not let everyone read everyone's lists
-        if request_id != str(gettargetid(user_id)):
+        if request_id != gettargetid(user_id):
             return check
 
     try:  # Yeah, only valid IDs please
@@ -702,12 +731,12 @@ def giftingto():
         row = notes_model.Notes.query.get(request_id)
         currentnotes = row.notes
     except Exception as e:
-        print(e)
+        print("Error displaying notes, there might be none:", e)
 
     # try:  # Not the prettiest, but tries to display names in the correct form
     #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     # except Exception:
-    return render_template("show_notes.html", notes=currentnotes, target=getpersonname(user_id), title="Kingisoovid")
+    return render_template("show_notes.html", notes=currentnotes, target=getpersonname(request_id), title="Kingisoovid")
 
 
 """
