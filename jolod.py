@@ -736,7 +736,7 @@ def giftingto():
     currentnotes = ["Praegu on siin ainult veel tühjus"]
 
     try:
-        print("Opening file:", user_id)
+        print(user_id, "is opening file:", request_id)
         row = notes_model.Notes.query.get(request_id)
         currentnotes = row.notes
     except Exception as e:
