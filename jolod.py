@@ -37,7 +37,7 @@ from config import Config, db, app, mail  # , celery
 
 # Database models
 from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, \
-    users_families_admins_model
+    users_families_admins_model, names_model
 
 import sys
 
@@ -107,6 +107,13 @@ def gettargetid(passed_person_id):
         return shuffles_model.Shuffle.query.get(passed_person_id).getter
     except Exception:
         return -1
+
+
+def getnameingenitive(name):
+    try:
+        return names_model.Name.query.get(name).genitive
+    except Exception:
+        return name
 
 
 # Views
@@ -525,6 +532,7 @@ def save_graph(passed_graph, file_name, colored=False):
 
 
 @app.route("/recreategraph")
+@login_required
 def regraph():
     #    check = check_if_admin()
     #    if check is not None:
@@ -548,8 +556,15 @@ def regraph():
         families.insert(family_index, {})
         for person_index, person in enumerate(list_family):
             family_ids_map[family_index] = getfamilyid(person.user_id)
-            families[family_index][getpersonname(person.user_id)] = getfamilyid(person.user_id)
+            families[family_index][getpersonname(person.user_id)] = person.user_id
 
+    families_shuf_nam = {}
+    families_shuf_ids = {}
+    #    print("Starting finding matches")
+    """""
+    # This comment block contains self-written algorithm that isn't as robust 
+    # as the library's solution thus this is not used for now
+    
     families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
     for family_index, family_members in enumerate(families_give_copy):
         for person in family_members:
@@ -559,13 +574,6 @@ def regraph():
     for family_index, family_members in enumerate(families_take_copy):
         for person in family_members:
             families_take_copy[family_index][person] = True
-
-    families_shuf_nam = {}
-    families_shuf_ids = {}
-    #    print("Starting finding matches")
-    """""
-    # This comment block contains self-written algorithm that isn't as robust 
-    # as the library's solution thus this is not used for now
     
     for index, family in enumerate(families_list_copy):  # For each family among every family
         for person in family:  # For each person in given family
@@ -736,7 +744,10 @@ def giftingto():
     # try:  # Not the prettiest, but tries to display names in the correct form
     #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     # except Exception:
-    return render_template("show_notes.html", notes=currentnotes, target=getpersonname(request_id), title="Kingisoovid")
+    return render_template("show_notes.html",
+                           notes=currentnotes,
+                           target=getnameingenitive(getpersonname(request_id)),
+                           title="Kingisoovid")
 
 
 """
