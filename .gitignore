@@ -113,6 +113,7 @@ __pycache__
 venv
 */*sitemap.xml*
 */*robots.txt*
+generated_graphs/
 
 # IntelliJ and PyCharm
 .idea

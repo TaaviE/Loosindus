@@ -81,7 +81,7 @@ security = Security(app, user_datastore,
                     forgot_password_form=ExtendedForgotPasswordForm)
 
 # Just for assigning members_to_families a few colors
-chistmasy_colors = ["#B3000C", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
+chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
 
 def getpersonid(name):
@@ -114,6 +114,13 @@ def getnameingenitive(name):
         return names_model.Name.query.get(name).genitive
     except Exception:
         return name
+
+
+def send_graph(filename):
+    return send_from_directory("./generated_graphs", filename)
+
+
+app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", view_func=send_graph)
 
 
 # Views
@@ -376,9 +383,9 @@ def graph():
         family_group = family_obj.group
         return render_template("graph.html",
                                id=str(session["user_id"]),
-                               image="graph" + str(family_group) + ".png",
+                               image="graph_" + str(family_group) + ".png",
                                title="Graaf")
-    except:
+    except Exception as e:
         return render_template("error.html", message="Loosimist ei ole administraatori poolt tehtud", title="Error")
 
 
@@ -519,13 +526,12 @@ def save_graph(passed_graph, file_name, colored=False):
     netx.draw_networkx_edges(passed_graph, pos)
 
     if colored:
-        raise Exception("Coloring nodes is not yet supported")
-        # name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
+        name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
 
-        # for name in shuffled_names.keys():
-        #    name_id_lookup_dict[getpersonid(name)] = name
+        for name in shuffled_names.keys():
+            name_id_lookup_dict[getpersonid(name)] = name
 
-        # netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
+        netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
     else:
         netx.draw_networkx_labels(passed_graph, pos)
     cut = 0
@@ -660,7 +666,7 @@ def regraph():
     for source, destination in copy.deepcopy(families_shuf_ids).items():
         digraph.add_edges_from([(source, destination)])
 
-    save_graph(digraph, "./static/graph" + str(family_group) + ".png")
+    save_graph(digraph, "./generated_graphs/graph_" + str(family_group) + ".png")
     del digraph
     #    rerendernamegraph()  # create the graph with names
 
@@ -683,17 +689,36 @@ def test_mail():
 @app.route("/rerendergraph")
 @login_required
 def rerender():
-    check = check_if_admin()
-    if check is not None:
-        return check
+    #    check = check_if_admin()
+    #    if check is not None:
+    #        return check
+
+    user_id = session["user_id"]
+    family_id = getfamilyid(user_id)
+    family_obj = family_model.Family.query.get(family_id)
+    family_group = family_obj.group
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)
-    #    digraph.add_nodes_from(copy.deepcopy(families_shuf_ids).keys())
 
-    #    for source, destination in copy.deepcopy(families_shuf_ids).items():
-    #        digraph.add_edges_from([(source, destination)])
+    database_all_families_with_members = []
+    database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
+    for db_family in database_families:
+        database_family_members = users_families_admins_model.UFARelationship.query.filter(
+            users_families_admins_model.UFARelationship.family_id == db_family.id).all()
+        database_all_families_with_members.append(database_family_members)
 
-    save_graph(digraph, "./static/graph"".png")
+    families_shuf_ids = {}
+    for family in database_all_families_with_members:
+        for member in family:
+            families_shuf_ids[member.user_id] = gettargetid(member.user_id)
+
+    digraph.add_nodes_from(families_shuf_ids.keys())
+
+    for source, destination in copy.deepcopy(families_shuf_ids).items():
+        digraph.add_edges_from([(source, destination)])
+
+    save_graph(digraph, "./generated_graphs/graph_" + str(family_group) + ".png")
+
     return render_template("success.html", action="Genereeritud", link="./notes", title="Genereeritud")
 
 

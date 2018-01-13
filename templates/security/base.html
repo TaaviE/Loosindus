@@ -4,6 +4,7 @@
     <title>{% block title %}{% endblock title %}</title>
     {% include "head_template.html" %}
     {% include "style.html" %}
+    <meta property="og:title" content="{{ self.title() }}"/>
 </head>
 
 

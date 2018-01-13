@@ -7,7 +7,7 @@
 
 
     <url>
-        <loc>https://example.com</loc>
+        <loc>https://jolod.aegrel.ee</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -15,28 +15,28 @@
 
 
     <url>
-        <loc>https://example.com/about</loc>
+        <loc>https://jolod.aegrel.ee/about</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>https://example.com/contact</loc>
+        <loc>https://jolod.aegrel.ee/contact</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>https://example.com/login</loc>
+        <loc>https://jolod.aegrel.ee/login</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
     </url>
 
     <url>
-        <loc>https://example.com/register</loc>
+        <loc>https://jolod.aegrel.ee/register</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>

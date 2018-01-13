@@ -10,6 +10,6 @@
 
         <div>
             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
-            <p class="center"><img src="{{ url_for('static', filename=image) }}"/></p>
+            <p class="center"><img src="{{ url_for("generated_graphs", filename=image) }}"/></p>
         </div>
 {% endblock %}
