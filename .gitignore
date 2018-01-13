@@ -111,6 +111,7 @@ config.py
 notes
 __pycache__
 venv
+*/*sitemap.xml*
 
 # IntelliJ and PyCharm
 .idea
