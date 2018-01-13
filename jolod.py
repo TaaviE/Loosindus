@@ -27,7 +27,7 @@ import datetime
 import random
 
 # Flask
-from flask import request, render_template, session, redirect
+from flask import request, render_template, session, redirect, send_from_directory
 from flask_security import login_required, logout_user, SQLAlchemyUserDatastore, forms, Security
 from flask_login import current_user
 from flask_mail import Message
@@ -148,6 +148,16 @@ def home():
 @app.route("/contact")
 def contact():
     return render_template("contact.html", no_sidebar=True)
+
+
+@app.route("/robots.txt")
+def robots():
+    return send_from_directory(app.static_folder, "robots.txt")
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    return send_from_directory(app.static_folder, "sitemap.xml")
 
 
 @app.route("/logout")
