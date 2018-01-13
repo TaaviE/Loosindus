@@ -112,6 +112,7 @@ notes
 __pycache__
 venv
 */*sitemap.xml*
+*/*robots.txt*
 
 # IntelliJ and PyCharm
 .idea
