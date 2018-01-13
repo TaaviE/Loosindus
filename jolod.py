@@ -531,9 +531,9 @@ def save_graph(passed_graph, file_name, colored=False):
         for name in shuffled_names.keys():
             name_id_lookup_dict[getpersonid(name)] = name
 
-        netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict)
+        netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict, font_size=18)
     else:
-        netx.draw_networkx_labels(passed_graph, pos)
+        netx.draw_networkx_labels(passed_graph, pos, font_size=18)
     cut = 0
     xmax = 1.1 + cut * max(xx for xx, yy in pos.values())
     ymax = 1.1 + cut * max(yy for xx, yy in pos.values())
