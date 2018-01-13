@@ -366,7 +366,8 @@ def graph():
         family_group = family_obj.group
         return render_template("graph.html",
                                id=str(session["user_id"]),
-                               image="graph" + str(family_group) + ".png")
+                               image="graph" + str(family_group) + ".png",
+                               title="Graaf")
     except:
         return render_template("error.html", message="Loosimist ei ole administraatori poolt tehtud", title="Error")
 
