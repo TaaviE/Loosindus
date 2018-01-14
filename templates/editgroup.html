@@ -4,24 +4,32 @@
 
 {% block content %}
     <h3 class="mdc-typography--display1">{{ title }}</h3>
-    <h3>Muudatused ei ole veel lubatud</h3>
     <div id="content">
         <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
             <thead>
             <tr>
                 <th>Perekond</th>
                 <th>ID</th>
+                <th>Tegevus</th>
+                {% if admin %}
+                    <th></th>
+                {% endif %}
             </tr>
             </thead>
             <tbody>
             {% for family in families %}
                 <tr>
-                    <td>
-                        {{ family[0] }}
+                    <td>{{ family[0] }}</td>
+                    <td>{{ family[1] }}</td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./editfam?id={{ family[1] }}">Vaata</a>
                     </td>
-                    <td>
-                        {{ family[1] }}
-                    </td>
+                    {% if family[2] %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editfam?id={{ family[1] }}">Eemalda</a>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>

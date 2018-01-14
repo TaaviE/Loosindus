@@ -4,23 +4,34 @@
 
 {% block content %}
     <h3 class="mdc-typography--display1">{{ title }}</h3>
-    <h3>Muudatused ei ole veel lubatud</h3>
     <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
         <thead>
         <tr>
             <th>Liige</th>
-            <th>ID</th>
+            {% if admin %}
+                <th>ID</th>
+            {% endif %}
+            <th>Tegevused</th>
+            {% if admin %}
+                <th></th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
         {% for member in family %}
             <tr>
-                <td>
-                    {{ member[0] }}
+                <td>{{ member[0] }}</td>
+                {% if admin %}
+                    <td>{{ member[1] }}</td>
+                {% endif %}
+                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="./giftingto?id={{ member[1] }}">Vaata nimekirja</a>
                 </td>
-                <td>
-                    {{ member[1] }}
-                </td>
+                {% if member[2] %}
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./removefromfam?id={{ member[1] }}">Eemalda</a>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

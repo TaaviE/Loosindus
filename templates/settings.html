@@ -23,7 +23,12 @@
                 <td>{{ name }}</td>
                 <td>{{ family[0] }}</td>
                 {% if family[1] %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./editfam?id={{ family[0] }}">Muuda</a>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./editfam?id={{ family[0] }}">Muuda / Vaata</a>
+                    </td>
+                {% else %}
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./viewfam?id={{ family[0] }}">Vaata</a>
                     </td>
                 {% endif %}
             </tr>
@@ -49,6 +54,10 @@
                 {% if group[1] %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                            href="./editgroup?id={{ group[0] }}">Muuda / Vaata</a>
+                    </td>
+                {% else %}
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./editgroup?id={{ group[0] }}">Vaata</a>
                     </td>
                 {% endif %}
             </tr>

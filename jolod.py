@@ -122,6 +122,16 @@ def send_graph(filename):
 
 app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", view_func=send_graph)
 
+if not Config.DEBUG:
+    @app.errorhandler(500)
+    def error_500():
+        return render_template("error.html", message="Päringu töötlemisel tekkis viga!", title="Error")
+
+
+    @app.errorhandler(404)
+    def error_404():
+        return render_template("error.html", message="Lehte ei leitud!", title="Error")
+
 
 # Views
 @app.route("/test")
@@ -385,7 +395,7 @@ def graph():
                                id=str(session["user_id"]),
                                image="graph_" + str(family_group) + ".png",
                                title="Graaf")
-    except Exception as e:
+    except Exception:
         return render_template("error.html", message="Loosimist ei ole administraatori poolt tehtud", title="Error")
 
 
@@ -429,28 +439,48 @@ def settings():
 @login_required
 def editfamily():
     user_id = session["user_id"]
-    user_obj = users_model.User.query.get(user_id)
 
-    db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(
-        users_families_admins_model.UFARelationship.user_id == user_id).all()
+    try:
+        request_id = int(request.args["id"])
+    except Exception:
+        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
+
+    if request_id < 0:
+        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
+
+    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(
+        users_groups_admins_model.UGARelationship.user_id == user_id).all()
+
+    valid = False
+    for group_relationship in db_groups_user_has_conn:
+        group = groups_model.Groups.query.get(group_relationship.group_id)
+        families = family_model.Family.query.filter(family_model.Family.group == group.id).all()
+        for family in families:
+            if family.id == request_id:
+                valid = True
+
+    if not valid:
+        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
+
+
+    db_family_members = users_families_admins_model.UFARelationship.query.filter(
+        users_families_admins_model.UFARelationship.family_id == request_id).all()
 
     family = []
-    db_family = db_families_user_has_conn[int(request.args["id"])]
-    family_id = db_family.family_id
-    db_family_members = users_families_admins_model.UFARelationship.query.filter(
-        users_families_admins_model.UFARelationship.family_id == family_id).all()
-
+    show_admin_column = False
     for member in db_family_members:
-        family.append((getpersonname(member.user_id), member.user_id))
+        is_admin = False
 
-    return render_template("editfam.html", family=family, title="Muuda perekonda")
+        family.append((getpersonname(member.user_id), member.user_id, is_admin))
+
+    return render_template("editfam.html", family=family, title="Muuda perekonda", admin=show_admin_column)
 
 
 @app.route("/editfam", methods=["POST"])
 @login_required
 def editfamily_with_action():
     user_id = session["user_id"]
-    user_obj = users_model.User.query.get(user_id)
+
     try:
         action = request.args["action"]
     except Exception:
@@ -464,7 +494,35 @@ def editfamily_with_action():
 def editgroup():
     user_id = session["user_id"]
     user_obj = users_model.User.query.get(user_id)
-    return render_template("editgroup.html", title="Muuda gruppi")
+
+    try:
+        request_id = int(request.args["id"])
+    except Exception:
+        request_id = 0
+
+    db_groups_user_is_admin = users_groups_admins_model.UGARelationship.query.filter(
+        users_groups_admins_model.UGARelationship.user_id == user_id).all()
+
+    db_groups_user_has_conn = family_model.Family.query.filter(family_model.Family.group == request_id).all()
+
+    db_group = db_groups_user_has_conn[request_id]
+
+    db_families_in_group = family_model.Family.query.filter(family_model.Family.group == db_group.group).all()
+
+    families = []
+    for family in db_families_in_group:
+        admin = False
+
+        if family in db_groups_user_is_admin:
+            admin = True
+
+        families.append((family.name, family.id, admin))
+
+    is_admin = False
+    if len(db_groups_user_is_admin) > 0:
+        is_admin = True
+
+    return render_template("editgroup.html", title="Muuda gruppi", families=families, admin=is_admin)
 
 
 @app.route("/editgroup", methods=["POST"])
@@ -756,7 +814,25 @@ def giftingto():
 
     if check is not None:  # Let's not let everyone read everyone's lists
         if request_id != gettargetid(user_id):
-            return check
+            family_id = getfamilyid(user_id)
+            family_obj = family_model.Family.query.get(family_id)
+            family_group = family_obj.group
+
+            database_all_families_with_members = []
+            database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
+            for db_family in database_families:
+                database_family_members = users_families_admins_model.UFARelationship.query.filter(
+                    users_families_admins_model.UFARelationship.family_id == db_family.id).all()
+                database_all_families_with_members.append(database_family_members)
+
+            found = False
+            for family in database_all_families_with_members:
+                for member in family:
+                    if member.user_id == request_id:
+                        found = True
+
+            if not found:
+                return check
 
     try:  # Yeah, only valid IDs please
         value = int(request_id)
