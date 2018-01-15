@@ -4,19 +4,33 @@
 
 {% block content %}
     <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
+    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a>
+    </p>
     <table class="mdl-data-table">
         <thead>
         <tr>
             <th>Kirjeldus</th>
+            <th>Ostetud</th>
+            <!--<th>Tegevus</th>-->
         </tr>
         </thead>
         <tbody>
         {% for item in notes %}
             <tr>
                 <td>
-                    {{ item }}
+                    {{ item[0] }}
                 </td>
+                <td>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-1">
+                        <input type="checkbox" id="checkbox-1" class="mdl-checkbox__input"
+                               disabled {% if item[1] %}checked{% endif %}>
+                        <span class="mdl-checkbox__label"></span>
+                    </label>
+                </td>
+                <!--<td>
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="./updatestatus?id={{ item[1] }}">Vaheta staatust</a>
+                </td>-->
             </tr>
         {% endfor %}
         </tbody>

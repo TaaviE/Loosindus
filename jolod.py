@@ -465,18 +465,21 @@ def settings():
         users_families_admins_model.UFARelationship.user_id == user_id).all()
 
     user_families = {}
+    db_groups_user_has_conn = []
     for family_relationship in db_families_user_has_conn:
         family = family_model.Family.query.get(family_relationship.family_id)
         user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
         is_in_family = True
-
-    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(
-        users_groups_admins_model.UGARelationship.user_id == user_id).all()
+        db_groups_user_has_conn += (groups_model.Groups.query.filter(family_model.Family.group == family.group).all())
 
     user_groups = {}
     for group_relationship in db_groups_user_has_conn:
-        group = groups_model.Groups.query.get(group_relationship.group_id)
-        user_groups[group.description] = (encrypt_id(group.id), group_relationship.admin)
+        uga_relationship = users_groups_admins_model.UGARelationship.query.filter(
+            users_groups_admins_model.UGARelationship.user_id == user_id and users_groups_admins_model.UGARelationship.group_id == group_relationship.id).first()
+        if not uga_relationship:
+            user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), False)
+        else:
+            user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), uga_relationship.admin)
         is_in_group = True
 
     return render_template("settings.html",
@@ -502,21 +505,6 @@ def editfamily():
 
     if request_id < 0:
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
-
-    db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(
-        users_groups_admins_model.UGARelationship.user_id == user_id).all()
-
-    valid = False
-    for group_relationship in db_groups_user_has_conn:
-        group = groups_model.Groups.query.get(group_relationship.group_id)
-        families = family_model.Family.query.filter(family_model.Family.group == group.id).all()
-        for family in families:
-            if family.id == request_id:
-                valid = True
-
-    if not valid:
-        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
-
 
     db_family_members = users_families_admins_model.UFARelationship.query.filter(
         users_families_admins_model.UFARelationship.family_id == request_id).all()
