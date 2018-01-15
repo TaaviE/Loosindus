@@ -907,8 +907,13 @@ def giftingto():
     # try:  # Not the prettiest, but tries to display names in the correct form
     #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     # except Exception:
+    note_status = []
+    for note in currentnotes:
+        note_status.append((note, False))
+
+
     return render_template("show_notes.html",
-                           notes=currentnotes,
+                           notes=note_status,
                            target=getnameingenitive(getpersonname(request_id)),
                            title="Kingisoovid")
 
