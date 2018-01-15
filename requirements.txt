@@ -10,3 +10,4 @@ sqlalchemy
 psycopg2
 matplotlib
 werkzeug
+pycryptodomex

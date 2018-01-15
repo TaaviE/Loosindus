@@ -25,6 +25,9 @@ import secretsanta
 import copy
 import datetime
 import random
+import base64
+import json
+from Cryptodome.Cipher import AES
 
 # Flask
 from flask import request, render_template, session, redirect, send_from_directory
@@ -33,7 +36,7 @@ from flask_login import current_user
 from flask_mail import Message
 
 # App specific config
-from config import Config, db, app, mail  # , celery
+from config import Config, db, app, mail
 
 # Database models
 from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, \
@@ -118,6 +121,37 @@ def getnameingenitive(name):
 
 def send_graph(filename):
     return send_from_directory("./generated_graphs", filename)
+
+
+def decrypt_id(encrypted_user_id):
+    base64_raw_data = base64.urlsafe_b64decode(encrypted_user_id).decode()
+    data = json.loads(base64_raw_data)
+    ciphertext = base64.b64decode(data[0])
+    nonce = base64.b64decode(data[1])
+    tag = base64.b64decode(data[2])
+
+    cipher = AES.new(Config.AES_KEY, AES.MODE_GCM, nonce=nonce)
+    plaintext = cipher.decrypt(ciphertext).decode()
+
+    try:
+        cipher.verify(tag)
+        print("The message is authentic:", plaintext)
+    except ValueError:
+        print("Key incorrect or message corrupted!")
+
+    return plaintext
+
+
+def encrypt_id(user_id):
+    cipher = AES.new(Config.AES_KEY, AES.MODE_GCM)
+    ciphertext, tag = cipher.encrypt_and_digest(bytes(str(user_id), encoding="utf8"))
+    nonce = base64.b64encode(cipher.nonce).decode()
+    ciphertext = base64.b64encode(ciphertext).decode()
+    tag = base64.b64encode(tag).decode()
+    json_package = json.dumps([ciphertext, nonce, tag])
+    packed = base64.urlsafe_b64encode(bytes(json_package, "utf8")).decode()
+
+    return packed
 
 
 app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", view_func=send_graph)
@@ -280,26 +314,28 @@ def editnote():
     user_id = session["user_id"]
     username = getpersonname(user_id)
     currentnotes = []
-    print("Trying to remove a note:", request.args["id"])
+
     try:
-        int(request.args["id"])  # Just check if the id passed can be converted to an integer
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
+
+        print(user_id, "is trying to remove a note", request_id)
     except Exception:
         return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
 
     try:
-        print("Opening file", user_id)
-        #        with open("./notes/" + useridno, "r") as file:
-        #            currentnotes = json.load(file)
+        print(user_id, " is pening notes of ", request_id)
         db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
     except Exception as e:
         print(e)
 
-    if int(request.args["id"]) >= len(currentnotes):
+    if int(request_id) >= len(currentnotes):
         return render_template("error.html", message="Ei leidnud seda, mida muuta tahtsid 🤔", title="Error")
+
     return render_template("createnote.html", action="Muuda", title="Muuda",
-                           placeholder=currentnotes[int(request.args["id"])])
+                           placeholder=currentnotes[request_id])
 
 
 @app.route("/editnote", methods=["POST"])
@@ -311,8 +347,17 @@ def editnote_edit():
     print("Found user id:", user_id)
     currentnotes = []
     addednote = request.form["note"]
-    print("Trying to add a note:", addednote)
     try:
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
+    except Exception:
+        request_id = -1
+
+    if request_id < 0:
+        return None
+
+    try:
+        print("Trying to add a note:", addednote)
         print("Opening file", user_id)
         #        with open("./notes/" + user_id, "r") as file:
         #            currentnotes = json.load(file)
@@ -322,7 +367,7 @@ def editnote_edit():
     except Exception as e:
         print(e)
 
-    currentnotes[int(request.args["id"])] = addednote
+    currentnotes[request_id] = addednote
 
     #    with open("./notes/" + user_id, "w") as file:
     #        file.write(json.dumps(currentnotes))
@@ -330,10 +375,11 @@ def editnote_edit():
         user_id=user_id,
         notes=currentnotes,
     )
+
     try:
         db.session.add(db_entry_notes)
         db.session.commit()
-    except:
+    except Exception:
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
@@ -348,7 +394,14 @@ def deletenote():
     user_id = session["user_id"]
     username = getpersonname(user_id)
     currentnotes = []
-    print("Trying to remove a note:", request.args["id"])
+
+    try:
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
+        print(user_id, " is trying to remove a note", request_id)
+    except Exception:
+        return None  # TODO: Add error
+
     try:
         print("Opening file", user_id)
         #        with open("./notes/" + useridno, "r") as file:
@@ -360,7 +413,7 @@ def deletenote():
         print(e)
 
     try:
-        currentnotes.pop(int(request.args["id"]))
+        currentnotes.pop(request_id)
     except Exception:
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid", title="Error")
 
@@ -370,16 +423,17 @@ def deletenote():
         user_id=user_id,
         notes=currentnotes,
     )
+
     try:
         db.session.add(db_entry_notes)
         db.session.commit()
-    except:
+    except Exception:
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
         db.session.commit()
 
-    print("Removed", username, "note with ID", request.args["id"])
+    print("Removed", username, "note with ID", request_id)
     return render_template("success.html", action="Eemaldatud", link="./notes", title="Eemaldatud")
 
 
@@ -413,7 +467,7 @@ def settings():
     user_families = {}
     for family_relationship in db_families_user_has_conn:
         family = family_model.Family.query.get(family_relationship.family_id)
-        user_families[family.name] = (family.id, family_relationship.admin)
+        user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
         is_in_family = True
 
     db_groups_user_has_conn = users_groups_admins_model.UGARelationship.query.filter(
@@ -422,7 +476,7 @@ def settings():
     user_groups = {}
     for group_relationship in db_groups_user_has_conn:
         group = groups_model.Groups.query.get(group_relationship.group_id)
-        user_groups[group.description] = (group.id, group_relationship.admin)
+        user_groups[group.description] = (encrypt_id(group.id), group_relationship.admin)
         is_in_group = True
 
     return render_template("settings.html",
@@ -441,7 +495,8 @@ def editfamily():
     user_id = session["user_id"]
 
     try:
-        request_id = int(request.args["id"])
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
     except Exception:
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
@@ -471,7 +526,7 @@ def editfamily():
     for member in db_family_members:
         is_admin = False
 
-        family.append((getpersonname(member.user_id), member.user_id, is_admin))
+        family.append((getpersonname(member.user_id), encrypt_id(member.user_id), is_admin))
 
     return render_template("editfam.html", family=family, title="Muuda perekonda", admin=show_admin_column)
 
@@ -483,6 +538,8 @@ def editfamily_with_action():
 
     try:
         action = request.args["action"]
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
     except Exception:
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
@@ -496,7 +553,8 @@ def editgroup():
     user_obj = users_model.User.query.get(user_id)
 
     try:
-        request_id = int(request.args["id"])
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
     except Exception:
         request_id = 0
 
@@ -516,7 +574,7 @@ def editgroup():
         if family in db_groups_user_is_admin:
             admin = True
 
-        families.append((family.name, family.id, admin))
+        families.append((family.name, encrypt_id(family.id), admin))
 
     is_admin = False
     if len(db_groups_user_is_admin) > 0:
@@ -539,15 +597,20 @@ def secretgraph():
     check = check_if_admin()
     if check is not None:
         return check
+
+    request_id = str(request.args["id"])
+
     return render_template("graph.html",
                            id=str(getpersonname(session["user_id"])),
-                           image="s" + str(request.args["id"]) + ".png",
+                           image="s" + request_id + ".png",
                            title="Salajane graaf")
 
 
 def check_if_admin():
     user_id = session["user_id"]
     requester = getpersonname(user_id)
+    requester = requester.lower()
+
     if requester != "admin" and requester != "taavi":
         return render_template("error.html", message="Pls no hax " + requester + "!!", title="Error")
     else:
@@ -808,9 +871,19 @@ def giftingto():
     username = getpersonname(user_id)
 
     try:
-        request_id = int(request.args["id"])
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
     except Exception:
         request_id = gettargetid(user_id)
+
+    try:  # Yeah, only valid IDs please
+        if request_id == -1:
+            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud",
+                                   title="Error")
+        elif request_id < 0:
+            raise Exception()
+    except Exception:
+        return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
 
     if check is not None:  # Let's not let everyone read everyone's lists
         if request_id != gettargetid(user_id):
@@ -833,16 +906,6 @@ def giftingto():
 
             if not found:
                 return check
-
-    try:  # Yeah, only valid IDs please
-        value = int(request_id)
-        if value == -1:
-            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud",
-                                   title="Error")
-        elif value < 0:
-            raise Exception()
-    except Exception:
-        return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
 
     currentnotes = ["Praegu on siin ainult veel tühjus"]
 
