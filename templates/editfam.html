@@ -4,6 +4,9 @@
 
 {% block content %}
     <h3 class="mdc-typography--display1">{{ title }}</h3>
+    <p><a {% if back %}id="link-previous"{% endif %}
+          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+          href="{{ back_link }}">Tagasi</a></p>
     <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
         <thead>
         <tr>
@@ -24,9 +27,13 @@
                 {% if admin %}
                     <td>{{ member[1] }}</td>
                 {% endif %}
+
+                {% if not member[3] %}
                 <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                        href="./giftingto?id={{ member[1] }}">Vaata nimekirja</a>
                 </td>
+                {% endif %}
+
                 {% if member[2] %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                            href="./removefromfam?id={{ member[1] }}">Eemalda</a>

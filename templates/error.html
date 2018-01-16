@@ -4,5 +4,6 @@
 
 {% block content %}
     <h4>{{ message }}</h4>
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
+    <a {% if back == True %}id="link-previous"{% endif %}
+       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
 {% endblock %}

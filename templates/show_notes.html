@@ -4,14 +4,17 @@
 
 {% block content %}
     <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a>
-    </p>
+    <p><a {% if back %}id="link-previous"{% endif %}
+          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+          href="{{ back_link }}">Tagasi</a></p>
     <table class="mdl-data-table">
         <thead>
         <tr>
             <th>Kirjeldus</th>
+            {% if not invalid %}
             <th>Ostetud</th>
-            <!--<th>Tegevus</th>-->
+                <th>Tegevus</th>
+            {% endif %}
         </tr>
         </thead>
         <tbody>
@@ -20,17 +23,24 @@
                 <td>
                     {{ item[0] }}
                 </td>
+                {% if not invalid %}
+                    <form action="" method="post">
                 <td>
-                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-1">
-                        <input type="checkbox" id="checkbox-1" class="mdl-checkbox__input"
-                               disabled {% if item[1] %}checked{% endif %}>
+                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
+                        <input name="checkbox" type="checkbox" id="checkbox" class="mdl-checkbox__input"
+                               {% if item[1] %}checked{% endif %}>
                         <span class="mdl-checkbox__label"></span>
                     </label>
                 </td>
-                <!--<td>
-                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="./updatestatus?id={{ item[1] }}">Vaheta staatust</a>
-                </td>-->
+                        <td>
+                            <input type="hidden" name="id" value="{{ id }}">
+                            <input type="hidden" name="index" value="{{ loop.index0 }}">
+                            <input id="submit" type="submit"
+                                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   value="Vaheta staatust"/>
+                        </td>
+                    </form>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

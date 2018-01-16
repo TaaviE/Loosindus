@@ -6,7 +6,8 @@
     <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
         jõuluvana 🎄</p>
     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa uus</a>
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./">Tagasi</a>
+    <a {% if back %}id="link-previous"{% endif %}
+       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="/">Tagasi</a>
     <table class="mdl-data-table">
         <thead>
         <tr>

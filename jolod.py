@@ -27,6 +27,7 @@ import datetime
 import random
 import base64
 import json
+import itertools
 from Cryptodome.Cipher import AES
 
 # Flask
@@ -235,7 +236,7 @@ def shuffle():
 @login_required
 def notes():
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    # username = getpersonname(user_id)
     notes_from_file = []
     empty = False
     try:
@@ -268,6 +269,7 @@ def createnote_add():
     print("Found user:", username)
     print("Found user id:", user_id)
     currentnotes = []
+    notes_purchased = []
     addednote = request.form["note"]
 
     if len(addednote) > 1000:
@@ -275,6 +277,7 @@ def createnote_add():
     elif len(addednote) <= 0:
         return render_template("error.html",
                                message="Jõuluvana tühjust tuua ei saa, " + username + "!", title="Error")
+
     print("Trying to add a note:", addednote)
     try:
         print("Opening file", user_id)
@@ -283,28 +286,35 @@ def createnote_add():
         db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
+            notes_purchased = db_notes.notes_purchased
     except Exception as e:
         print(e)
-    if len(currentnotes) == 999:
+
+    if len(currentnotes) >= 999:
         return render_template("error.html",
                                message="Soovinimekiri muutuks liiga pikaks, " + username + "", title="Error")
 
     currentnotes.append(addednote)
+    notes_purchased.append(False)
 
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
     db_entry_notes = notes_model.Notes(
         user_id=user_id,
         notes=currentnotes,
+        notes_purchased=notes_purchased
     )
+
     try:
         db.session.add(db_entry_notes)
         db.session.commit()
-    except:
+    except Exception:
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
+        row.notes_purchased = notes_purchased
         db.session.commit()
+
     return render_template("success.html", action="Lisatud", link="./notes", title="Lisatud")
 
 
@@ -343,9 +353,11 @@ def editnote():
 def editnote_edit():
     print("Got a post request to edit a note")
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    # username = getpersonname(user_id)
     print("Found user id:", user_id)
     currentnotes = []
+    notes_purchased = []
+
     addednote = request.form["note"]
     try:
         request_id = request.args["id"]
@@ -364,6 +376,7 @@ def editnote_edit():
         db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
+            notes_purchased = db_notes.notes_purchased
     except Exception as e:
         print(e)
 
@@ -374,6 +387,7 @@ def editnote_edit():
     db_entry_notes = notes_model.Notes(
         user_id=user_id,
         notes=currentnotes,
+        notes_purchased=notes_purchased
     )
 
     try:
@@ -383,6 +397,7 @@ def editnote_edit():
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
+        row.notes_purchased = notes_purchased
         db.session.commit()
 
     return render_template("success.html", action="Muudetud", link="./notes", title="Muudetud")
@@ -394,13 +409,14 @@ def deletenote():
     user_id = session["user_id"]
     username = getpersonname(user_id)
     currentnotes = []
+    notes_purchased = []
 
     try:
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
         print(user_id, " is trying to remove a note", request_id)
     except Exception:
-        return None  # TODO: Add error
+        return render_template("error.html", message="Viga lingis", title="Error")
 
     try:
         print("Opening file", user_id)
@@ -409,11 +425,13 @@ def deletenote():
         db_notes = notes_model.Notes.query.get(user_id)
         if db_notes is not None:  # Don't want to display None
             currentnotes = db_notes.notes
+            notes_purchased = db_notes.notes_purchased
     except Exception as e:
         print(e)
 
     try:
         currentnotes.pop(request_id)
+        notes_purchased.pop(request_id)
     except Exception:
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid", title="Error")
 
@@ -422,6 +440,7 @@ def deletenote():
     db_entry_notes = notes_model.Notes(
         user_id=user_id,
         notes=currentnotes,
+        notes_purchased=notes_purchased
     )
 
     try:
@@ -431,6 +450,7 @@ def deletenote():
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
+        row.notes_purchased = notes_purchased
         db.session.commit()
 
     print("Removed", username, "note with ID", request_id)
@@ -475,7 +495,10 @@ def settings():
     user_groups = {}
     for group_relationship in db_groups_user_has_conn:
         uga_relationship = users_groups_admins_model.UGARelationship.query.filter(
-            users_groups_admins_model.UGARelationship.user_id == user_id and users_groups_admins_model.UGARelationship.group_id == group_relationship.id).first()
+            users_groups_admins_model.UGARelationship.user_id == user_id
+            and
+            users_groups_admins_model.UGARelationship.group_id == group_relationship.id).first()
+
         if not uga_relationship:
             user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), False)
         else:
@@ -489,7 +512,8 @@ def settings():
                            group_admin=is_in_group,
                            families=user_families,
                            groups=user_groups,
-                           title="Seaded")
+                           title="Seaded",
+                           back_link="/")
 
 
 @app.route("/editfam")
@@ -513,23 +537,31 @@ def editfamily():
     show_admin_column = False
     for member in db_family_members:
         is_admin = False
+        is_person = False
+        if member.user_id == user_id:
+            is_person = True
 
-        family.append((getpersonname(member.user_id), encrypt_id(member.user_id), is_admin))
+        family.append((getpersonname(member.user_id), encrypt_id(member.user_id), is_admin, is_person))
 
-    return render_template("editfam.html", family=family, title="Muuda perekonda", admin=show_admin_column)
+    return render_template("editfam.html",
+                           family=family,
+                           title="Muuda perekonda",
+                           admin=show_admin_column,
+                           back=False,
+                           back_link="/settings")
 
 
 @app.route("/editfam", methods=["POST"])
 @login_required
 def editfamily_with_action():
-    user_id = session["user_id"]
+    # user_id = session["user_id"]
 
-    try:
-        action = request.args["action"]
-        request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
-    except Exception:
-        return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
+    # try:
+    # action = request.args["action"]
+    # request_id = request.args["id"]
+    # request_id = int(decrypt_id(request_id))
+    # except Exception:
+    # return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
     return None
 
@@ -538,7 +570,7 @@ def editfamily_with_action():
 @login_required
 def editgroup():
     user_id = session["user_id"]
-    user_obj = users_model.User.query.get(user_id)
+    # user_obj = users_model.User.query.get(user_id)
 
     try:
         request_id = request.args["id"]
@@ -574,8 +606,8 @@ def editgroup():
 @app.route("/editgroup", methods=["POST"])
 @login_required
 def editgroup_with_action():
-    user_id = session["user_id"]
-    user_obj = users_model.User.query.get(user_id)
+    # user_id = session["user_id"]
+    # user_obj = users_model.User.query.get(user_id)
     return None
 
 
@@ -618,7 +650,7 @@ def family():
 """
 
 
-def save_graph(passed_graph, file_name, colored=False):
+def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping={}):
     # This function just saves a networkx graph into a .png file without any GUI(!)
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
     plotlib.axis("off")  # Turn off the axis display
@@ -637,7 +669,7 @@ def save_graph(passed_graph, file_name, colored=False):
     if colored:
         name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
 
-        for name in shuffled_names.keys():
+        for name in id_to_id_mapping.keys():
             name_id_lookup_dict[getpersonid(name)] = name
 
         netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict, font_size=18)
@@ -763,7 +795,7 @@ def regraph():
         try:
             db.session.add(db_entry_shuffle)
             db.session.commit()
-        except:
+        except Exception:
             db.session.rollback()
             row = shuffles_model.Shuffle.query.get(giver)
             row.getter = getter
@@ -840,15 +872,99 @@ def rerendernamegraph():
 
     digraph = netx.DiGraph(iterations=100000000, scale=2)  # This is probably a horrible idea with more nodes
 
-    # for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
-    #    digraph.add_node(shuffled_ids_id)
+    user_id = session["user_id"]
+    family_id = getfamilyid(user_id)
+    family_obj = family_model.Family.query.get(family_id)
+    family_group = family_obj.group
 
-    # for source, destination in copy.deepcopy(families_shuf_ids).items():
-    #    digraph.add_edges_from([(source, destination)])
+    database_all_families_with_members = []
+    database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
+    for db_family in database_families:
+        database_family_members = users_families_admins_model.UFARelationship.query.filter(
+            users_families_admins_model.UFARelationship.family_id == db_family.id).all()
+        database_all_families_with_members.append(database_family_members)
 
-    save_graph(digraph, "./static/secretgraph.png", colored=True)
+    families_shuf_ids = {}
+    for family in database_all_families_with_members:
+        for member in family:
+            families_shuf_ids[member.user_id] = gettargetid(member.user_id)
+
+    for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
+        digraph.add_node(shuffled_ids_id)
+
+    for source, destination in copy.deepcopy(families_shuf_ids).items():
+        digraph.add_edges_from([(source, destination)])
+
+    save_graph(digraph, "./static/secretgraph.png", colored=True, id_to_id_mapping=families_shuf_ids)
 
     return render_template("success.html", action="Genereeritud", link="./graph")
+
+
+@app.route("/giftingto", methods=["POST"])
+@login_required
+def updatenotestatus():
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
+    currentnotes = []
+    notes_purchased = []
+
+    try:
+        request_id = request.form["id"]
+        request_id = int(decrypt_id(request_id))
+        print(user_id, " is trying to mark a note bought", request_id)
+    except Exception as e:
+        print("Failed decrypting", e)
+        return render_template("error.html", message="Viga lingis", title="Error")
+
+    try:
+        print("Opening file", user_id)
+        #        with open("./notes/" + useridno, "r") as file:
+        #            currentnotes = json.load(file)
+        db_notes = notes_model.Notes.query.get(request_id)
+        if db_notes is not None:  # Don't want to display None
+            currentnotes = db_notes.notes
+            notes_purchased = db_notes.notes_purchased
+    except Exception as e:
+        print("Failed opening", e)
+        return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
+
+    try:
+        try:
+            boolean = request.form["checkbox"]
+        except Exception as e:
+            print("Checkbox not found:", e)
+            boolean = "off"
+
+        if boolean == "on":
+            notes_purchased[int(request.form["index"])] = False
+        elif boolean == "off":
+            notes_purchased[int(request.form["index"])] = True
+        else:
+            raise Exception
+    except Exception as e:
+        print("Failed toggling:", e)
+        return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
+
+    #    with open("./notes/" + useridno, "w") as file:
+    #        file.write(json.dumps(currentnotes))
+    db_entry_notes = notes_model.Notes(
+        user_id=request_id,
+        notes=currentnotes,
+        notes_purchased=notes_purchased
+    )
+
+    try:
+        db.session.add(db_entry_notes)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        row = notes_model.Notes.query.get(request_id)
+        row.notes = currentnotes
+        row.notes_purchased = notes_purchased
+        db.session.commit()
+
+    print(username, " updated note with ID", request_id, "made by", user_id)
+    return redirect("/giftingto?id=" + request.form["id"] + "&back=-2", code=303)
 
 
 @app.route("/giftingto")
@@ -857,11 +973,17 @@ def giftingto():
     check = check_if_admin()
     user_id = session["user_id"]
     username = getpersonname(user_id)
+    invalid_notes = False
+    try:
+        back_count = request.args["back"]
+    except Exception:
+        back_count = -1
 
     try:
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
-    except Exception:
+    except Exception as e:
+        print("Failed decrypting:", e)
         request_id = gettargetid(user_id)
 
     try:  # Yeah, only valid IDs please
@@ -870,6 +992,8 @@ def giftingto():
                                    title="Error")
         elif request_id < 0:
             raise Exception()
+        elif request_id == int(user_id):
+            return render_template("error.html", message="Sellele nimekirjale on ligipääs keelatud", title="Keelatud")
     except Exception:
         return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
 
@@ -896,26 +1020,33 @@ def giftingto():
                 return check
 
     currentnotes = ["Praegu on siin ainult veel tühjus"]
+    boughtnotes = [False]
 
     try:
         print(user_id, "is opening file:", request_id)
         row = notes_model.Notes.query.get(request_id)
         currentnotes = row.notes
+        boughtnotes = row.notes_purchased
     except Exception as e:
+        invalid_notes = True
         print("Error displaying notes, there might be none:", e)
 
     # try:  # Not the prettiest, but tries to display names in the correct form
     #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
     # except Exception:
-    note_status = []
-    for note in currentnotes:
-        note_status.append((note, False))
 
+    passednotes = []
+    for note, bought in list(itertools.zip_longest(currentnotes, boughtnotes, fillvalue=False)):
+        passednotes.append((note, bought))
 
     return render_template("show_notes.html",
-                           notes=note_status,
+                           notes=passednotes,
                            target=getnameingenitive(getpersonname(request_id)),
-                           title="Kingisoovid")
+                           id=encrypt_id(request_id),
+                           title="Kingisoovid",
+                           invalid=invalid_notes,
+                           back=True,
+                           back_count=back_count)
 
 
 """

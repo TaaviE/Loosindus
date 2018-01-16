@@ -3,7 +3,9 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./shuffle">Tagasi</a></p>
+    <p><a {% if back %}id="link-previous"{% endif %}
+          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+          href="{{ back_link }}">Tagasi</a></p>
     <p>Sinu ID: {{ user_id }}</p>
     <p>Sinu nimi: {{ user_name }}</p>
 
@@ -22,11 +24,11 @@
                 <td>{{ name }}</td>
                 {% if family[1] %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editfam?id={{ family[0] }}">Muuda / Vaata</a>
+                           href="./editfam?id={{ family[0] }}{{ back_link }}">Muuda / Vaata</a>
                     </td>
                 {% else %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editfam?id={{ family[0] }}">Vaata</a>
+                           href="./editfam?id={{ family[0] }}{{ back_link }}">Vaata</a>
                     </td>
                 {% endif %}
             </tr>
@@ -49,11 +51,11 @@
                 <td>{{ name }}</td>
                 {% if group[1] %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}">Muuda / Vaata</a>
+                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Muuda / Vaata</a>
                     </td>
                 {% else %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}">Vaata</a>
+                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Vaata</a>
                     </td>
                 {% endif %}
             </tr>
