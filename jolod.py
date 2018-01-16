@@ -936,9 +936,9 @@ def updatenotestatus():
             boolean = "off"
 
         if boolean == "on":
-            notes_purchased[int(request.form["index"])] = False
-        elif boolean == "off":
             notes_purchased[int(request.form["index"])] = True
+        elif boolean == "off":
+            notes_purchased[int(request.form["index"])] = False
         else:
             raise Exception
     except Exception as e:
