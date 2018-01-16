@@ -413,7 +413,7 @@ def deletenote():
 
     try:
         request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
+        request_id = int(request_id)
         print(user_id, " is trying to remove a note", request_id)
     except Exception:
         return render_template("error.html", message="Viga lingis", title="Error")
