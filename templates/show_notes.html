@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block title %}🎄 {{ title }}{% endblock %}
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
+    </div>
+{% endblock %}
 
 {% block content %}
-    <p class="center">Siin on {{ target }} jõulusoovide nimekiri</p>
     <p><a {% if back %}id="link-previous"{% endif %}
           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
           href="{{ back_link }}">Tagasi</a></p>
@@ -12,7 +16,7 @@
         <tr>
             <th>Kirjeldus</th>
             {% if not invalid %}
-            <th>Ostetud</th>
+                <th>Ostetud</th>
                 <th>Tegevus</th>
             {% endif %}
         </tr>
@@ -25,13 +29,13 @@
                 </td>
                 {% if not invalid %}
                     <form action="" method="post">
-                <td>
-                    <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
-                        <input name="checkbox" type="checkbox" id="checkbox" class="mdl-checkbox__input"
-                               {% if item[1] %}checked{% endif %}>
-                        <span class="mdl-checkbox__label"></span>
-                    </label>
-                </td>
+                        <td>
+                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
+                                <input name="checkbox" type="checkbox" id="checkbox" class="mdl-checkbox__input"
+                                       {% if item[1] %}checked{% endif %}>
+                                <span class="mdl-checkbox__label"></span>
+                            </label>
+                        </td>
                         <td>
                             <input type="hidden" name="id" value="{{ id }}">
                             <input type="hidden" name="index" value="{{ loop.index0 }}">

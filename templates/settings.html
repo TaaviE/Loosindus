@@ -2,6 +2,12 @@
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>Siin lehel on näha info sinu konto ja sellega seonduva kohta</p>
+    </div>
+{% endblock %}
+
 {% block content %}
     <p><a {% if back %}id="link-previous"{% endif %}
           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
