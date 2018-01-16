@@ -2,12 +2,20 @@
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
+            jõuluvana 🎄</p>
+    </div>
+{% endblock %}
 {% block content %}
-    <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
-        jõuluvana 🎄</p>
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa uus</a>
+    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa
+        uus</a>
     <a {% if back %}id="link-previous"{% endif %}
        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="/">Tagasi</a>
+    <br>
+    <br>
     <table class="mdl-data-table">
         <thead>
         <tr>
