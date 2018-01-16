@@ -308,7 +308,7 @@ def createnote_add():
     try:
         db.session.add(db_entry_notes)
         db.session.commit()
-    except Exception:
+    except Exception as e:
         db.session.rollback()
         row = notes_model.Notes.query.get(user_id)
         row.notes = currentnotes
@@ -361,12 +361,13 @@ def editnote_edit():
     addednote = request.form["note"]
     try:
         request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
+        request_id = int(request_id)
     except Exception:
         request_id = -1
 
     if request_id < 0:
-        return None
+        return render_template("error.html", message="Viga lingis", title="Error")
+
 
     try:
         print("Trying to add a note:", addednote)
