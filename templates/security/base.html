@@ -4,6 +4,7 @@
     <title>{% block title %}{% endblock title %}</title>
     {% include "head_template.html" %}
     {% include "style.html" %}
+    <meta name="description" content="{% block description %}{% endblock %}">
     <meta property="og:title" content="{{ self.title() }}"/>
 </head>
 
@@ -26,8 +27,8 @@
                     {% block content %}{% endblock %}
                     {% block navbar %}
                     {%- endblock navbar %}
-
-
+                    <noscript>Sinu brauser ei toeta JavaScript'i, teatud funktsioonid võivad olla limiteeritud!
+                    </noscript>
                     {% block scripts %}
                     {%- endblock scripts %}
                 </div>

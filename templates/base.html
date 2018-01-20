@@ -4,6 +4,7 @@
     <title>{% block title %}{% endblock title %}</title>
     {% include "head_template.html" %}
     {% include "style.html" %}
+    <meta name="description" content="{% block description %}{% endblock %}">
     <meta property="og:title" content="{{ self.title() }}"/>
 </head>
 
@@ -22,6 +23,8 @@
             <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col">
                 <div class="mdl-card__supporting-text mdl-color-text--grey-600">
                 {% block content %}{% endblock %}
+                    <noscript>Sinu brauser ei toeta JavaScript'i, teatud funktsioonid võivad olla limiteeritud!
+                    </noscript>
                 </div>
                 {% block buttons %}{% endblock %}
             </div>
