@@ -175,6 +175,11 @@ def test():
     return render_template("error.html", message="Here you go!", title="Error")
 
 
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory("./static", "favicon-16x16.png")
+
+
 def index():
     user_id = session["user_id"]
     username = getpersonname(user_id)
