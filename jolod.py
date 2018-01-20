@@ -159,12 +159,12 @@ app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", vi
 
 if not Config.DEBUG:
     @app.errorhandler(500)
-    def error_500():
+    def error_500(err):
         return render_template("error.html", message="Päringu töötlemisel tekkis viga!", title="Error")
 
 
     @app.errorhandler(404)
-    def error_404():
+    def error_404(err):
         return render_template("error.html", message="Lehte ei leitud!", title="Error")
 
 
