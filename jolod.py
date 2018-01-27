@@ -142,9 +142,9 @@ def decrypt_id(encrypted_user_id):
 
     try:
         cipher.verify(tag)
-        print("The message is authentic:", plaintext)
+        print(get_timestamp(), "The message is authentic:", plaintext)
     except ValueError:
-        print("Key incorrect or message corrupted!")
+        print(get_timestamp(), "Key incorrect or message corrupted!")
 
     return plaintext
 
@@ -159,6 +159,26 @@ def encrypt_id(user_id):
     packed = base64.urlsafe_b64encode(bytes(json_package, "utf8")).decode()
 
     return packed
+
+
+def get_timestamp():
+    # [yyyy-mm-dd hh:mm:ss +0000]
+    time_now = datetime.datetime.now()
+    timestamp = "[" + \
+                str(time_now.year) + \
+                "-" + \
+                str(time_now.month) + \
+                "-" + \
+                str(time_now.day) + \
+                " " + \
+                str(time_now.hour) + \
+                ":" + \
+                str(time_now.minute) + \
+                ":" + \
+                str(time_now.second) + \
+                " +0200"  # FIXME: Get actual timezone
+
+    return timestamp
 
 
 app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", view_func=send_graph)
@@ -250,11 +270,11 @@ def logout():
 def shuffle():
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    print(username)
+    print(get_timestamp(), username)
     gifter = getpersonid(username)
-    print(gifter)
+    print(get_timestamp(), gifter)
     giftee = gettargetid(gifter)
-    print(giftee)
+    print(get_timestamp(), giftee)
     return render_template("shuffle.html",
                            title="Loosimine",
                            id=giftee)
@@ -297,11 +317,11 @@ def createnote():
 @app.route("/createnote", methods=["POST"])
 @login_required
 def createnote_add():
-    print("Got a post request to add a note")
+    print(get_timestamp(), "Got a post request to add a note")
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    print("Found user:", username)
-    print("Found user id:", user_id)
+    print(get_timestamp(), "Found user:", username)
+    print(get_timestamp(), "Found user id:", user_id)
     currentnotes = {}
     addednote = request.form["note"]
 
@@ -314,9 +334,9 @@ def createnote_add():
                                message="Jõuluvana tühjust tuua ei saa, " + username + "!",
                                title="Error")
 
-    print("Trying to add a note:", addednote)
+    print(get_timestamp(), "Trying to add a note:", addednote)
     try:
-        print("Opening file", user_id)
+        print(get_timestamp(), "Opening file", user_id)
         #    with open("./notes/" + useridno, "r") as file:
         #        currentnotes = json.load(file)
         db_notes = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.user_id == user_id).all()
@@ -362,7 +382,7 @@ def editnote():
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
 
-        print(user_id, "is trying to remove a note", request_id)
+        print(get_timestamp(), user_id, "is trying to remove a note", request_id)
     except Exception:
         if not Config.DEBUG:
             sentry.captureException()
@@ -371,7 +391,7 @@ def editnote():
                                title="Error")
 
     try:
-        print(user_id, " is editing notes of ", request_id)
+        print(get_timestamp(), user_id, " is editing notes of ", request_id)
         db_note = wishlist_model.Wishlist.query.get(request_id)
     except Exception as e:
         if not Config.DEBUG:
@@ -387,10 +407,10 @@ def editnote():
 @app.route("/editnote", methods=["POST"])
 @login_required
 def editnote_edit():
-    print("Got a post request to edit a note by", end="")
+    print(get_timestamp(), "Got a post request to edit a note by", end="")
     user_id = session["user_id"]
     # username = getpersonname(user_id)
-    print(" user id:", user_id)
+    print(get_timestamp(), " user id:", user_id)
 
     addednote = request.form["note"]
     try:
@@ -431,7 +451,7 @@ def deletenote():
         request_id = request.args["id"]
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
-        print(user_id, " is trying to remove a note", request_id)
+        print(get_timestamp(), user_id, " is trying to remove a note", request_id)
     except Exception:
         if not Config.DEBUG:
             sentry.captureException()
@@ -450,7 +470,7 @@ def deletenote():
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
 
-    print("Removed", username, "note with ID", request_id)
+    print(get_timestamp(), "Removed", username, "note with ID", request_id)
     return render_template("success.html",
                            action="Eemaldatud",
                            link="./notes",
@@ -493,7 +513,7 @@ def updatenotestatus():
         if not Config.DEBUG:
             sentry.captureException()
         else:
-            print("Failed toggling:", e)
+            print(get_timestamp(), "Failed toggling:", e)
         return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
 
     #    with open("./notes/" + useridno, "w") as file:
@@ -521,7 +541,7 @@ def giftingto():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception as e:
-        print("Failed decrypting or missing:", e)
+        print(get_timestamp(), "Failed decrypting or missing:", e)
         request_id = gettargetid(user_id)
 
     try:  # Yeah, only valid IDs please
@@ -567,7 +587,7 @@ def giftingto():
     currentnotes = {}
 
     try:
-        print(user_id, "is opening file:", request_id)
+        print(get_timestamp(), user_id, "is opening file:", request_id)
         db_notes = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.user_id == request_id).all()
         if len(db_notes) <= 0:
             raise Exception
@@ -610,7 +630,7 @@ def giftingto():
     except Exception as e:
         currentnotes = {"Praegu on siin ainult veel tühjus": (-1, -1, False, "")}
         invalid_notes = True
-        print("Error displaying notes, there might be none:", e)
+        print(get_timestamp(), "Error displaying notes, there might be none:", e)
 
     return render_template("show_notes.html",
                            notes=currentnotes,
@@ -859,7 +879,7 @@ def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping=None):
 
     fig.savefig(file_name, bbox_inches="tight")
     plotlib.close()
-    print("Saved generated graph to file:", file_name)
+    print(get_timestamp(), "Saved generated graph to file:", file_name)
     del fig
 
 
@@ -892,7 +912,7 @@ def regraph():
 
     families_shuf_nam = {}
     families_shuf_ids = {}
-    #    print("Starting finding matches")
+    #    print(get_timestamp(), "Starting finding matches")
     """""
     # This comment block contains self-written algorithm that isn't as robust 
     # as the library's solution thus this is not used for now
@@ -947,7 +967,7 @@ def regraph():
     last_connections = secretsanta.ConnectionGraph.ConnectionGraph(members_to_families, families_to_members)
     # connections.add(source, target, year)
     current_year = datetime.datetime.now().year
-    print(current_year, "is the year of Linux Desktop")
+    print(get_timestamp(), current_year, "is the year of Linux Desktop")
 
     santa = secretsanta.secretsanta.SecretSanta(families_to_members, members_to_families, last_connections)
     new_connections = santa.generate_connections(current_year)
@@ -958,8 +978,8 @@ def regraph():
         families_shuf_nam[getpersonname(connection.source)] = getpersonname(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
-        #    print(shuffled_names)
-        #    print(shuffled_ids)
+        #    print(get_timestamp(),  shuffled_names)
+        #    print(get_timestamp(),  shuffled_ids)
 
     for giver, getter in families_shuf_ids.items():
         db_entry_shuffle = shuffles_model.Shuffle(
@@ -992,7 +1012,7 @@ def regraph():
 @login_required
 def test_mail():
     with mail.connect() as conn:
-        print(conn.configure_host().vrfy)
+        print(get_timestamp(), conn.configure_host().vrfy)
         msg = Message(recipients=["root@localhost"],
                       body="test",
                       subject="test2")
@@ -1103,8 +1123,8 @@ def confirmation():
 
 if __name__ == "__main__":
     if Config.DEBUG:
-        print("Starting in debug!")
+        print(get_timestamp(), "Starting in debug!")
         app.run(debug=Config.DEBUG, use_evalex=False, host="0.0.0.0", port=5000)
     else:
-        print("Starting in production.")
+        print(get_timestamp(), "Starting in production.")
         app.run(debug=Config.DEBUG, use_evalex=False, host="127.0.0.1")
