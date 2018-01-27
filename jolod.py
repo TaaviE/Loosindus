@@ -30,7 +30,7 @@ import json
 from Cryptodome.Cipher import AES
 
 # Flask
-from flask import request, render_template, session, redirect, send_from_directory
+from flask import g, request, render_template, session, redirect, send_from_directory
 from flask_security import login_required, logout_user, SQLAlchemyUserDatastore, forms, Security
 from flask_login import current_user
 from flask_mail import Message
@@ -43,11 +43,14 @@ from models import family_model, shuffles_model, groups_model, users_groups_admi
     users_families_admins_model, names_model, wishlist_model
 
 import sys
+
 sys.setrecursionlimit(2000)
 
 from raven.contrib.flask import Sentry
 
-sentry = Sentry(app, dsn=Config.SENTRY_URL)
+sentry = Sentry(app,
+                dsn=Config.SENTRY_URL,
+                logging=True)
 
 
 # Setup Flask-Security
@@ -160,15 +163,26 @@ def encrypt_id(user_id):
 
 app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", view_func=send_graph)
 
-if not Config.DEBUG:
+# Show a friendlier error page
+if not Config.DEBUG or Config.TESTING:
     @app.errorhandler(500)
     def error_500(err):
-        return render_template("error.html", message="Päringu töötlemisel tekkis viga!", title="Error")
+        return render_template("error.html",
+                               sentry_enabled=True,
+                               sentry_event_id=g.sentry_event_id,
+                               sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                               message="Päringu töötlemisel tekkis viga!",
+                               title="Error")
 
 
     @app.errorhandler(404)
     def error_404(err):
-        return render_template("error.html", message="Lehte ei leitud!", title="Error")
+        return render_template("error.html",
+                               sentry_enabled=True,
+                               sentry_event_id=g.sentry_event_id,
+                               sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                               message="Lehte ei leitud!",
+                               title="Error")
 
 
 # Views
@@ -259,7 +273,7 @@ def notes():
         for note in db_notes:
             notes_from_file[note.item] = encrypt_id(note.id)
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         raise e
 
@@ -309,7 +323,7 @@ def createnote_add():
         for note in db_notes:
             currentnotes[note.item] = note.id
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         raise e
 
@@ -327,7 +341,7 @@ def createnote_add():
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         raise e
 
@@ -350,7 +364,7 @@ def editnote():
 
         print(user_id, "is trying to remove a note", request_id)
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html",
                                message="Pls no hax " + username + "!!",
@@ -360,7 +374,7 @@ def editnote():
         print(user_id, " is editing notes of ", request_id)
         db_note = wishlist_model.Wishlist.query.get(request_id)
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         raise e
 
@@ -384,7 +398,7 @@ def editnote_edit():
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html",
                                message="Viga lingis",
@@ -397,7 +411,7 @@ def editnote_edit():
         db_note.status = wishlist_model.NoteState.MODIFIED.value["id"]
         db.session.commit()
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         raise e
 
@@ -419,7 +433,7 @@ def deletenote():
         request_id = int(request_id)
         print(user_id, " is trying to remove a note", request_id)
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html",
                                message="Viga lingis",
@@ -429,7 +443,7 @@ def deletenote():
         wishlist_model.Wishlist.query.filter_by(id=request_id).delete()
         db.session.commit()
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid", title="Error")
 
@@ -447,28 +461,36 @@ def deletenote():
 @login_required
 def updatenotestatus():
     user_id = session["user_id"]
+    try:
+        back_count = int(request.args["back"]) - 2
+    except Exception:
+        back_count = -2
 
     try:
-        try:
-            boolean = request.form["checkbox"]
-        except Exception as e:
-            print("Checkbox not found:", e)
-            boolean = "off"
-
+        status = int(request.form["status"])
         note = wishlist_model.Wishlist.query.get(decrypt_id(request.form["id"]))
-        if boolean == "on":
-            note.status = wishlist_model.NoteState.PURCHASED.value["id"]
+
+        if status > -1:
+            if int(note.status) == wishlist_model.NoteState.PURCHASED.value["id"] or status == \
+                    wishlist_model.NoteState.MODIFIED.value["id"]:
+                raise Exception("Invalid access")
+            note.status = status
             note.purchased_by = user_id
-        elif boolean == "off":
-            note.status = wishlist_model.NoteState.DEFAULT.value["id"]
+            db.session.commit()
+        #        elif status == "off":
+        #            note.status = wishlist_model.NoteState.DEFAULT.value["id"]
+        #            note.purchased_by = None
+        elif status == -1:
+            if int(note.status) == wishlist_model.NoteState.PURCHASED.value["id"] or status == \
+                    wishlist_model.NoteState.MODIFIED.value["id"]:
+                raise Exception("Invalid access")
+            note.status = status
             note.purchased_by = None
+            db.session.commit()
         else:
-            if not Config.TESTING:
-                sentry.captureException()
-            raise Exception
-        db.session.commit()
+            raise Exception("Invalid status code")
     except Exception as e:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         else:
             print("Failed toggling:", e)
@@ -477,7 +499,7 @@ def updatenotestatus():
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
 
-    return redirect("/giftingto?id=" + request.args["id"] + "&back=-2", code=303)
+    return redirect("/giftingto?id=" + str(request.args["id"]) + "&back=" + str(back_count), code=303)
 
 
 @app.route("/giftingto")
@@ -487,6 +509,9 @@ def giftingto():
     user_id = session["user_id"]
     username = getpersonname(user_id)
     invalid_notes = False
+    all_states = [state.value for state in wishlist_model.NoteState]
+    all_states.remove(wishlist_model.NoteState.MODIFIED.value)
+
     try:
         back_count = request.args["back"]
     except Exception:
@@ -511,9 +536,8 @@ def giftingto():
                                    message="Sellele nimekirjale on ligipääs keelatud",
                                    title="Keelatud")
     except Exception:
-        if not Config.TESTING:
-            if not Config.TESTING:
-                sentry.captureException()
+        if not Config.DEBUG:
+            sentry.captureException()
         return render_template("error.html",
                                message="Pls no hax " + username + "!!",
                                title="Error")
@@ -549,12 +573,42 @@ def giftingto():
             raise Exception
 
         for note in db_notes:
-            currentnotes[note.item] = (encrypt_id(note.id), note.status)
+            selections = []
+            modifyable = False
+            name = ""
+
+            if note.status == wishlist_model.NoteState.DEFAULT.value["id"]:
+                selections = all_states
+                selections.insert(0, selections.pop(selections.index(wishlist_model.NoteState.DEFAULT.value)))
+                modifyable = True
+            elif note.status == wishlist_model.NoteState.MODIFIED.value["id"]:
+                if note.purchased_by == user_id:
+                    selections = all_states
+                    selections.insert(0, selections.pop(selections.index(wishlist_model.NoteState.MODIFIED.value)))
+                    modifyable = True
+                else:
+                    selections = [wishlist_model.NoteState.MODIFIED.value]
+                    modifyable = False
+                name = getnameingenitive(getpersonname(note.purchased_by))
+            elif note.status == wishlist_model.NoteState.PURCHASED.value["id"]:
+                selections = [wishlist_model.NoteState.PURCHASED.value]
+                name = getnameingenitive(getpersonname(note.purchased_by))
+                modifyable = False
+            elif note.status == wishlist_model.NoteState.PLANNING_TO_PURCHASE.value["id"]:
+                selections = [wishlist_model.NoteState.PLANNING_TO_PURCHASE.value,
+                              wishlist_model.NoteState.DEFAULT.value, wishlist_model.NoteState.PURCHASED.value]
+                name = getnameingenitive(getpersonname(note.purchased_by))
+                if note.purchased_by == int(user_id):
+                    modifyable = True
+                else:
+                    modifyable = False
+
+            currentnotes[note.item] = (encrypt_id(note.id), selections, modifyable, name)
     except ValueError:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
     except Exception as e:
-        currentnotes = {"Praegu on siin ainult veel tühjus": (-1, -1)}
+        currentnotes = {"Praegu on siin ainult veel tühjus": (-1, -1, False, "")}
         invalid_notes = True
         print("Error displaying notes, there might be none:", e)
 
@@ -636,12 +690,12 @@ def editfamily():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
     if request_id < 0:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
@@ -691,7 +745,7 @@ def editgroup():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
-        if not Config.TESTING:
+        if not Config.DEBUG:
             sentry.captureException()
         request_id = 0
 

@@ -11,41 +11,59 @@
     <p><a {% if back %}id="link-previous"{% endif %}
           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
           href="{{ back_link }}">Tagasi</a></p>
-    <table class="mdl-data-table">
-        <thead>
+    <div class="table-responsive">
+        <table class="mdl-data-table mdl-js-data-table">
+            <thead class="mdl-textfield--full-width">
         <tr>
-            <th>Kirjeldus</th>
+            <th class="mdl-data-table__cell--non-numeric">Kirjeldus</th>
             {% if not invalid %}
-                <th>Ostetud</th>
-                <th>Tegevus</th>
+                <th class="mdl-data-table__cell--non-numeric">Staatus</th>
+                <th class="mdl-data-table__cell--non-numeric">Kelle poolt</th>
+                <th class="mdl-data-table__cell--non-numeric">Tegevus</th>
             {% endif %}
         </tr>
         </thead>
-        <tbody>
-        {% for item, (id, status) in notes.items() %}
+            <tbody class="mdl-textfield--full-width">
+            {% for item, (id, enums, modifyable, name) in notes.items() %}
             <tr>
-                <td>
-                    {{ item }}
-                </td>
+                <td class="mdl-data-table__cell--non-numeric">{{ item }}</td>
                 {% if not invalid %}
                     <form action="" method="post">
-                        <td>
-                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
-                                <input name="checkbox" type="checkbox" id="checkbox" class="mdl-checkbox__input"
-                                       {% if status == 2 %}checked{% endif %}>
-                                <span class="mdl-checkbox__label"></span>
-                            </label>
+                        <td class="mdl-data-table__cell--non-numeric">
+                            <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
+                                <select class="mdl-selectfield__select" id="status" name="status">
+                                    {% if modifyable %}
+                                        {% for enum in enums %}
+                                            <option value="{{ enum["id"] }}">{{ enum["description"] }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <option value="{{ enums[0]["id"] }}">{{ enums[0]["description"] }}</option>
+                                    {% endif %}
+                                </select>
+                            </div>
                         </td>
-                        <td>
-                            <input type="hidden" name="id" value="{{ id }}">
-                            <input id="submit" type="submit"
-                                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   value="Salvesta"/>
-                        </td>
+
+                        <td class="mdl-data-table__cell--non-numeric">{{ name }}</td>
+
+                        {% if modifyable %}
+                            <td class="mdl-data-table__cell--non-numeric">
+                                <input type="hidden" name="id" value="{{ id }}">
+                                <input id="submit" type="submit"
+                                       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                       value="Salvesta"/>
+                            </td>
+                        {% else %}
+                            <td class="mdl-data-table__cell--non-numeric">
+                                <input title="Ostetud!"
+                                       class="disabled mdl-button--disabled mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                       value="Ostetud!"/>
+                            </td>
+                        {% endif %}
                     </form>
                 {% endif %}
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    </div>
 {% endblock %}

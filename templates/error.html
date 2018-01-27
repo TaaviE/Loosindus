@@ -4,8 +4,24 @@
 
 {% block content %}
     <h4>{{ message }}</h4>
-    {% if g.sentry_event_id %}
-        <p>Errori ID on: {{ g.sentry_event_id }}</p>
+    {% if sentry_enabled %}
+        {% if g.sentry_event_id %}
+            <p>Errori ID on: {{ g.sentry_event_id }}</p>
+        {% endif %}
+        <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
+
+        {% if event_id %}
+            <script>
+                Raven.showReportDialog({
+                    {% if g.sentry_event_id %}
+                        eventId: '{{ g.sentry_event_id }}',
+                    {% else %}
+                        eventId: '{{ sentry_event_id }}',
+                    {% endif %}
+                    dsn: '{{ sentry_public_dsn }}'
+                });
+            </script>
+        {% endif %}
     {% endif %}
     <a {% if back == True %}id="link-previous"{% endif %}
        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>

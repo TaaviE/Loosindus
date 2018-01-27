@@ -9,7 +9,7 @@ class NoteState(Enum):
     """
     DEFAULT = {"id": -1, "description": "Vaba", "color": "#4CAF50"}
     """Default state"""
-    PLANNING_TO_PURCHASE = {"id": 0, "description": "Plaanitud osta", "color": "#FFEB3B"}
+    PLANNING_TO_PURCHASE = {"id": 0, "description": "Reserveeri(tud)", "color": "#FFEB3B"}
     """Plans to purchase"""
     PURCHASED = {"id": 2, "description": "Ostetud", "color": "#F44336"}
     """Purchased"""

@@ -10,40 +10,45 @@
     </div>
 {% endblock %}
 {% block content %}
-    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./createnote">Lisa
+    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+          href="./createnote">Lisa
         uus</a>
-    <a {% if back %}id="link-previous"{% endif %}
-       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="/">Tagasi</a>
-    <br>
-    <br>
-    <table class="mdl-data-table">
-        <thead>
-        <tr>
-            <th>Kirjeldus</th>
-            {% if not empty %}
-                <th>Kustuta</th>
-                <th>Muuda</th>
-            {% else %}
-                <th></th>
-                <th></th>
-            {% endif %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for item, id in list.items() %}
+        <a {% if back %}id="link-previous"{% endif %}
+           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+           href="/">Tagasi</a>
+    </p>
+    <div class="table-responsive">
+        <table class="mdl-data-table mdl-js-data-table">
+            <thead>
             <tr>
-                <td>{{ item }}</td>
+                <th class="mdl-data-table__cell--non-numeric">Kirjeldus</th>
                 {% if not empty %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./removenote?id={{ id }}">Kustuta</a></td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editnote?id={{ id }}">Muuda</a></td>
+                    <th class="mdl-data-table__cell--non-numeric">Kustuta</th>
+                    <th class="mdl-data-table__cell--non-numeric">Muuda</th>
                 {% else %}
-                    <td></td>
-                    <td></td>
+                    <th class="mdl-data-table__cell--non-numeric"></th>
+                    <th class="mdl-data-table__cell--non-numeric"></th>
                 {% endif %}
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for item, id in list.items() %}
+                <tr>
+                    <td class="mdl-data-table__cell--non-numeric">{{ item }}</td>
+                    {% if not empty %}
+                        <td class="mdl-data-table__cell--non-numeric">
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./removenote?id={{ id }}">Kustuta</a></td>
+                        <td class="mdl-data-table__cell--non-numeric">
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editnote?id={{ id }}">Muuda</a></td>
+                    {% else %}
+                        <td class="mdl-data-table__cell--non-numeric"></td>
+                        <td class="mdl-data-table__cell--non-numeric"></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
