@@ -22,23 +22,22 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in notes %}
+        {% for item, (id, status) in notes.items() %}
             <tr>
                 <td>
-                    {{ item[0] }}
+                    {{ item }}
                 </td>
                 {% if not invalid %}
                     <form action="" method="post">
                         <td>
                             <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox">
                                 <input name="checkbox" type="checkbox" id="checkbox" class="mdl-checkbox__input"
-                                       {% if item[1] %}checked{% endif %}>
+                                       {% if status == 2 %}checked{% endif %}>
                                 <span class="mdl-checkbox__label"></span>
                             </label>
                         </td>
                         <td>
                             <input type="hidden" name="id" value="{{ id }}">
-                            <input type="hidden" name="index" value="{{ loop.index0 }}">
                             <input id="submit" type="submit"
                                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                    value="Salvesta"/>

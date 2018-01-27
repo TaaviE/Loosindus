@@ -27,7 +27,6 @@ import datetime
 import random
 import base64
 import json
-import itertools
 from Cryptodome.Cipher import AES
 
 # Flask
@@ -40,12 +39,16 @@ from flask_mail import Message
 from config import Config, db, app, mail
 
 # Database models
-from models import notes_model, family_model, shuffles_model, groups_model, users_groups_admins_model, \
-    users_families_admins_model, names_model
+from models import family_model, shuffles_model, groups_model, users_groups_admins_model, \
+    users_families_admins_model, names_model, wishlist_model
 
 import sys
-
 sys.setrecursionlimit(2000)
+
+from raven.contrib.flask import Sentry
+
+sentry = Sentry(app, dsn=Config.SENTRY_URL)
+
 
 # Setup Flask-Security
 userroles = db.Table(
@@ -186,7 +189,11 @@ def index():
     no_shuffle = False
     if gettargetid(user_id) == -1:
         no_shuffle = True
-    return render_template("index.html", auth=username, no_shuffle=no_shuffle, uid=user_id, title="Kodu")
+    return render_template("index.html",
+                           auth=username,
+                           no_shuffle=no_shuffle,
+                           uid=user_id,
+                           title="Kodu")
 
 
 @app.route("/about")
@@ -234,7 +241,9 @@ def shuffle():
     print(gifter)
     giftee = gettargetid(gifter)
     print(giftee)
-    return render_template("shuffle.html", title="Loosimine", id=giftee)
+    return render_template("shuffle.html",
+                           title="Loosimine",
+                           id=giftee)
 
 
 @app.route("/notes")
@@ -242,27 +251,33 @@ def shuffle():
 def notes():
     user_id = session["user_id"]
     # username = getpersonname(user_id)
-    notes_from_file = []
+    notes_from_file = {}
     empty = False
+
     try:
-        db_notes = notes_model.Notes.query.get(user_id)
-        #    with open("./notes/" + useridno) as file:
-        #        notes_from_file = json.load(file)
-        if db_notes is not None:  # Don't want to display None
-            notes_from_file = db_notes.notes
+        db_notes = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.user_id == user_id).all()
+        for note in db_notes:
+            notes_from_file[note.item] = encrypt_id(note.id)
     except Exception as e:
-        print(e)
+        if not Config.TESTING:
+            sentry.captureException()
+        raise e
 
     if len(notes_from_file) <= 0:
-        notes_from_file = ["Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?"]
+        notes_from_file = {"Praegu on siin ainult veel tühjus, ei tahagi jõuludeks midagi?": ("", "")}
         empty = True
-    return render_template("notes.html", list=notes_from_file, empty=empty, title="Minu jõulusoovid")
+
+    return render_template("notes.html",
+                           list=notes_from_file,
+                           empty=empty,
+                           title="Minu jõulusoovid")
 
 
 @app.route("/createnote", methods=["GET"])
 @login_required
 def createnote():
-    return render_template("createnote.html", title="Lisa uus")
+    return render_template("createnote.html",
+                           title="Lisa uus")
 
 
 @app.route("/createnote", methods=["POST"])
@@ -273,54 +288,53 @@ def createnote_add():
     username = getpersonname(user_id)
     print("Found user:", username)
     print("Found user id:", user_id)
-    currentnotes = []
-    notes_purchased = []
+    currentnotes = {}
     addednote = request.form["note"]
 
     if len(addednote) > 1000:
-        return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
+        return render_template("error.html",
+                               message="Pls no hax " + username + "!!",
+                               title="Error")
     elif len(addednote) <= 0:
         return render_template("error.html",
-                               message="Jõuluvana tühjust tuua ei saa, " + username + "!", title="Error")
+                               message="Jõuluvana tühjust tuua ei saa, " + username + "!",
+                               title="Error")
 
     print("Trying to add a note:", addednote)
     try:
         print("Opening file", user_id)
         #    with open("./notes/" + useridno, "r") as file:
         #        currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(user_id)
-        if db_notes is not None:  # Don't want to display None
-            currentnotes = db_notes.notes
-            notes_purchased = db_notes.notes_purchased
+        db_notes = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.user_id == user_id).all()
+        for note in db_notes:
+            currentnotes[note.item] = note.id
     except Exception as e:
-        print(e)
+        if not Config.TESTING:
+            sentry.captureException()
+        raise e
 
-    if len(currentnotes) >= 999:
+    if len(currentnotes) >= 200:
         return render_template("error.html",
-                               message="Soovinimekiri muutuks liiga pikaks, " + username + "", title="Error")
+                               message="Soovinimekiri muutuks liiga pikaks, " + username + "",
+                               title="Error")
 
-    currentnotes.append(addednote)
-    notes_purchased.append(False)
-
-    #    with open("./notes/" + useridno, "w") as file:
-    #        file.write(json.dumps(currentnotes))
-    db_entry_notes = notes_model.Notes(
+    db_entry_notes = wishlist_model.Wishlist(
         user_id=user_id,
-        notes=currentnotes,
-        notes_purchased=notes_purchased
+        item=addednote
     )
 
     try:
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
-        db.session.rollback()
-        row = notes_model.Notes.query.get(user_id)
-        row.notes = currentnotes
-        row.notes_purchased = notes_purchased
-        db.session.commit()
+        if not Config.TESTING:
+            sentry.captureException()
+        raise e
 
-    return render_template("success.html", action="Lisatud", link="./notes", title="Lisatud")
+    return render_template("success.html",
+                           action="Lisatud",
+                           link="./notes",
+                           title="Lisatud")
 
 
 @app.route("/editnote", methods=["GET"])
@@ -328,85 +342,69 @@ def createnote_add():
 def editnote():
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    currentnotes = []
 
     try:
         request_id = request.args["id"]
+        request_id = decrypt_id(request_id)
         request_id = int(request_id)
 
         print(user_id, "is trying to remove a note", request_id)
     except Exception:
-        return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
+        if not Config.TESTING:
+            sentry.captureException()
+        return render_template("error.html",
+                               message="Pls no hax " + username + "!!",
+                               title="Error")
 
     try:
-        print(user_id, " is pening notes of ", request_id)
-        db_notes = notes_model.Notes.query.get(user_id)
-        if db_notes is not None:  # Don't want to display None
-            currentnotes = db_notes.notes
+        print(user_id, " is editing notes of ", request_id)
+        db_note = wishlist_model.Wishlist.query.get(request_id)
     except Exception as e:
-        print(e)
+        if not Config.TESTING:
+            sentry.captureException()
+        raise e
 
-    if int(request_id) >= len(currentnotes):
-        return render_template("error.html", message="Ei leidnud seda, mida muuta tahtsid 🤔", title="Error")
-
-    return render_template("createnote.html", action="Muuda", title="Muuda",
-                           placeholder=currentnotes[request_id])
+    return render_template("createnote.html",
+                           action="Muuda",
+                           title="Muuda",
+                           placeholder=db_note.item)
 
 
 @app.route("/editnote", methods=["POST"])
 @login_required
 def editnote_edit():
-    print("Got a post request to edit a note")
+    print("Got a post request to edit a note by", end="")
     user_id = session["user_id"]
     # username = getpersonname(user_id)
-    print("Found user id:", user_id)
-    currentnotes = []
-    notes_purchased = []
+    print(" user id:", user_id)
 
     addednote = request.form["note"]
     try:
         request_id = request.args["id"]
+        request_id = decrypt_id(request_id)
         request_id = int(request_id)
     except Exception:
-        request_id = -1
+        if not Config.TESTING:
+            sentry.captureException()
+        return render_template("error.html",
+                               message="Viga lingis",
+                               title="Error")
 
-    if request_id < 0:
-        return render_template("error.html", message="Viga lingis", title="Error")
-
+    db_note = wishlist_model.Wishlist.query.get(request_id)
 
     try:
-        print("Trying to add a note:", addednote)
-        print("Opening file", user_id)
-        #        with open("./notes/" + user_id, "r") as file:
-        #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(user_id)
-        if db_notes is not None:  # Don't want to display None
-            currentnotes = db_notes.notes
-            notes_purchased = db_notes.notes_purchased
+        db_note.item = addednote
+        db_note.status = wishlist_model.NoteState.MODIFIED.value["id"]
+        db.session.commit()
     except Exception as e:
-        print(e)
+        if not Config.TESTING:
+            sentry.captureException()
+        raise e
 
-    currentnotes[request_id] = addednote
-
-    #    with open("./notes/" + user_id, "w") as file:
-    #        file.write(json.dumps(currentnotes))
-    db_entry_notes = notes_model.Notes(
-        user_id=user_id,
-        notes=currentnotes,
-        notes_purchased=notes_purchased
-    )
-
-    try:
-        db.session.add(db_entry_notes)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        row = notes_model.Notes.query.get(user_id)
-        row.notes = currentnotes
-        row.notes_purchased = notes_purchased
-        db.session.commit()
-
-    return render_template("success.html", action="Muudetud", link="./notes", title="Muudetud")
+    return render_template("success.html",
+                           action="Muudetud",
+                           link="./notes",
+                           title="Muudetud")
 
 
 @app.route("/removenote")
@@ -414,53 +412,160 @@ def editnote_edit():
 def deletenote():
     user_id = session["user_id"]
     username = getpersonname(user_id)
-    currentnotes = []
-    notes_purchased = []
 
     try:
         request_id = request.args["id"]
+        request_id = decrypt_id(request_id)
         request_id = int(request_id)
         print(user_id, " is trying to remove a note", request_id)
     except Exception:
-        return render_template("error.html", message="Viga lingis", title="Error")
+        if not Config.TESTING:
+            sentry.captureException()
+        return render_template("error.html",
+                               message="Viga lingis",
+                               title="Error")
 
     try:
-        print("Opening file", user_id)
-        #        with open("./notes/" + useridno, "r") as file:
-        #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(user_id)
-        if db_notes is not None:  # Don't want to display None
-            currentnotes = db_notes.notes
-            notes_purchased = db_notes.notes_purchased
-    except Exception as e:
-        print(e)
-
-    try:
-        currentnotes.pop(request_id)
-        notes_purchased.pop(request_id)
+        wishlist_model.Wishlist.query.filter_by(id=request_id).delete()
+        db.session.commit()
     except Exception:
+        if not Config.TESTING:
+            sentry.captureException()
         return render_template("error.html", message="Ei leidnud seda, mida kustutada tahtsid", title="Error")
 
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
-    db_entry_notes = notes_model.Notes(
-        user_id=user_id,
-        notes=currentnotes,
-        notes_purchased=notes_purchased
-    )
-
-    try:
-        db.session.add(db_entry_notes)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        row = notes_model.Notes.query.get(user_id)
-        row.notes = currentnotes
-        row.notes_purchased = notes_purchased
-        db.session.commit()
 
     print("Removed", username, "note with ID", request_id)
-    return render_template("success.html", action="Eemaldatud", link="./notes", title="Eemaldatud")
+    return render_template("success.html",
+                           action="Eemaldatud",
+                           link="./notes",
+                           title="Eemaldatud")
+
+
+@app.route("/giftingto", methods=["POST"])
+@login_required
+def updatenotestatus():
+    user_id = session["user_id"]
+
+    try:
+        try:
+            boolean = request.form["checkbox"]
+        except Exception as e:
+            print("Checkbox not found:", e)
+            boolean = "off"
+
+        note = wishlist_model.Wishlist.query.get(decrypt_id(request.form["id"]))
+        if boolean == "on":
+            note.status = wishlist_model.NoteState.PURCHASED.value["id"]
+            note.purchased_by = user_id
+        elif boolean == "off":
+            note.status = wishlist_model.NoteState.DEFAULT.value["id"]
+            note.purchased_by = None
+        else:
+            if not Config.TESTING:
+                sentry.captureException()
+            raise Exception
+        db.session.commit()
+    except Exception as e:
+        if not Config.TESTING:
+            sentry.captureException()
+        else:
+            print("Failed toggling:", e)
+        return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
+
+    #    with open("./notes/" + useridno, "w") as file:
+    #        file.write(json.dumps(currentnotes))
+
+    return redirect("/giftingto?id=" + request.args["id"] + "&back=-2", code=303)
+
+
+@app.route("/giftingto")
+@login_required
+def giftingto():
+    check = check_if_admin()
+    user_id = session["user_id"]
+    username = getpersonname(user_id)
+    invalid_notes = False
+    try:
+        back_count = request.args["back"]
+    except Exception:
+        back_count = -1
+
+    try:
+        request_id = request.args["id"]
+        request_id = int(decrypt_id(request_id))
+    except Exception as e:
+        print("Failed decrypting or missing:", e)
+        request_id = gettargetid(user_id)
+
+    try:  # Yeah, only valid IDs please
+        if request_id == -1:
+            return render_template("error.html",
+                                   message="Loosimist ei ole veel administraatori poolt tehtud",
+                                   title="Error")
+        elif request_id < 0:
+            raise Exception()
+        elif request_id == int(user_id):
+            return render_template("error.html",
+                                   message="Sellele nimekirjale on ligipääs keelatud",
+                                   title="Keelatud")
+    except Exception:
+        if not Config.TESTING:
+            if not Config.TESTING:
+                sentry.captureException()
+        return render_template("error.html",
+                               message="Pls no hax " + username + "!!",
+                               title="Error")
+
+    if check is not None:  # Let's not let everyone read everyone's lists
+        if request_id != gettargetid(user_id):
+            family_id = getfamilyid(user_id)
+            family_obj = family_model.Family.query.get(family_id)
+            family_group = family_obj.group
+
+            database_all_families_with_members = []
+            database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
+            for db_family in database_families:
+                database_family_members = users_families_admins_model.UFARelationship.query.filter(
+                    users_families_admins_model.UFARelationship.family_id == db_family.id).all()
+                database_all_families_with_members.append(database_family_members)
+
+            found = False
+            for family in database_all_families_with_members:
+                for member in family:
+                    if member.user_id == request_id:
+                        found = True
+
+            if not found:
+                return check
+
+    currentnotes = {}
+
+    try:
+        print(user_id, "is opening file:", request_id)
+        db_notes = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.user_id == request_id).all()
+        if len(db_notes) <= 0:
+            raise Exception
+
+        for note in db_notes:
+            currentnotes[note.item] = (encrypt_id(note.id), note.status)
+    except ValueError:
+        if not Config.TESTING:
+            sentry.captureException()
+    except Exception as e:
+        currentnotes = {"Praegu on siin ainult veel tühjus": (-1, -1)}
+        invalid_notes = True
+        print("Error displaying notes, there might be none:", e)
+
+    return render_template("show_notes.html",
+                           notes=currentnotes,
+                           target=getnameingenitive(getpersonname(request_id)),
+                           id=encrypt_id(request_id),
+                           title="Kingisoovid",
+                           invalid=invalid_notes,
+                           back=True,
+                           back_count=back_count)
 
 
 @app.route("/graph")
@@ -531,9 +636,13 @@ def editfamily():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
+        if not Config.TESTING:
+            sentry.captureException()
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
     if request_id < 0:
+        if not Config.TESTING:
+            sentry.captureException()
         return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
 
     db_family_members = users_families_admins_model.UFARelationship.query.filter(
@@ -582,6 +691,8 @@ def editgroup():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
+        if not Config.TESTING:
+            sentry.captureException()
         request_id = 0
 
     db_groups_user_is_admin = users_groups_admins_model.UGARelationship.query.filter(
@@ -656,8 +767,11 @@ def family():
 """
 
 
-def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping={}):
+def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping=None):
     # This function just saves a networkx graph into a .png file without any GUI(!)
+    if id_to_id_mapping is None:
+        id_to_id_mapping = {}
+
     plotlib.figure(num=None, figsize=(10, 10), dpi=60)
     plotlib.axis("off")  # Turn off the axis display
     fig = plotlib.figure(1)
@@ -904,155 +1018,6 @@ def rerendernamegraph():
     save_graph(digraph, "./static/secretgraph.png", colored=True, id_to_id_mapping=families_shuf_ids)
 
     return render_template("success.html", action="Genereeritud", link="./graph")
-
-
-@app.route("/giftingto", methods=["POST"])
-@login_required
-def updatenotestatus():
-    user_id = session["user_id"]
-    username = getpersonname(user_id)
-    currentnotes = []
-    notes_purchased = []
-
-    try:
-        request_id = request.form["id"]
-        request_id = int(decrypt_id(request_id))
-        print(user_id, " is trying to mark a note bought", request_id)
-    except Exception as e:
-        print("Failed decrypting", e)
-        return render_template("error.html", message="Viga lingis", title="Error")
-
-    try:
-        print("Opening file", user_id)
-        #        with open("./notes/" + useridno, "r") as file:
-        #            currentnotes = json.load(file)
-        db_notes = notes_model.Notes.query.get(request_id)
-        if db_notes is not None:  # Don't want to display None
-            currentnotes = db_notes.notes
-            notes_purchased = db_notes.notes_purchased
-    except Exception as e:
-        print("Failed opening", e)
-        return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
-
-    try:
-        try:
-            boolean = request.form["checkbox"]
-        except Exception as e:
-            print("Checkbox not found:", e)
-            boolean = "off"
-
-        if boolean == "on":
-            notes_purchased[int(request.form["index"])] = True
-        elif boolean == "off":
-            notes_purchased[int(request.form["index"])] = False
-        else:
-            raise Exception
-    except Exception as e:
-        print("Failed toggling:", e)
-        return render_template("error.html", message="Ei saanud staatusemuudatusega hakkama", title="Error", back=True)
-
-    #    with open("./notes/" + useridno, "w") as file:
-    #        file.write(json.dumps(currentnotes))
-    db_entry_notes = notes_model.Notes(
-        user_id=request_id,
-        notes=currentnotes,
-        notes_purchased=notes_purchased
-    )
-
-    try:
-        db.session.add(db_entry_notes)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        row = notes_model.Notes.query.get(request_id)
-        row.notes = currentnotes
-        row.notes_purchased = notes_purchased
-        db.session.commit()
-
-    print(username, " updated note with ID", request_id, "made by", user_id)
-    return redirect("/giftingto?id=" + request.form["id"] + "&back=-2", code=303)
-
-
-@app.route("/giftingto")
-@login_required
-def giftingto():
-    check = check_if_admin()
-    user_id = session["user_id"]
-    username = getpersonname(user_id)
-    invalid_notes = False
-    try:
-        back_count = request.args["back"]
-    except Exception:
-        back_count = -1
-
-    try:
-        request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
-    except Exception as e:
-        print("Failed decrypting:", e)
-        request_id = gettargetid(user_id)
-
-    try:  # Yeah, only valid IDs please
-        if request_id == -1:
-            return render_template("error.html", message="Loosimist ei ole veel administraatori poolt tehtud",
-                                   title="Error")
-        elif request_id < 0:
-            raise Exception()
-        elif request_id == int(user_id):
-            return render_template("error.html", message="Sellele nimekirjale on ligipääs keelatud", title="Keelatud")
-    except Exception:
-        return render_template("error.html", message="Pls no hax " + username + "!!", title="Error")
-
-    if check is not None:  # Let's not let everyone read everyone's lists
-        if request_id != gettargetid(user_id):
-            family_id = getfamilyid(user_id)
-            family_obj = family_model.Family.query.get(family_id)
-            family_group = family_obj.group
-
-            database_all_families_with_members = []
-            database_families = family_model.Family.query.filter(family_model.Family.group == family_group).all()
-            for db_family in database_families:
-                database_family_members = users_families_admins_model.UFARelationship.query.filter(
-                    users_families_admins_model.UFARelationship.family_id == db_family.id).all()
-                database_all_families_with_members.append(database_family_members)
-
-            found = False
-            for family in database_all_families_with_members:
-                for member in family:
-                    if member.user_id == request_id:
-                        found = True
-
-            if not found:
-                return check
-
-    currentnotes = ["Praegu on siin ainult veel tühjus"]
-    boughtnotes = [False]
-
-    try:
-        print(user_id, "is opening file:", request_id)
-        row = notes_model.Notes.query.get(request_id)
-        currentnotes = row.notes
-        boughtnotes = row.notes_purchased
-    except Exception as e:
-        invalid_notes = True
-        print("Error displaying notes, there might be none:", e)
-
-    # try:  # Not the prettiest, but tries to display names in the correct form
-    #    return render_template("show_notes.html", notes=currentnotes, target=names_proper[username])
-    # except Exception:
-
-    passednotes = []
-    for note, bought in list(itertools.zip_longest(currentnotes, boughtnotes, fillvalue=False)):
-        passednotes.append((note, bought))
-
-    return render_template("show_notes.html",
-                           notes=passednotes,
-                           target=getnameingenitive(getpersonname(request_id)),
-                           id=encrypt_id(request_id),
-                           title="Kingisoovid",
-                           invalid=invalid_notes,
-                           back=True,
-                           back_count=back_count)
 
 
 """

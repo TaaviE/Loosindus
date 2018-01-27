@@ -4,6 +4,9 @@
 
 {% block content %}
     <h4>{{ message }}</h4>
+    {% if g.sentry_event_id %}
+        <p>Errori ID on: {{ g.sentry_event_id }}</p>
+    {% endif %}
     <a {% if back == True %}id="link-previous"{% endif %}
        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
 {% endblock %}

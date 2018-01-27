@@ -114,6 +114,7 @@ venv
 */*sitemap.xml*
 */*robots.txt*
 generated_graphs/
+.directory
 
 # IntelliJ and PyCharm
 .idea

@@ -30,14 +30,14 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in list %}
+        {% for item, id in list.items() %}
             <tr>
                 <td>{{ item }}</td>
                 {% if not empty %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./removenote?id={{ loop.index0 }}">Kustuta</a></td>
+                           href="./removenote?id={{ id }}">Kustuta</a></td>
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editnote?id={{ loop.index0 }}">Muuda</a></td>
+                           href="./editnote?id={{ id }}">Muuda</a></td>
                 {% else %}
                     <td></td>
                     <td></td>

@@ -11,3 +11,4 @@ psycopg2
 matplotlib
 werkzeug
 pycryptodomex
+raven
