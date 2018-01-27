@@ -176,7 +176,7 @@ def get_timestamp():
                 str(time_now.minute) + \
                 ":" + \
                 str(time_now.second) + \
-                " +0200"  # FIXME: Get actual timezone
+                " +0200]"  # FIXME: Get actual timezone
 
     return timestamp
 
@@ -609,15 +609,15 @@ def giftingto():
                 else:
                     selections = [wishlist_model.NoteState.MODIFIED.value]
                     modifyable = False
-                name = getnameingenitive(getpersonname(note.purchased_by))
+                name = note.purchased_by
             elif note.status == wishlist_model.NoteState.PURCHASED.value["id"]:
                 selections = [wishlist_model.NoteState.PURCHASED.value]
-                name = getnameingenitive(getpersonname(note.purchased_by))
+                name = note.purchased_by
                 modifyable = False
             elif note.status == wishlist_model.NoteState.PLANNING_TO_PURCHASE.value["id"]:
                 selections = [wishlist_model.NoteState.PLANNING_TO_PURCHASE.value,
                               wishlist_model.NoteState.DEFAULT.value, wishlist_model.NoteState.PURCHASED.value]
-                name = getnameingenitive(getpersonname(note.purchased_by))
+                name = note.purchased_by
                 if note.purchased_by == int(user_id):
                     modifyable = True
                 else:
