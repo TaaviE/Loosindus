@@ -547,8 +547,6 @@ def giftingto():
     user_id = session["user_id"]
     username = getpersonname(user_id)
     invalid_notes = False
-    all_states = [state.value for state in wishlist_model.NoteState]
-    all_states.remove(wishlist_model.NoteState.MODIFIED.value)
 
     try:
         back_count = request.args["back"]
@@ -611,6 +609,8 @@ def giftingto():
             raise Exception
 
         for note in db_notes:
+            all_states = [state.value for state in wishlist_model.NoteState]
+            all_states.remove(wishlist_model.NoteState.MODIFIED.value)
             selections = []
             modifyable = False
             name = ""
@@ -641,7 +641,7 @@ def giftingto():
                 else:
                     modifyable = False
 
-            currentnotes[note.item] = (encrypt_id(note.id), selections, modifyable, name)
+            currentnotes[note.item] = (encrypt_id(note.id), copy.deepcopy(selections), modifyable, name)
     except ValueError:
         if not Config.DEBUG:
             sentry.captureException()
