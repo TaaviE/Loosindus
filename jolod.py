@@ -620,7 +620,7 @@ def giftingto():
                 selections.insert(0, selections.pop(selections.index(wishlist_model.NoteState.DEFAULT.value)))
                 modifyable = True
             elif note.status == wishlist_model.NoteState.MODIFIED.value["id"]:
-                if note.purchased_by == user_id:
+                if note.purchased_by == int(user_id):
                     selections = all_states
                     selections.insert(0, selections.pop(selections.index(wishlist_model.NoteState.MODIFIED.value)))
                     modifyable = True
