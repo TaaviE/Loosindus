@@ -5,12 +5,12 @@
 {% block content %}
     <h4>{{ message }}</h4>
     {% if sentry_enabled %}
-        {% if g.sentry_event_id %}
-            <p>Errori ID on: {{ g.sentry_event_id }}</p>
+        {% if sentry_event_id %}
+            <p>Errori ID on: {{ sentry_event_id }}</p>
         {% endif %}
         <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
 
-        {% if event_id %}
+        {% if sentry_ask_feedback %}
             <script>
                 Raven.showReportDialog({
                     {% if g.sentry_event_id %}

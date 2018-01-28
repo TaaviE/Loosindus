@@ -187,8 +187,17 @@ app.add_url_rule("/generated_graphs/<filename>", endpoint="generated_graphs", vi
 if not Config.DEBUG or Config.TESTING:
     @app.errorhandler(500)
     def error_500(err):
+        try:
+            if not current_user.is_authenticated:
+                sentry_enabled = False
+            else:
+                sentry_enabled = True
+        except:
+            sentry_enabled = False
+
         return render_template("error.html",
-                               sentry_enabled=True,
+                               sentry_enabled=sentry_enabled,
+                               sentry_ask_feedback=True,
                                sentry_event_id=g.sentry_event_id,
                                sentry_public_dsn=sentry.client.get_public_dsn("https"),
                                message="Päringu töötlemisel tekkis viga!",
@@ -197,8 +206,17 @@ if not Config.DEBUG or Config.TESTING:
 
     @app.errorhandler(404)
     def error_404(err):
+        try:
+            if not current_user.is_authenticated:
+                sentry_enabled = False
+            else:
+                sentry_enabled = True
+        except:
+            sentry_enabled = False
+
         return render_template("error.html",
-                               sentry_enabled=True,
+                               sentry_enabled=sentry_enabled,
+                               sentry_ask_feedback=True,
                                sentry_event_id=g.sentry_event_id,
                                sentry_public_dsn=sentry.client.get_public_dsn("https"),
                                message="Lehte ei leitud!",
