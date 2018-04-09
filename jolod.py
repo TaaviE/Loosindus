@@ -128,7 +128,7 @@ def remind_to_add():
 
         mail.send_message(subject="Meeldetuletus kinkide kohta",
                           body=email_to_send,
-                          recipients=user.email)
+                          recipients=[user.email])
 
     print(get_timestamp() + " Finished sending adding reminders")
 
@@ -178,7 +178,7 @@ def remind_to_buy():
 
         mail.send_message(subject="Meeldetuletus kinkide kohta",
                           body=email_to_send,
-                          recipients=user.email)
+                          recipients=[user.email])
 
     print(get_timestamp() + " Finished sending purchase reminders")
 
@@ -230,15 +230,12 @@ def remind_about_change():
         email_to_send += "Palume päeva jooksul enda otsus uuesti süsteemi sisestada\n"
         email_to_send += "Jõulurakendus 🎄"
 
-        #mail.send_message(subject="Meeldetuletus kinkide kohta",
-        #                  body=email_to_send,
-        #                  recipients=user.email)
+        mail.send_message(subject="Meeldetuletus kinkide kohta",
+                          body=email_to_send,
+                          recipients=[user.email])
 
     print(get_timestamp() + " Finished sending change reminders")
 
-
-#def remind_about_change():
-#    print("Scheduler is alive!")
 
 
 scheduler = BackgroundScheduler(daemon=True)
