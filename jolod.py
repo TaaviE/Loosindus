@@ -42,16 +42,17 @@ from config import Config, db, app, mail
 from models import family_model, shuffles_model, groups_model, users_groups_admins_model, \
     users_families_admins_model, names_model, wishlist_model
 
+# Recursion fix
 import sys
 
 sys.setrecursionlimit(2000)
 
+# Error reporting
 from raven.contrib.flask import Sentry
 
 sentry = Sentry(app,
                 dsn=Config.SENTRY_URL,
                 logging=True)
-
 
 # Setup Flask-Security
 userroles = db.Table(
@@ -90,15 +91,192 @@ security = Security(app, user_datastore,
                     send_confirmation_form=ExtendedConfirmationForm,
                     forgot_password_form=ExtendedForgotPasswordForm)
 
+# Background scheduling task
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+
+def remind_to_add():
+    print(get_timestamp() + " Started sending adding reminders")
+    now = datetime.datetime.now()
+    try:
+        with open("remind_to_add", "r+") as timer_file:
+            lastexec = timer_file.read()
+            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+
+            if now - lastexec < datetime.timedelta(days=30):
+                print(get_timestamp() + " Adding reminders were rate-limited")
+                return
+            else:
+                timer_file.seek(0)
+                timer_file.write(get_timestamp_string(now))
+    except Exception:
+        print(get_timestamp() + " Adding reminders rate-limit file was not found")
+        with open("remind_to_add", "w") as timer_file:
+            timer_file.write(get_timestamp_string(now))
+
+    for user in users_model.User.query:
+        if now - datetime.datetime(*map(int, user.last_login_at.split("/"))) < datetime.timedelta(days=15):
+            continue
+
+        email_to_send = "Tere,\n"
+        email_to_send += "Tegemist on väikese meeldetuletusega enda nimekirja koostamisele hakata mõtlema\n"
+        email_to_send += "\n"
+        email_to_send += "Kirja saavad kõik kasutajad kes ei ole vähemalt 15 päeva sisse loginud\n"
+        email_to_send += "Jõulurakendus 🎄"
+
+        mail.send_message(subject="Meeldetuletus kinkide kohta",
+                          body=email_to_send,
+                          recipients=user.email)
+
+    print(get_timestamp() + " Finished sending adding reminders")
+
+
+def remind_to_buy():
+    print(get_timestamp() + " Started sending purchase reminders")
+    now = datetime.datetime.now()
+    try:
+        with open("remind_to_buy", "r+") as timer_file:
+            lastexec = timer_file.read()
+            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+
+            if now - lastexec < datetime.timedelta(days=15):
+                print(get_timestamp() + " Buying reminders were rate-limited")
+                return
+            else:
+                timer_file.seek(0)
+                timer_file.write(get_timestamp_string(now))
+    except Exception:
+        print(get_timestamp() + " Reminder to buy timer file was not found")
+        with open("remind_to_buy", "w") as timer_file:
+            timer_file.write(get_timestamp_string(now))
+
+    for user in users_model.User.query:
+        marked_entries = get_person_marked(user.id)
+        items_to_purchase = []
+        for entry in marked_entries:
+            if entry.status == wishlist_model.NoteState.PLANNING_TO_PURCHASE.value["id"] or entry.status == wishlist_model.NoteState.MODIFIED.value["id"]:
+                items_to_purchase.append((entry.item, get_person_name(entry.user_id)))
+
+        if len(items_to_purchase) == 0:
+            continue
+
+        email_to_send = "Tere,\n"
+        email_to_send += "Olete märkinud, et plaanite osta allpool loetletud kingitused kuid ei ole vastavate kingituste staatust uuendanud vähemalt viisteist päeva eelnevast meeldetuletusest:\n"
+        email_to_send += "\n"
+        email_to_send += "Kingitus | Kellele\n"
+        for item in items_to_purchase:
+            email_to_send += "\""
+            email_to_send += item[0]
+            email_to_send += "\" - "
+            email_to_send += item[1]
+            email_to_send += "\n"
+        email_to_send += "\n"
+        email_to_send += "Palume mitte unustada, ebameeldivad üllatused ei ole need, mida jõuludeks teistele teha soovime\n"
+        email_to_send += "Jõulurakendus 🎄"
+
+        mail.send_message(subject="Meeldetuletus kinkide kohta",
+                          body=email_to_send,
+                          recipients=user.email)
+
+    print(get_timestamp() + " Finished sending purchase reminders")
+
+
+def get_timestamp_string(now):
+    return str(now.hour) + "/" + str(now.day) + "/" + str(now.month) + "/" + str(now.year)
+
+
+def remind_about_change():
+    print(get_timestamp() + " Started sending change reminders")
+    now = datetime.datetime.now()
+    try:
+        with open("remind_about_change", "r+") as timer_file:
+            lastexec = timer_file.read()
+            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+
+            if now - lastexec < datetime.timedelta(hours=6):
+                print(get_timestamp() + " Changing reminders were rate-limited")
+                return
+            else:
+                timer_file.seek(0)
+                timer_file.write(get_timestamp_string(now))
+    except Exception:
+        print(get_timestamp() + " Change reminder timer file was not found")
+        with open("remind_about_change", "w") as timer_file:
+            timer_file.write(get_timestamp_string(now))
+
+    for user in users_model.User.query:
+        marked_entries = get_person_marked(user.id)
+        items_to_purchase = []
+        for entry in marked_entries:
+            if entry.status == wishlist_model.NoteState.MODIFIED.value["id"]:
+                items_to_purchase.append((entry.item, get_person_name(entry.user_id)))
+
+        if len(items_to_purchase) == 0:
+            continue
+
+        email_to_send = "Tere,\n"
+        email_to_send += "Viimase päeva jooksul on muudetud allpool loetletud soove, on oluline, et otsustaksite kas soovite ikka kinki osta või vabastate selle teistele:\n"
+        email_to_send += "\n"
+        email_to_send += "Kingitus | Kellele\n"
+        for item in items_to_purchase:
+            email_to_send += "\""
+            email_to_send += item[0]
+            email_to_send += "\" - "
+            email_to_send += item[1]
+            email_to_send += "\n"
+        email_to_send += "\n"
+        email_to_send += "Palume päeva jooksul enda otsus uuesti süsteemi sisestada\n"
+        email_to_send += "Jõulurakendus 🎄"
+
+        #mail.send_message(subject="Meeldetuletus kinkide kohta",
+        #                  body=email_to_send,
+        #                  recipients=user.email)
+
+    print(get_timestamp() + " Finished sending change reminders")
+
+
+#def remind_about_change():
+#    print("Scheduler is alive!")
+
+
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(remind_to_add,
+                  trigger=IntervalTrigger(days=30),
+                  name="Addition reminder",
+                  id="add_reminder",
+                  replace_existing=True)
+scheduler.add_job(remind_to_buy,
+                  trigger=IntervalTrigger(days=15),
+                  name="Buying reminder",
+                  id="buy_reminder",
+                  replace_existing=True)
+scheduler.add_job(remind_about_change,
+                  trigger=IntervalTrigger(minutes=720),
+                  name="Change reminder",
+                  id="cng_reminder",
+                  replace_existing=True)
+
+
+atexit.register(lambda: scheduler.shutdown())
+scheduler.start()
+
 # Just for assigning members_to_families a few colors
 chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
 
-def getpersonid(name):
+def get_person_marked(id):
+    passed_person_id = int(id)
+    wishlist_marked = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.purchased_by == passed_person_id).all()
+    return wishlist_marked
+
+
+def get_person_id(name):
     return users_model.User.query.filter(users_model.User.username == name).first().id
 
 
-def getfamilyid(passed_person_id):
+def get_family_id(passed_person_id):
     passed_person_id = int(passed_person_id)
     db_families_user_has_conn = users_families_admins_model.UFARelationship.query.filter(
         users_families_admins_model.UFARelationship.user_id == passed_person_id).all()
@@ -108,18 +286,18 @@ def getfamilyid(passed_person_id):
     return family_id
 
 
-def getpersonname(passed_person_id):
+def get_person_name(passed_person_id):
     return users_model.User.query.get(passed_person_id).username
 
 
-def gettargetid(passed_person_id):
+def get_target_id(passed_person_id):
     try:
         return shuffles_model.Shuffle.query.get(passed_person_id).getter
     except Exception:
         return -1
 
 
-def getnameingenitive(name):
+def get_name_in_genitive(name):
     try:
         return names_model.Name.query.get(name).genitive
     except Exception:
@@ -211,7 +389,7 @@ if not Config.DEBUG or Config.TESTING:
                 sentry_enabled = False
             else:
                 sentry_enabled = True
-        except:
+        except Exception:
             sentry_enabled = False
 
         return render_template("error.html",
@@ -227,6 +405,9 @@ if not Config.DEBUG or Config.TESTING:
 @app.route("/test")
 @login_required
 def test():
+    remind_about_change()
+    remind_to_buy()
+    remind_to_add()
     return render_template("error.html", message="Here you go!", title="Error")
 
 
@@ -237,10 +418,18 @@ def favicon():
 
 def index():
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
     no_shuffle = False
-    if gettargetid(user_id) == -1:
+    if get_target_id(user_id) == -1:
         no_shuffle = True
+
+    try:
+        users_model.User.query.get(user_id).last_activity_at = datetime.datetime.now();
+        users_model.User.query.get(user_id).last_activity_ip = "0.0.0.0"
+    except Exception:
+        sentry.captureException()
+
+
     return render_template("index.html",
                            auth=username,
                            no_shuffle=no_shuffle,
@@ -287,11 +476,11 @@ def logout():
 @login_required
 def shuffle():
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
     print(get_timestamp(), username)
-    gifter = getpersonid(username)
+    gifter = get_person_id(username)
     print(get_timestamp(), gifter)
-    giftee = gettargetid(gifter)
+    giftee = get_target_id(gifter)
     print(get_timestamp(), giftee)
     return render_template("shuffle.html",
                            title="Loosimine",
@@ -302,7 +491,7 @@ def shuffle():
 @login_required
 def notes():
     user_id = session["user_id"]
-    # username = getpersonname(user_id)
+    # username = get_person_name(user_id)
     notes_from_file = {}
     empty = False
 
@@ -337,7 +526,7 @@ def createnote():
 def createnote_add():
     print(get_timestamp(), "Got a post request to add a note")
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
     print(get_timestamp(), "Found user:", username)
     print(get_timestamp(), "Found user id:", user_id)
     currentnotes = {}
@@ -393,7 +582,7 @@ def createnote_add():
 @login_required
 def editnote():
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
 
     try:
         request_id = request.args["id"]
@@ -427,7 +616,7 @@ def editnote():
 def editnote_edit():
     print(get_timestamp(), "Got a post request to edit a note by", end="")
     user_id = session["user_id"]
-    # username = getpersonname(user_id)
+    # username = get_person_name(user_id)
     print(get_timestamp(), " user id:", user_id)
 
     addednote = request.form["note"]
@@ -463,7 +652,7 @@ def editnote_edit():
 @login_required
 def deletenote():
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
 
     try:
         request_id = request.args["id"]
@@ -545,7 +734,7 @@ def updatenotestatus():
 def giftingto():
     check = check_if_admin()
     user_id = session["user_id"]
-    username = getpersonname(user_id)
+    username = get_person_name(user_id)
     invalid_notes = False
 
     try:
@@ -558,7 +747,7 @@ def giftingto():
         request_id = int(decrypt_id(request_id))
     except Exception as e:
         print(get_timestamp(), "Failed decrypting or missing:", e)
-        request_id = gettargetid(user_id)
+        request_id = get_target_id(user_id)
 
     try:  # Yeah, only valid IDs please
         if request_id == -1:
@@ -579,8 +768,8 @@ def giftingto():
                                title="Error")
 
     if check is not None:  # Let's not let everyone read everyone's lists
-        if request_id != gettargetid(user_id):
-            family_id = getfamilyid(user_id)
+        if request_id != get_target_id(user_id):
+            family_id = get_family_id(user_id)
             family_obj = family_model.Family.query.get(family_id)
             family_group = family_obj.group
 
@@ -620,7 +809,7 @@ def giftingto():
                 selections.insert(0, selections.pop(selections.index(wishlist_model.NoteState.DEFAULT.value)))
                 modifyable = True
             elif note.status == wishlist_model.NoteState.MODIFIED.value["id"]:
-                if note.purchased_by == int(user_id):
+                if note.purchased_by == int(user_id) or note.purchased_by is None:
                     selections = all_states
                     selections.insert(0, wishlist_model.NoteState.MODIFIED.value)
                     modifyable = True
@@ -652,7 +841,7 @@ def giftingto():
 
     return render_template("show_notes.html",
                            notes=currentnotes,
-                           target=getnameingenitive(getpersonname(request_id)),
+                           target=get_name_in_genitive(get_person_name(request_id)),
                            id=encrypt_id(request_id),
                            title="Kingisoovid",
                            invalid=invalid_notes,
@@ -665,7 +854,7 @@ def giftingto():
 def graph():
     user_id = session["user_id"]
     try:
-        family_id = getfamilyid(user_id)
+        family_id = get_family_id(user_id)
         family_obj = family_model.Family.query.get(family_id)
         family_group = family_obj.group
         return render_template("graph.html",
@@ -748,7 +937,7 @@ def editfamily():
         if member.user_id == user_id:
             is_person = True
 
-        family.append((getpersonname(member.user_id), encrypt_id(member.user_id), is_admin, is_person))
+        family.append((get_person_name(member.user_id), encrypt_id(member.user_id), is_admin, is_person))
 
     return render_template("editfam.html",
                            family=family,
@@ -830,14 +1019,14 @@ def secretgraph():
     request_id = str(request.args["id"])
 
     return render_template("graph.html",
-                           id=str(getpersonname(session["user_id"])),
+                           id=str(get_person_name(session["user_id"])),
                            image="s" + request_id + ".png",
                            title="Salajane graaf")
 
 
 def check_if_admin():
     user_id = session["user_id"]
-    requester = getpersonname(user_id)
+    requester = get_person_name(user_id)
     requester = requester.lower()
 
     if requester != "admin" and requester != "taavi":
@@ -882,7 +1071,7 @@ def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping=None):
         name_id_lookup_dict = {}  # Let's create a admin-user_id mapping
 
         for name in id_to_id_mapping.keys():
-            name_id_lookup_dict[getpersonid(name)] = name
+            name_id_lookup_dict[get_person_id(name)] = name
 
         netx.draw_networkx_labels(passed_graph, pos, labels=name_id_lookup_dict, font_size=18)
     else:
@@ -909,7 +1098,7 @@ def regraph():
     #        return check
 
     user_id = session["user_id"]
-    family_id = getfamilyid(user_id)
+    family_id = get_family_id(user_id)
     family_obj = family_model.Family.query.get(family_id)
     family_group = family_obj.group
 
@@ -925,8 +1114,8 @@ def regraph():
     for family_index, list_family in enumerate(database_all_families_with_members):
         families.insert(family_index, {})
         for person_index, person in enumerate(list_family):
-            family_ids_map[family_index] = getfamilyid(person.user_id)
-            families[family_index][getpersonname(person.user_id)] = person.user_id
+            family_ids_map[family_index] = get_family_id(person.user_id)
+            families[family_index][get_person_name(person.user_id)] = person.user_id
 
     families_shuf_nam = {}
     families_shuf_ids = {}
@@ -948,7 +1137,7 @@ def regraph():
     for index, family in enumerate(families_list_copy):  # For each family among every family
         for person in family:  # For each person in given family
             if families_give_copy[index][person] == True:  # If person needs to gift
-                #                print("Looking for a match for:", person, getpersonid(person))
+                #                print("Looking for a match for:", person, get_person_id(person))
                 familynumbers = list(range(0, index))
                 familynumbers.extend(range(index + 1, len(family) - 1))
                 
@@ -965,7 +1154,7 @@ def regraph():
                             #print("Receiving:", receiving_family_index, receiving_person)
                             families_give_copy[index][person] = False  # ; print("Giving:", index, person)
                             families_shuf_nam[person] = receiving_person
-                            families_shuf_ids[getpersonid(person)] = getpersonid(receiving_person)
+                            families_shuf_ids[get_person_id(person)] = get_person_id(receiving_person)
                             #                             print("Breaking")
                             break
     """""
@@ -993,7 +1182,7 @@ def regraph():
     shuffled_ids_str = {}
     for connection in new_connections:
         families_shuf_ids[connection.source] = connection.target
-        families_shuf_nam[getpersonname(connection.source)] = getpersonname(connection.target)
+        families_shuf_nam[get_person_name(connection.source)] = get_person_name(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
         #    print(get_timestamp(),  shuffled_names)
@@ -1047,7 +1236,7 @@ def rerender():
     #        return check
 
     user_id = session["user_id"]
-    family_id = getfamilyid(user_id)
+    family_id = get_family_id(user_id)
     family_obj = family_model.Family.query.get(family_id)
     family_group = family_obj.group
 
@@ -1063,7 +1252,7 @@ def rerender():
     families_shuf_ids = {}
     for family in database_all_families_with_members:
         for member in family:
-            families_shuf_ids[member.user_id] = gettargetid(member.user_id)
+            families_shuf_ids[member.user_id] = get_target_id(member.user_id)
 
     digraph.add_nodes_from(families_shuf_ids.keys())
 
@@ -1085,7 +1274,7 @@ def rerendernamegraph():
     digraph = netx.DiGraph(iterations=100000000, scale=2)  # This is probably a horrible idea with more nodes
 
     user_id = session["user_id"]
-    family_id = getfamilyid(user_id)
+    family_id = get_family_id(user_id)
     family_obj = family_model.Family.query.get(family_id)
     family_group = family_obj.group
 
@@ -1099,7 +1288,7 @@ def rerendernamegraph():
     families_shuf_ids = {}
     for family in database_all_families_with_members:
         for member in family:
-            families_shuf_ids[member.user_id] = gettargetid(member.user_id)
+            families_shuf_ids[member.user_id] = get_target_id(member.user_id)
 
     for shuffled_ids_id in copy.deepcopy(families_shuf_ids).keys():
         digraph.add_node(shuffled_ids_id)

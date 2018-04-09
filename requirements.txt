@@ -12,3 +12,4 @@ matplotlib
 werkzeug
 pycryptodomex
 raven
+apscheduler
