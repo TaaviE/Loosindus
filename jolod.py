@@ -264,8 +264,8 @@ scheduler.start()
 chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
 
-def get_person_marked(id):
-    passed_person_id = int(id)
+def get_person_marked(user_id):
+    passed_person_id = int(user_id)
     wishlist_marked = wishlist_model.Wishlist.query.filter(wishlist_model.Wishlist.purchased_by == passed_person_id).all()
     return wishlist_marked
 
@@ -340,19 +340,14 @@ def encrypt_id(user_id):
 def get_timestamp():
     # [yyyy-mm-dd hh:mm:ss +0000]
     time_now = datetime.datetime.now()
-    timestamp = "[" + \
-                str(time_now.year) + \
-                "-" + \
-                "0" + str(time_now.month) if len(str(time_now.month)) == 1 else str(time_now.month) + \
-                "-" + \
-                "0" + str(time_now.day) if len(str(time_now.day)) == 1 else str(time_now.day) + \
-                " " + \
-                "0" + str(time_now.hour) if len(str(time_now.hour)) == 1 else str(time_now.hour) + \
-                ":" + \
-                "0" + str(time_now.minute) if len(str(time_now.minute)) == 1 else str(time_now.minute) + \
-                ":" + \
-                "0" + str(time_now.second) if len(str(time_now.second)) == 1 else str(time_now.second) + \
-                " +0200]"  # FIXME: Get actual timezone
+    year = str(time_now.year)
+    month = "0" + str(time_now.month) if len(str(time_now.month)) == 1 else str(time_now.month)
+    day = "0" + str(time_now.day) if len(str(time_now.day)) == 1 else str(time_now.day)
+    hour = "0" + str(time_now.hour) if len(str(time_now.hour)) == 1 else str(time_now.hour)
+    minute = "0" + str(time_now.minute) if len(str(time_now.minute)) == 1 else str(time_now.minute)
+    second = "0" + str(time_now.second) if len(str(time_now.second)) == 1 else str(time_now.second)
+    timestamp = "[" + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " +0300]"
+    # FIXME: Get actual timezone
 
     return timestamp
 
@@ -368,7 +363,7 @@ if not Config.DEBUG or Config.TESTING:
                 sentry_enabled = False
             else:
                 sentry_enabled = True
-        except:
+        except Exception:
             sentry_enabled = False
 
         return render_template("error.html",
@@ -422,11 +417,10 @@ def index():
         no_shuffle = True
 
     try:
-        users_model.User.query.get(user_id).last_activity_at = datetime.datetime.now();
+        users_model.User.query.get(user_id).last_activity_at = datetime.datetime.now()
         users_model.User.query.get(user_id).last_activity_ip = "0.0.0.0"
     except Exception:
         sentry.captureException()
-
 
     return render_template("index.html",
                            auth=username,
