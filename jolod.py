@@ -27,6 +27,7 @@ import datetime
 import random
 import base64
 import json
+import os
 from Cryptodome.Cipher import AES
 
 # Flask
@@ -346,7 +347,11 @@ def get_timestamp():
     hour = "0" + str(time_now.hour) if len(str(time_now.hour)) == 1 else str(time_now.hour)
     minute = "0" + str(time_now.minute) if len(str(time_now.minute)) == 1 else str(time_now.minute)
     second = "0" + str(time_now.second) if len(str(time_now.second)) == 1 else str(time_now.second)
-    timestamp = "[" + year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + " +0300]"
+    pid = os.getpid()
+    timestamp = "[" + year + "-" + month + "-" + day + " " + \
+                hour + ":" + minute + ":" + second + \
+                " +0300]" + \
+                " [" + str(pid) + "]"
     # FIXME: Get actual timezone
 
     return timestamp
