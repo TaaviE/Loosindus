@@ -343,15 +343,15 @@ def get_timestamp():
     timestamp = "[" + \
                 str(time_now.year) + \
                 "-" + \
-                str(time_now.month) + \
+                "0" + str(time_now.month) if len(str(time_now.month)) == 1 else str(time_now.month) + \
                 "-" + \
-                str(time_now.day) + \
+                "0" + str(time_now.day) if len(str(time_now.day)) == 1 else str(time_now.day) + \
                 " " + \
-                str(time_now.hour) + \
+                "0" + str(time_now.hour) if len(str(time_now.hour)) == 1 else str(time_now.hour) + \
                 ":" + \
-                str(time_now.minute) + \
+                "0" + str(time_now.minute) if len(str(time_now.minute)) == 1 else str(time_now.minute) + \
                 ":" + \
-                str(time_now.second) + \
+                "0" + str(time_now.second) if len(str(time_now.second)) == 1 else str(time_now.second) + \
                 " +0200]"  # FIXME: Get actual timezone
 
     return timestamp
