@@ -103,8 +103,6 @@ ENV/
 
 # Repository config
 genitive.json
-graph.json
-ids.json
 graph*.png
 secret*.png
 config.py
@@ -115,6 +113,7 @@ venv
 */*robots.txt*
 generated_graphs/
 .directory
+remind_*
 
 # IntelliJ and PyCharm
 .idea
