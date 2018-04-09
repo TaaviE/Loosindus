@@ -117,8 +117,9 @@ def remind_to_add():
             timer_file.write(get_timestamp_string(now))
 
     for user in users_model.User.query:
-        if now - datetime.datetime(*map(int, user.last_login_at.split("/"))) < datetime.timedelta(days=15):
-            continue
+        if user.last_activity_at:
+            if now - datetime.datetime(*map(int, user.last_activity_at.split("/"))) < datetime.timedelta(days=15):
+                continue
 
         email_to_send = "Tere,\n"
         email_to_send += "Tegemist on väikese meeldetuletusega enda nimekirja koostamisele hakata mõtlema\n"
