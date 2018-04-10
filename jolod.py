@@ -734,9 +734,9 @@ def updatenotestatus():
 @app.route("/giftingto")
 @login_required
 def giftingto():
-    check = check_if_admin()
-    if check is not None:
-        return check
+    #check = check_if_admin()
+    #if check is not None:
+    #   return check
 
     user_id = session["user_id"]
     username = get_person_name(user_id)
