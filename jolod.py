@@ -98,7 +98,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 
-def remind_to_add():
+def remind_to_add(rate_limit=True):
     print(get_timestamp() + " Started sending adding reminders")
     now = datetime.datetime.now()
     try:
@@ -108,7 +108,8 @@ def remind_to_add():
 
             if now - lastexec < datetime.timedelta(days=30):
                 print(get_timestamp() + " Adding reminders were rate-limited")
-                return
+                if rate_limit:
+                    return
             else:
                 timer_file.seek(0)
                 timer_file.write(get_timestamp_string(now))
@@ -135,7 +136,7 @@ def remind_to_add():
     print(get_timestamp() + " Finished sending adding reminders")
 
 
-def remind_to_buy():
+def remind_to_buy(rate_limit=True):
     print(get_timestamp() + " Started sending purchase reminders")
     now = datetime.datetime.now()
     try:
@@ -145,7 +146,8 @@ def remind_to_buy():
 
             if now - lastexec < datetime.timedelta(days=15):
                 print(get_timestamp() + " Buying reminders were rate-limited")
-                return
+                if rate_limit:
+                    return
             else:
                 timer_file.seek(0)
                 timer_file.write(get_timestamp_string(now))
@@ -189,7 +191,7 @@ def get_timestamp_string(now):
     return str(now.hour) + "/" + str(now.day) + "/" + str(now.month) + "/" + str(now.year)
 
 
-def remind_about_change():
+def remind_about_change(rate_limit=True):
     print(get_timestamp() + " Started sending change reminders")
     now = datetime.datetime.now()
     try:
@@ -199,7 +201,8 @@ def remind_about_change():
 
             if now - lastexec < datetime.timedelta(hours=6):
                 print(get_timestamp() + " Changing reminders were rate-limited")
-                return
+                if rate_limit:
+                    return
             else:
                 timer_file.seek(0)
                 timer_file.write(get_timestamp_string(now))
@@ -237,7 +240,6 @@ def remind_about_change():
                           recipients=[user.email])
 
     print(get_timestamp() + " Finished sending change reminders")
-
 
 
 scheduler = BackgroundScheduler(daemon=True)
@@ -403,9 +405,12 @@ if not Config.DEBUG or Config.TESTING:
 @app.route("/test")
 @login_required
 def test():
-    remind_about_change()
-    remind_to_buy()
-    remind_to_add()
+    check = check_if_admin()
+    if check is not None:
+        return check
+    remind_about_change(False)
+    remind_to_buy(False)
+    remind_to_add(False)
     return render_template("error.html", message="Here you go!", title="Error")
 
 
@@ -730,6 +735,9 @@ def updatenotestatus():
 @login_required
 def giftingto():
     check = check_if_admin()
+    if check is not None:
+        return check
+
     user_id = session["user_id"]
     username = get_person_name(user_id)
     invalid_notes = False
@@ -1090,9 +1098,9 @@ def save_graph(passed_graph, file_name, colored=False, id_to_id_mapping=None):
 @app.route("/recreategraph")
 @login_required
 def regraph():
-    #    check = check_if_admin()
-    #    if check is not None:
-    #        return check
+    check = check_if_admin()
+    if check is not None:
+        return check
 
     user_id = session["user_id"]
     family_id = get_family_id(user_id)
@@ -1228,9 +1236,9 @@ def test_mail():
 @app.route("/rerendergraph")
 @login_required
 def rerender():
-    #    check = check_if_admin()
-    #    if check is not None:
-    #        return check
+    check = check_if_admin()
+    if check is not None:
+        return check
 
     user_id = session["user_id"]
     family_id = get_family_id(user_id)
