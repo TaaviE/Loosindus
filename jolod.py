@@ -734,7 +734,7 @@ def updatenotestatus():
 @app.route("/giftingto")
 @login_required
 def giftingto():
-    #check = check_if_admin()
+    check = check_if_admin()
     #if check is not None:
     #   return check
 
