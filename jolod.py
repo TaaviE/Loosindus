@@ -427,8 +427,10 @@ def index():
         no_shuffle = True
 
     try:
-        users_model.User.query.get(user_id).last_activity_at = datetime.datetime.now()
-        users_model.User.query.get(user_id).last_activity_ip = "0.0.0.0"
+        user = users_model.User.query.get(int(user_id))
+        user.last_activity_at = datetime.datetime.now()
+        user.last_activity_ip = "0.0.0.0"  # TODO: Fix
+        db.session.commit()
     except Exception:
         sentry.captureException()
 
