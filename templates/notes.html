@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
 
 
 {% block updates %}
@@ -11,8 +11,7 @@
 {% endblock %}
 {% block content %}
     <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="./createnote">Lisa
-        uus</a>
+          href="./createnote">Lisa uus</a>
         <a {% if back %}id="link-previous"{% endif %}
            class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
            href="/">Tagasi</a>

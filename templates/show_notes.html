@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
+
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
         <p class="center">Siin on <b>{{ target }}</b> jõulusoovide nimekiri</p>
@@ -8,9 +9,6 @@
 {% endblock %}
 
 {% block content %}
-    <p><a {% if back %}id="link-previous"{% endif %}
-          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="{{ back_link }}">Tagasi</a></p>
     <div class="table-responsive">
         <table class="mdl-data-table mdl-js-data-table">
             <thead class="mdl-textfield--full-width">

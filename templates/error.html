@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
 
 {% block content %}
     <h4>{{ message }}</h4>
@@ -23,6 +23,4 @@
             </script>
         {% endif %}
     {% endif %}
-    <a {% if back == True %}id="link-previous"{% endif %}
-       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
 {% endblock %}

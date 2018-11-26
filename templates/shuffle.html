@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
 
 {% block content %}
     <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
           href="./giftingto?id={{ id }}">Vaata soovinimekirja</a></p>
     <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./graph">Vaata
         graafi</a></p>
-    <p><a id="link-previous" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="./">Tagasi</a></p>
 {% endblock %}
 

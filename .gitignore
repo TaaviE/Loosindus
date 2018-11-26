@@ -105,7 +105,7 @@ ENV/
 genitive.json
 graph*.png
 secret*.png
-config.py
+secretsettings.py
 notes
 __pycache__
 venv

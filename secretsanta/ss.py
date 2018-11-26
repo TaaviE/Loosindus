@@ -1,5 +1,6 @@
 # coding=utf-8
-# Small python script to show how the graphing algorith works
+# Small python script to show how the graphing algorithm works
+# Not used in the primary project itself
 import datetime as dt
 import sys
 

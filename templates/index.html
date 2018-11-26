@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
 
 {% block content %}
     <h3>Tere, kumba nimekirja soovid vaadata?</h3>
@@ -25,7 +25,5 @@
 {% endblock %}
 
 {% block footer %}
-    {% with user_id = uid %}
-        {% include "set_user_id.html" %}
-    {% endwith %}
+    <script>gtag("set", {"user_id": "{{ user_id }}"});</script>
 {% endblock %}

@@ -1,5 +1,8 @@
 from enum import Enum
-from config import db
+
+from django.contrib.auth.models import User
+
+from django.db.models import Model, ForeignKey, CASCADE, IntegerField, CharField
 
 
 class NoteState(Enum):
@@ -16,10 +19,12 @@ class NoteState(Enum):
     """Modified"""
 
 
-class Wishlist(db.Model):
+class Wishlist(Model):
     """
     Specifies how wishlist items are held in the database
 
+    @type  id: int
+    @param id: note's ID
     @type  user_id: int
     @param user_id: user's ID
     @type  item: str
@@ -29,19 +34,12 @@ class Wishlist(db.Model):
     @type  purchased_by: int
     @param purchased_by: item has been claimed by whom
     """
-    __tablename__ = "wishlists"
 
-    user_id = db.Column(db.Integer)
-    item = db.Column(db.VARCHAR(255))
-    status = db.Column(db.Integer)
-    purchased_by = db.Column(db.Integer, nullable=True)
-    id = db.Column(db.BIGINT, primary_key=True, autoincrement=True, nullable=False)
+    class Meta:
+        db_table = "wishlists"
 
-    def __init__(self, user_id, item, status=NoteState.DEFAULT.value["id"], purchased_by=None):
-        self.user_id = user_id
-        self.item = item
-        self.status = status
-        self.purchased_by = purchased_by
-
-    def __repr__(self):
-        return "<id {}>".format(self.user_id)
+    id = IntegerField(primary_key=True, null=False, blank=True)
+    user_id = IntegerField(ForeignKey(User, db_column='id', on_delete=CASCADE), null=False, blank=True)
+    item = CharField(max_length=1024, null=False, blank=True)
+    status = IntegerField(null=False, blank=True)
+    purchased_by = IntegerField(ForeignKey(User, db_column='id', on_delete=CASCADE), null=True, blank=False)

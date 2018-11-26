@@ -1,15 +1,9 @@
-Flask
-Flask-SqlAlchemy
-Flask-Security
-Flask-Script
-Flask-Mail
-Flask-WTF
-networkx
+passlib
+wheel
+django
+psycopg2 --no-binary psycopg2
 bcrypt
-sqlalchemy
-psycopg2
-matplotlib
-werkzeug
+argon2-cffi
+celery
 pycryptodomex
 raven
-apscheduler

@@ -5,14 +5,14 @@
     {% include "head_template.html" %}
     {% include "style.html" %}
     <meta name="description" content="{% block description %}{% endblock %}">
-    <meta property="og:title" content="{{ self.title() }}"/>
+    <meta property="og:title" content="{{ self.title }}"/>
 </head>
 
 
 <body>
-<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+<div class="demo-layout mdl-layout mdl-js-layout {% if drawer %} mdl-layout--fixed-drawer {% endif %} mdl-layout--fixed-header">
     {% block title_bar %}
-        {% with title=self.title() %}
+        {% with title=self.title %}
             {% include "title_bar.html" %}
         {% endwith %}
     {% endblock %}

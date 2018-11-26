@@ -205,10 +205,6 @@ def remind_to_buy(rate_limit=True):
     print(get_timestamp() + " Finished sending purchase reminders")
 
 
-def get_timestamp_string(now):
-    return str(now.hour) + "/" + str(now.day) + "/" + str(now.month) + "/" + str(now.year)
-
-
 def remind_about_change(rate_limit=True):
     print(get_timestamp() + " Started sending change reminders")
     now = datetime.datetime.now()

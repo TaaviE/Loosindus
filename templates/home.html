@@ -1,6 +1,6 @@
-{% extends "security/base.html" %}
+{% extends "base.html" %}
 
-{% block title %}🎄 Jõulurakendus{% endblock %}
+{% block title %}🎄 Jõulurakendus {% endblock %}
 
 {% block description %}
     Lihtne Eestikeelne loosipakkide tegemise jaoks mõeldud veebileht
@@ -12,7 +12,7 @@
         jagamiseks 🎅, nimede loosimise korraldamise jaoks. Töötab hästi nii mobiilil kui arvutil! Katsetamiseks
         registreeru (või logi sisse).</p>
     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-       href="./login">Logi sisse</a>
+       href="./accounts/login">Logi sisse</a>
     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-       href="./register">Registreeru</a>
+       href="./accounts/signup">Registreeru</a>
 {% endblock %}

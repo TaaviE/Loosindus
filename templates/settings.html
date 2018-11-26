@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄 {{ page_title }}{% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
@@ -9,9 +9,6 @@
 {% endblock %}
 
 {% block content %}
-    <p><a {% if back %}id="link-previous"{% endif %}
-          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="{{ back_link }}">Tagasi</a></p>
     <p>Sinu ID: {{ user_id }}</p>
     <p>Sinu nimi: {{ user_name }}</p>
 
@@ -57,11 +54,11 @@
                 <td>{{ name }}</td>
                 {% if group[1] %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Muuda / Vaata</a>
+                           href="./editgroup?id={{ group[0] }}">Muuda / Vaata</a>
                     </td>
                 {% else %}
                     <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Vaata</a>
+                           href="./editgroup?id={{ group[0] }}">Vaata</a>
                     </td>
                 {% endif %}
             </tr>
