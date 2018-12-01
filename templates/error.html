@@ -3,26 +3,31 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <h4>{{ message }}</h4>
-    {% if sentry_enabled %}
-        {% if sentry_event_id %}
-            <p>Errori ID on: {{ sentry_event_id }}</p>
-        {% endif %}
-        <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+            <h4>{{ message }}</h4>
+            {% if sentry_enabled %}
+                {% if sentry_event_id %}
+                    <p>{{ _("Error ID is: ") }}{{ sentry_event_id }}</p>
+                {% endif %}
+                <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
 
-        {% if sentry_ask_feedback %}
-            <script>
-                Raven.showReportDialog({
-                    {% if g.sentry_event_id %}
-                        eventId: '{{ g.sentry_event_id }}',
-                    {% else %}
-                        eventId: '{{ sentry_event_id }}',
-                    {% endif %}
-                    dsn: '{{ sentry_public_dsn }}'
-                });
-            </script>
-        {% endif %}
-    {% endif %}
-    <a {% if back == True %}id="link-previous"{% endif %}
-       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="../">Tagasi</a>
+                {% if sentry_ask_feedback %}
+                    <script>
+                        Raven.showReportDialog({
+                            {% if g.sentry_event_id %}
+                                eventId: '{{ g.sentry_event_id }}',
+                            {% else %}
+                                eventId: '{{ sentry_event_id }}',
+                            {% endif %}
+                            dsn: '{{ sentry_public_dsn }}'
+                        });
+                    </script>
+                {% endif %}
+            {% endif %}
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               href="/">{{ _("Back") }}</a>
+        </div>
+    </div>
 {% endblock %}

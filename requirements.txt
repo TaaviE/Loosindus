@@ -4,7 +4,6 @@ Flask-Security
 Flask-Script
 Flask-Mail
 Flask-WTF
-networkx
 bcrypt
 sqlalchemy
 psycopg2
@@ -12,4 +11,5 @@ matplotlib
 werkzeug
 pycryptodomex
 raven
-apscheduler
+Celery
+Flask-Babel

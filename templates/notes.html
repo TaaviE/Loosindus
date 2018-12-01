@@ -2,53 +2,58 @@
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
-
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>Siin on sinu personaalne nimekiri kuhu peaksid kirja panema enda jõulusoovid, seda näeb peale sinu ainult
-            jõuluvana 🎄</p>
+        <p>{{ _("Here is your personal wishlist, this can be viewed by anyone in your group, including your personal santa") }}🎄</p>
     </div>
 {% endblock %}
+
+{% block buttons %}
+    <div class="mdl-card mdl-shadow--2dp mdl-cell">
+        <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 style="color: #fff;" class="mdl-card__title-text">{{ _("Options") }}</h2>
+        </div>
+        <div class="mdl-card__supporting-text">
+
+        </div>
+        <div class="mdl-card__actions mdl-card--border">
+            <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+               href="./createnote">{{ _("Add new") }}</a>
+        </div>
+    </div>
+{% endblock %}
+
 {% block content %}
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="./createnote">Lisa
-        uus</a>
-        <a {% if back %}id="link-previous"{% endif %}
-           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-           href="/">Tagasi</a>
-    </p>
-    <div class="table-responsive">
-        <table class="mdl-data-table mdl-js-data-table">
-            <thead>
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+
+    <table style="overflow: auto;"
+           class="mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+        <tbody>
+        <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
+        {% if not empty %}
+            <th class="mdl-data-table__cell--non-numeric">{{ _("Delete") }}</th>
+            <th class="mdl-data-table__cell--non-numeric">{{ _("Edit") }}</th>
+        {% else %}
+            <th class="mdl-data-table__cell--non-numeric"></th>
+            <th class="mdl-data-table__cell--non-numeric"></th>
+        {% endif %}
+
+        {% for item, id in list.items() %}
             <tr>
-                <th class="mdl-data-table__cell--non-numeric">Kirjeldus</th>
+                <td style="white-space: pre-line;" class="mdl-data-table__cell--non-numeric">{{ item }}</td>
                 {% if not empty %}
-                    <th class="mdl-data-table__cell--non-numeric">Kustuta</th>
-                    <th class="mdl-data-table__cell--non-numeric">Muuda</th>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./removenote?id={{ id }}">{{ _("Delete") }}</a></td>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./editnote?id={{ id }}">{{ _("Edit") }}</a></td>
                 {% else %}
-                    <th class="mdl-data-table__cell--non-numeric"></th>
-                    <th class="mdl-data-table__cell--non-numeric"></th>
+                    <td class="mdl-data-table__cell--non-numeric"></td>
+                    <td class="mdl-data-table__cell--non-numeric"></td>
                 {% endif %}
             </tr>
-            </thead>
-            <tbody>
-            {% for item, id in list.items() %}
-                <tr>
-                    <td class="mdl-data-table__cell--non-numeric">{{ item }}</td>
-                    {% if not empty %}
-                        <td class="mdl-data-table__cell--non-numeric">
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="./removenote?id={{ id }}">Kustuta</a></td>
-                        <td class="mdl-data-table__cell--non-numeric">
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="./editnote?id={{ id }}">Muuda</a></td>
-                    {% else %}
-                        <td class="mdl-data-table__cell--non-numeric"></td>
-                        <td class="mdl-data-table__cell--non-numeric"></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

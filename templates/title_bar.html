@@ -16,27 +16,26 @@
             <i class="material-icons">more_vert</i>
         </button>
         <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-            <li class="mdl-menu__item"><a href="/about">Teenusest</a></li>
-            <li class="mdl-menu__item"><a href="/contact">Kontakt</a></li>
-            <!--            <li class="mdl-menu__item">Legal information</li>-->
+            <li class="mdl-menu__item"><a href="/about">{{ _("About") }}</a></li>
+            <li class="mdl-menu__item"><a href="/contact">{{ _("Contact") }}</a></li>
         </ul>
     </div>
 </header>
 
 {% if no_sidebar != True %}
-<div class="demo-drawer mdl-layout__drawer">
-    <nav class="demo-navigation mdl-navigation">
-        <a class="mdl-navigation__link" href="/notes">
-            <i class="material-icons"  role="presentation">list</i> Minu nimekiri</a>
-        <a class="mdl-navigation__link" href="/giftingto">
-            <i class="material-icons" role="presentation">list</i> Kingisaaja nimekiri</a>
-        <a class="mdl-navigation__link" href="/graph">
-            <i class="material-icons" role="presentation">cached</i> Graaf</a>
-        <div class="mdl-layout-spacer"></div>
-        <a class="mdl-navigation__link" href="/settings">
-            <i class="material-icons" role="presentation">settings</i> Seaded</a>
-        <a class="mdl-navigation__link" href="/logout">
-            <i class="material-icons" role="presentation">exit_to_app</i> Logi välja</a>
-    </nav>
-</div>
+    <div class="demo-drawer mdl-layout__drawer">
+        <nav class="demo-navigation mdl-navigation">
+            <a class="mdl-navigation__link" href="/notes">
+                <i class="material-icons" role="presentation">list</i> {{ _("My Wishlist") }}</a>
+            <a class="mdl-navigation__link" href="/giftingto">
+                <i class="material-icons" role="presentation">list</i> {{ _("Receiver's Wishlist") }}</a>
+            <a class="mdl-navigation__link" href="/graph">
+                <i class="material-icons" role="presentation">cached</i> {{ _("Graph") }}</a>
+            <div class="mdl-layout-spacer"></div>
+            <a class="mdl-navigation__link" href="/settings">
+                <i class="material-icons" role="presentation">settings</i> {{ _("Settings") }}</a>
+            <a class="mdl-navigation__link" href="/logout">
+                <i class="material-icons" role="presentation">exit_to_app</i> {{ _("Log out") }}</a>
+        </nav>
+    </div>
 {% endif %}

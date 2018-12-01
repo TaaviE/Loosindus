@@ -1,45 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄{{ target }} {{ title }}{% endblock %}
+
+{% block additional_head %}
+    <script {# integrity="sha256-PCfu4+fnQrp4wNmVbjN1eaX4LbOvOejab0UOhjLezrw=" #}
+            src="{{ url_for("static", filename="material/lite/mdl-selectfield.js") }}"></script>
+    <link rel="stylesheet"
+          type="text/css"
+            {# crossorigin="use-credentials"
+      integrity="sha512-a14ICq+f2dfUBQT/as+9i+KecV2raU7On6RdgVTSKpzoVhOi7lCW3aJSRROmw8iuAFlIO5ovhHzOF3oeORi70A==" #}
+          href="{{ url_for("static", filename="material/lite/mdl-selectfield.css") }}">
+{% endblock %}
+
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p class="center">Siin on <b>{{ target }}</b> jõulusoovide nimekiri</p>
+        <p class="center">{{ _("Here is") }}
+            <b>{{ target }}</b>{{ _("'s wishlist, you can change their wishlist items' statuses") }}</p>
     </div>
 {% endblock %}
 
 {% block content %}
-    <p><a {% if back %}id="link-previous"{% endif %}
-          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="{{ back_link }}">Tagasi</a></p>
-    <div class="table-responsive">
-        <table class="mdl-data-table mdl-js-data-table">
-            <thead class="mdl-textfield--full-width">
-        <tr>
-            <th class="mdl-data-table__cell--non-numeric">Kirjeldus</th>
-            {% if not invalid %}
-                <th class="mdl-data-table__cell--non-numeric">Staatus</th>
-                <th class="mdl-data-table__cell--non-numeric">Kelle poolt</th>
-                <th class="mdl-data-table__cell--non-numeric">Tegevus</th>
-            {% endif %}
-        </tr>
-        </thead>
-            <tbody class="mdl-textfield--full-width">
-            {% for item, (id, enums, modifyable, name) in notes.items() %}
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+
+    <table style="overflow: auto;"
+           class="mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+        <tbody>
+        <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
+        {% if not invalid %}
+            <th class="mdl-data-table__cell--non-numeric">{{ _("Status") }}</th>
+            <th class="mdl-data-table__cell--non-numeric">{{ _("By whom") }}</th>
+            <th class="mdl-data-table__cell--non-numeric">{{ _("Action") }}</th>
+        {% endif %}
+
+        {% for item, (id, enums, modifyable, name) in notes.items() %}
             <tr>
-                <td class="mdl-data-table__cell--non-numeric">{{ item }}</td>
+                <td style="white-space: pre-line;" class="mdl-data-table__cell--non-numeric">{{ item }}</td>
+
                 {% if not invalid %}
                     <form action="" method="post">
                         <td class="mdl-data-table__cell--non-numeric">
-                            <div class="mdl-selectfield mdl-js-selectfield mdl-selectfield--floating-label">
-                                <select class="mdl-selectfield__select" id="status" name="status">
-                                    {% if modifyable %}
-                                        {% for enum in enums %}
-                                            <option value="{{ enum["id"] }}">{{ enum["description"] }}</option>
-                                        {% endfor %}
-                                    {% else %}
-                                        <option value="{{ enums[0]["id"] }}">{{ enums[0]["description"] }}</option>
-                                    {% endif %}
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                {% if modifyable %}
+                                    <select class="mdl-textfield__input" id="status" name="status">
+                                    {% for enum in enums %}
+                                        <option value="{{ enum["id"] }}">{{ _(enum["description"]) }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <select disabled class="mdl-textfield__input" id="status" name="status">
+                                    <option value="{{ enums[0]["id"] }}">{{ _(enums[0]["description"]) }}</option>
+                                {% endif %}
                                 </select>
+                                <label class="mdl-textfield__label" for="status"></label>
                             </div>
                         </td>
 
@@ -50,13 +61,13 @@
                                 <input type="hidden" name="id" value="{{ id }}">
                                 <input id="submit" type="submit"
                                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       value="Salvesta"/>
+                                       value="{{ _("Save") }}"/>
                             </td>
                         {% else %}
                             <td class="mdl-data-table__cell--non-numeric">
-                                <input title="Ostetud!"
+                                <input title="{{ _("Bought!") }}"
                                        class="disabled mdl-button--disabled mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       value="Ostetud!"/>
+                                       value="{{ _("Bought!") }}"/>
                             </td>
                         {% endif %}
                     </form>
@@ -65,5 +76,4 @@
         {% endfor %}
         </tbody>
     </table>
-    </div>
 {% endblock %}

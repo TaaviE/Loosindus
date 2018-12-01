@@ -1,6 +1,21 @@
 {% macro render_field_with_errors(field) %}
-    <p>
-        {{ field.label }} {{ field(**kwargs)|safe }}
+    <tr>
+        <td>
+            {% if field.widget.input_type == "checkbox" %}
+                <div class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+            {% else %}
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            {% endif %}
+            {% set _dummy = kwargs.update({"id": field.id}) %}
+            {% if field.widget.input_type == "checkbox" %}
+                {{ field.label(class_="mdl-checkbox__label", **{"for": field.id}) }}
+                {{ field(class_="mdl-checkbox__input", **kwargs)|safe }}
+            {% else %}
+                {{ field.label(class_="mdl-textfield__label", **{"for": field.id}) }}
+                {{ field(class_="mdl-textfield__input", **kwargs)|safe }}
+            {% endif %}
+            </div>
+        </td>
         {% if field.errors %}
             <ul>
                 {% for error in field.errors %}
@@ -8,9 +23,11 @@
                 {% endfor %}
             </ul>
         {% endif %}
-    </p>
+    </tr>
 {% endmacro %}
 
 {% macro render_field(field) %}
-    <p>{{ field(**kwargs)|safe }}</p>
+    <tr>
+        <td>{{ field(class_="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent", **kwargs)|safe }}</td>
+    </tr>
 {% endmacro %}

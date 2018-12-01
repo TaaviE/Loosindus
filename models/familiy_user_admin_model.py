@@ -1,7 +1,7 @@
-from config import db
+from main import db
 
 
-class UFARelationship(db.Model):
+class UserFamilyAdmin(db.Model):
     """
     Specifies how user-family-admin relationships are modeled in the database
 

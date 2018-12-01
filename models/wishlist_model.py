@@ -1,18 +1,27 @@
 from enum import Enum
-from config import db
+
+from flask_babel import gettext as _
+
+from main import db
+
+# To make sure these strings get translated
+unclaimed = _("Unclaimed")
+reserved = _("Reserved")
+purchased = _("Purchased")
+modified = _("Modified")
 
 
 class NoteState(Enum):
     """
     Describes all the possible states of a wishlist item
     """
-    DEFAULT = {"id": -1, "description": "Vaba", "color": "#4CAF50"}
+    DEFAULT = {"id": -1, "description": "Unclaimed", "color": "#4CAF50"}
     """Default state"""
-    PLANNING_TO_PURCHASE = {"id": 0, "description": "Reserveeri(tud)", "color": "#FFEB3B"}
+    PLANNING_TO_PURCHASE = {"id": 0, "description": "Reserved", "color": "#FFEB3B"}
     """Plans to purchase"""
-    PURCHASED = {"id": 2, "description": "Ostetud", "color": "#F44336"}
+    PURCHASED = {"id": 2, "description": "Purchased", "color": "#F44336"}
     """Purchased"""
-    MODIFIED = {"id": 3, "description": "Muudetud", "color": "#4CAF50"}
+    MODIFIED = {"id": 3, "description": "Modified", "color": "#4CAF50"}
     """Modified"""
 
 

@@ -3,23 +3,29 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <h3>Tere, kumba nimekirja soovid vaadata?</h3>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+            <h3>{{ _("Hi, which list do you wish to display?") }}</h3>
+        </div>
+
+        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+           href="./notes">{{ _("My Wishlist") }}</a>
+
+        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+           href="./giftingto">{{ _("Receiver's Wishlist") }}</a>
+    </div>
 {% endblock %}
 
 {% block buttons %}
-    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-       href="./notes">Minu</a>
-
-    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-       href="./giftingto">Kingisaaja</a>
 {% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
         {% if no_shuffle %}
-            <h5>Loosimist ei ole veel administraatori poolt tehtud, funktsionaalsus on limiteeritud</h5>
+            <h5>{{ _("Shuffling has not yet been done for your group!") }}</h5>
         {% else %}
-             <h5>Probleemide korral kontakteeru koheselt!</h5>
+            <h5>{{ _("This web service is in Beta testing, please report any errors you see") }}</h5>
         {% endif %}
     </div>
 {% endblock %}

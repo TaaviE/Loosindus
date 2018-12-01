@@ -9,7 +9,8 @@ shopping lists and gifting constraints (avoid gifts between family members for e
 1. Install requirements (`pip3 install -r requirements.txt`)
 2. Set up PostgresSQL with the script in `init_db.sql`
 3. Set up uwsgi/gunicorn and nginx as you wish (to provide TLS)
-4. You're done. Use `/profile` or `/settings` to configure your account.
+4. Update configuration and sitemap to your own URL 
+5. You're done. Use `/profile` or `/settings` to configure your account.
 
 ## Wishlists
 

@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄{{ title }}{% endblock %}
 
 {% block content %}
-    <a {% if back == True %}id="link-previous"{% endif %}
-       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="{{ link }}">Vaata
-        kõiki</a>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+        </div>
+    </div>
 {% endblock %}

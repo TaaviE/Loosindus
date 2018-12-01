@@ -114,6 +114,8 @@ venv
 generated_graphs/
 .directory
 remind_*
+*.swp
+.bash_history
 
 # IntelliJ and PyCharm
 .idea

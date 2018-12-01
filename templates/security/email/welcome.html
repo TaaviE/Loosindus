@@ -1,11 +1,11 @@
-<p>Tere tulemast {{ user.email }}!</p>
+<p>{{ _("Welcome") }} {{ user.email }}!</p>
 
 {% if security.confirmable %}
-    <p>Saad enda e-maili kinnitada allpool asuva lingi kaudu:</p>
+    <p>{{ _("You can confirm your account using the link below:") }}</p>
 
-    <p><a href="{{ confirmation_link }}">Kinnita minu konto</a></p>
+    <p><a href="{{ confirmation_link }}">{{ _("Confirm my account") }}</a></p>
 
-    <p>Kui antud link ei tööta siis saad kopeerida allpool asuva lingi otse aadressiribale:</p>
+    <p>{{ _("If your email client doesn't display links properly then copy-paste the link into your browser's address bar: ") }}</p>
 
     <p>{{ confirmation_link }}</p>
 {% endif %}

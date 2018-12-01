@@ -1,23 +1,26 @@
 {% extends "security/base.html" %}
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
-{% block title %}Register{% endblock %}
+{% block title %}{{ _("Register") }}{% endblock %}
 
 {% block content %}
     <h1>{{ _("Register") }}</h1>
     {% include "security/_messages.html" %}
+
     <form action="{{ url_for_security("register") }}" method="POST" name="register_user_form">
-        {{ register_user_form.hidden_tag() }}
-        {{ render_field_with_errors(register_user_form.username) }}
-        {{ render_field_with_errors(register_user_form.email) }}
-        {{ render_field_with_errors(register_user_form.password) }}
-        {% if register_user_form.password_confirm %}
-            {{ render_field_with_errors(register_user_form.password_confirm) }}
-        {% endif %}
-        {{ render_field_with_errors(register_user_form.recaptcha) }}
-        {{ render_field(register_user_form.submit) }}
+        <table>
+            {{ register_user_form.hidden_tag() }}
+            {{ render_field_with_errors(register_user_form.username) }}
+            {{ render_field_with_errors(register_user_form.email) }}
+            {{ render_field_with_errors(register_user_form.password) }}
+            {% if register_user_form.password_confirm %}
+                {{ render_field_with_errors(register_user_form.password_confirm) }}
+            {% endif %}
+            {{ render_field_with_errors(register_user_form.recaptcha) }}
+            {{ render_field(register_user_form.submit) }}
+        </table>
     </form>
     {% include "security/_menu.html" %}
 {% endblock %}
 
-{% block description %}Register page{% endblock %}
+{% block description %}{{ _("Register page") }}{% endblock %}

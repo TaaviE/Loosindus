@@ -4,69 +4,75 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>Siin lehel on näha info sinu konto ja sellega seonduva kohta</p>
+        <p>{{ _("Page for managing your account, families and groups") }}</p>
     </div>
 {% endblock %}
 
 {% block content %}
-    <p><a {% if back %}id="link-previous"{% endif %}
-          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="{{ back_link }}">Tagasi</a></p>
-    <p>Sinu ID: {{ user_id }}</p>
-    <p>Sinu nimi: {{ user_name }}</p>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+            <p>{{ _("Your ID:") }} {{ user_id }}</p>
+            <p>{{ _("Your name:") }} {{ user_name }}</p>
 
-    <p>Sinu perekonnad:</p>
-    <table class="mdl-data-table">
-        <thead>
-        <tr>
-            <th>Perekond</th>
-            <th>Valikud</th>
-        </tr>
-        </thead>
+            <p>{{ _("Your families:") }}</p>
+            <table class="mdl-data-table">
+                <thead>
+                <tr>
+                    <th>{{ _("Family") }}</th>
+                    <th>{{ _("Options") }}</th>
+                </tr>
+                </thead>
 
-        <tbody>
-        {% for name, family in families.items() %}
-            <tr>
-                <td>{{ name }}</td>
-                {% if family[1] %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editfam?id={{ family[0] }}{{ back_link }}">Muuda / Vaata</a>
-                    </td>
-                {% else %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editfam?id={{ family[0] }}{{ back_link }}">Vaata</a>
-                    </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <tbody>
+                {% for name, family in families.items() %}
+                    <tr>
+                        <td>{{ name }}</td>
+                        {% if family[1] %}
+                            <td>
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                            </td>
+                        {% else %}
+                            <td>
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
-    <p>Sinu grupid:</p>
-    <table class="mdl-data-table">
-        <thead>
-        <tr>
-            <th>Grupp</th>
-            <th>Valikud</th>
-        </tr>
-        </thead>
+            <p>{{ _("Your groups:") }}</p>
+            <table class="mdl-data-table">
+                <thead>
+                <tr>
+                    <th>{{ _("Group") }}</th>
+                    <th>{{ _("Options") }}</th>
+                </tr>
+                </thead>
 
-        <tbody>
-        {% for name, group in groups.items() %}
-            <tr>
-                <td>{{ name }}</td>
-                {% if group[1] %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Muuda / Vaata</a>
-                    </td>
-                {% else %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editgroup?id={{ group[0] }}{{ back_link }}">Vaata</a>
-                    </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <tbody>
+                {% for name, group in groups.items() %}
+                    <tr>
+                        <td>{{ name }}</td>
+                        {% if group[1] %}
+                            <td>
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                            </td>
+                        {% else %}
+                            <td>
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}
 

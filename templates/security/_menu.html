@@ -1,17 +1,23 @@
 {% if security.registerable or security.recoverable or security.confirmable %}
-    <h3>{{ _('Menu') }}</h3>
+    <h3>{{ _("Options") }}</h3>
     <ul>
-        <a class="button" href="
-                {{ url_for_security('login') }}{% if 'next' in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _('Login') }}</a>
+        <li><a class="button" href="
+
+
+                {{ url_for_security("login") }}{% if "next" in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _("Log in") }}</a>
+        </li>
         {% if security.registerable %}
-            <a class="button" href="
-                    {{ url_for_security('register') }}{% if 'next' in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _('Register') }}</a><br/>
+            <li><a class="button" href="
+
+
+                    {{ url_for_security("register") }}{% if "next" in request.args %}?next={{ request.args.next|urlencode }}{% endif %}">{{ _("Register") }}</a>
+            </li>
         {% endif %}
         {% if security.recoverable %}
-            <a class="button" href="{{ url_for_security('forgot_password') }}">{{ _('Forgot password') }}</a><br/>
+            <li><a class="button" href="{{ url_for_security("forgot_password") }}">{{ _("Forgot password") }}</a></li>
         {% endif %}
         {% if security.confirmable %}
-            <a class="button" href="{{ url_for_security('send_confirmation') }}">{{ _('Confirm account') }}</a>
+            <li><a class="button" href="{{ url_for_security("send_confirmation") }}">{{ _("Confirm account") }}</a></li>
         {% endif %}
     </ul>
 {% endif %}

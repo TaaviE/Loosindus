@@ -1,4 +1,4 @@
-from config import db
+from main import db
 
 
 class Groups(db.Model):

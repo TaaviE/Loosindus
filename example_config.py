@@ -1,75 +1,54 @@
 # coding=utf-8
+import logging
 
 
 class Config(object):
-    """DEVELOPMENT =
-    DEBUG =
-    TESTING = """
+    ENV = "debug"  # TODO: Replace with "production"
+    FLASK_DEBUG = True  # TODO: Disable in production
+    DEVELOPMENT = True  # TODO: Disable in production
+    DEBUG = True  # TODO: Disable in production
+    TESTING = True  # TODO: Disable in production
 
-    CSRF_ENABLED = True
-    WTF_CSRF_ENABLED = True
+    CSRF_ENABLED = False  # TODO: Enable in production
+    WTF_CSRF_ENABLED = False  # TODO: Enable in production
 
-    SECRET_KEY = ""
-    SQLALCHEMY_DATABASE_URI = "postgresql://"
+    SENTRY_URL = ""  # TODO: Add sentry URL
+    SENTRY_USER_ATTRS = ["username",
+                         "id",
+                         "email"]
+
+    AES_KEY = b"yFrstBQ&iKi1OwugdJ?EnIfPWundVBPO"
+    SECRET_KEY = ""  # TODO: Update secret key info
+    SQLALCHEMY_DATABASE_URI = ""  # TODO: Add database URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    MAIL_SERVER = ""
+    MAIL_SERVER = "localhost"
     MAIL_PORT = 25
     MAIL_USE_SSL = False
     MAIL_USERNAME = ""
-    MAIL_PASSWORD = ""
-    MAIL_DEFAULT_SENDER = ("Name", "example@example.com")
-    SECURITY_EMAIL_SENDER = ("Name", "example@example.com")
-    MAIL_SUPPRESS_SEND = False
+    MAIL_PASSWORD = ""  # TODO: Add email server info
+    MAIL_DEFAULT_SENDER = ("Pretty mailer name", "place@holder")  # TODO: Update email sender info
+    MAIL_SUPPRESS_SEND = True  # TODO: Do not suppress send in production
 
-    RECAPTCHA_PUBLIC_KEY = ""
+    RECAPTCHA_PUBLIC_KEY = ""  # TODO: Add captcha keys
     RECAPTCHA_PRIVATE_KEY = ""
 
-    SECURITY_PASSWORD_HASH = ""
-    SECURITY_PASSWORD_SALT = ""
+    SECURITY_EMAIL_SENDER = ("Pretty mailer name", "place@holder")  # TODO: Update email sender info
+    SECURITY_PASSWORD_HASH = "pbkdf2_sha512"
+    SECURITY_PASSWORD_SALT = None  # TODO: Add salt!
+
     SECURITY_REGISTERABLE = True
     SECURITY_RECOVERABLE = True
     SECURITY_CONFIRMABLE = True
     SECURITY_CHANGEABLE = True
     SECURITY_TRACKABLE = True
-    SESSION_COOKIE_SECURE = True
-    REMEMBER_COOKIE_SECURE = True
-    SESSION_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_HTTPONLY = True
 
+    USER_AFTER_REGISTER_ENDPOINT = "/login"
 
-class ProductionConfig(Config):
-    DEBUG = False
-    TESTING = False
-    DEVELOPMENT = False
-    CSRF_ENABLED = True
-    WTF_CSRF_ENABLED = True
+    SESSION_COOKIE_SECURE = False  # TODO: Enable in production
+    REMEMBER_COOKIE_SECURE = False  # TODO: Enable in production
+    SESSION_COOKIE_HTTPONLY = False  # TODO: Enable in production
+    REMEMBER_COOKIE_HTTPONLY = False  # TODO: Enable in production
 
+    LOGLEVEL = logging.DEBUG
 
-class StagingConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
-
-
-class DevelopmentConfig(Config):
-    DEVELOPMENT = True
-    DEBUG = True
-
-
-class TestingConfig(Config):
-    TESTING = True
-
-
-import os
-
-from flask import Flask
-from flask_mail import Mail
-from flask_sqlalchemy import SQLAlchemy
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__)
-app.config.from_object("config.DevelopmentConfig")
-from werkzeug.contrib.fixers import ProxyFix
-
-ProxyFix(app, num_proxies=1)
-db = SQLAlchemy(app)
-mail = Mail(app)
+    BABEL_DEFAULT_LOCALE = "ee"  # TODO: You might want to change this to "en" if you want to default to English

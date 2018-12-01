@@ -1,7 +1,7 @@
-from config import db
+from main import db
 
 
-class UGARelationship(db.Model):
+class UserGroupAdmin(db.Model):
     """
     Specifies how user-group-admin relationships are modeled in the database
 
@@ -24,4 +24,4 @@ class UGARelationship(db.Model):
         self.admin = admin
 
     def __repr__(self):
-        return "<user_id {}>".format(self.user_id)
+        return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)

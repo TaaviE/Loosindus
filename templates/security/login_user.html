@@ -1,13 +1,13 @@
 {% extends "security/base.html" %}
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
-{% block title %}Login{% endblock %}
+{% block title %}{{ _("Login") }}{% endblock %}
 
 <div class="container">
 {% block content %}
-    <h1>{{ _('Login') }}</h1>
-    <b><font color="red">{% include "security/_messages.html" %}</font></b>
-    <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+    <h1>{{ _("Login") }}</h1>
+    <b>{% include "security/_messages.html" %}</b>
+    <form action="{{ url_for_security("login") }}" method="POST" name="login_user_form">
         {{ login_user_form.hidden_tag() }}
         {{ render_field_with_errors(login_user_form.email) }}
         {{ render_field_with_errors(login_user_form.password) }}
@@ -19,4 +19,4 @@
 {% endblock %}
 </div>
 
-{% block description %}Login page{% endblock %}
+{% block description %}{{ _("Login page") }}{% endblock %}

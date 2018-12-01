@@ -4,29 +4,25 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>Siin lehel on näha kõik valitud perekonda kuuluvad liikmed</p>
+        <p>{{ _("This page lists all the people in this family") }}</p>
     </div>
 {% endblock %}
 
 
 {% block content %}
-    <p><a {% if back %}id="link-previous"{% endif %}
-          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="{{ back_link }}">Tagasi</a></p>
-    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
-        <thead>
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <tbody>
         <tr>
-            <th>Liige</th>
+            <th>{{ _("Member") }}</th>
             {% if admin %}
                 <th>ID</th>
             {% endif %}
-            <th>Tegevused</th>
+            <th>{{ _("Actions") }}</th>
             {% if admin %}
                 <th></th>
             {% endif %}
         </tr>
-        </thead>
-        <tbody>
         {% for member in family %}
             <tr>
                 <td>{{ member[0] }}</td>
@@ -35,14 +31,16 @@
                 {% endif %}
 
                 {% if not member[3] %}
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="./giftingto?id={{ member[1] }}">Vaata nimekirja</a>
-                </td>
+                    <td>
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./giftingto?id={{ member[1] }}">{{ _("Display") }}</a>
+                    </td>
                 {% endif %}
 
                 {% if member[2] %}
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./removefromfam?id={{ member[1] }}">Eemalda</a>
+                    <td>
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="./removefromfam?id={{ member[1] }}">{{ _("Remove") }}</a>
                     </td>
                 {% endif %}
             </tr>

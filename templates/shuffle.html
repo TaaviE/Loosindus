@@ -3,11 +3,15 @@
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="./giftingto?id={{ id }}">Vaata soovinimekirja</a></p>
-    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" href="./graph">Vaata
-        graafi</a></p>
-    <p><a id="link-previous" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-          href="./">Tagasi</a></p>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="./giftingto?id={{ id }}">{{ _("View wishlist") }}</a></p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="./graph">{{ _("View") }}
+                graafi</a></p>
+        </div>
+    </div>
 {% endblock %}
 

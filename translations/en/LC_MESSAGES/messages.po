@@ -1,0 +1,537 @@
+# English translations for PROJECT.
+# Copyright (C) 2018 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2018-12-01 19:18+0200\n"
+"PO-Revision-Date: 2018-12-01 17:22+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+
+#: views.py:88
+msgid "There was an error"
+msgstr ""
+
+#: views.py:89 views.py:107 views.py:122 views.py:260 views.py:264 views.py:282
+#: views.py:320 views.py:354 views.py:389 views.py:399 views.py:445
+#: views.py:481 views.py:493 views.py:603 views.py:710 views.py:717
+#: views.py:828
+msgid "Error"
+msgstr ""
+
+#: views.py:106
+msgid "Page not found!"
+msgstr ""
+
+#: views.py:121
+msgid "Here you go!"
+msgstr ""
+
+#: views.py:155
+msgid "Home"
+msgstr ""
+
+#: views.py:208
+msgid "Shuffle"
+msgstr ""
+
+#: views.py:230
+msgid "Right now there's nothing in the Wishlist"
+msgstr ""
+
+#: templates/index.html:13 templates/title_bar.html:29 views.py:236
+msgid "My Wishlist"
+msgstr ""
+
+#: templates/notes.html:21 views.py:243
+msgid "Add new"
+msgstr ""
+
+#: views.py:259 views.py:319 views.py:492 views.py:827
+msgid "Pls no hax "
+msgstr ""
+
+#: views.py:263
+msgid "Santa can't bring you nothin', "
+msgstr ""
+
+#: views.py:281
+msgid "You're wishing for too much, "
+msgstr ""
+
+#: views.py:298 views.py:300
+msgid "Added"
+msgstr ""
+
+#: templates/notes.html:35 templates/notes.html:50 views.py:331 views.py:332
+msgid "Edit"
+msgstr ""
+
+#: views.py:353 views.py:388 views.py:709 views.py:716
+msgid "Broken link"
+msgstr ""
+
+#: views.py:368 views.py:370
+msgid "Changed"
+msgstr ""
+
+#: views.py:398
+msgid "Can't find what you wanted to delete"
+msgstr ""
+
+#: views.py:406 views.py:408
+msgid "Removed"
+msgstr ""
+
+#: views.py:444
+msgid "Could not edit"
+msgstr ""
+
+#: templates/index.html:26 views.py:480 views.py:602
+msgid "Shuffling has not yet been done for your group!"
+msgstr ""
+
+#: views.py:486
+msgid "Access to this list is forbidden"
+msgstr ""
+
+#: views.py:487
+msgid "Forbidden"
+msgstr ""
+
+#: views.py:563
+msgid "Right now there isn't anything on the list"
+msgstr ""
+
+#: views.py:571
+msgid "Wishlist"
+msgstr ""
+
+#: views.py:588
+msgid "or with your own name"
+msgstr ""
+
+#: templates/title_bar.html:33 views.py:599
+msgid "Graph"
+msgstr ""
+
+#: templates/title_bar.html:36 views.py:693
+msgid "Settings"
+msgstr ""
+
+#: views.py:734
+msgid "Edit family"
+msgstr ""
+
+#: views.py:792
+msgid "Edit group"
+msgstr ""
+
+#: views.py:817
+msgid "Secret graph"
+msgstr ""
+
+#: views.py:959 views.py:961
+msgid "Generated"
+msgstr ""
+
+#: views.py:976 views.py:978
+msgid "Sent"
+msgstr ""
+
+#: models/wishlist_model.py:9
+msgid "Unclaimed"
+msgstr ""
+
+#: models/wishlist_model.py:10
+msgid "Reserved"
+msgstr ""
+
+#: models/wishlist_model.py:11
+msgid "Purchased"
+msgstr ""
+
+#: models/wishlist_model.py:12
+msgid "Modified"
+msgstr ""
+
+#: templates/base.html:26 templates/security/base.html:39
+msgid "Information"
+msgstr ""
+
+#: templates/contact.html:8 templates/createnote.html:14
+#: templates/editfam.html:13 templates/editgroup.html:15 templates/error.html:8
+#: templates/graph.html:11 templates/home.html:12 templates/index.html:8
+#: templates/notes.html:27 templates/security/base.html:30
+#: templates/settings.html:14 templates/show_notes.html:23
+#: templates/shuffle.html:8 templates/success.html:8
+msgid ""
+"Your browser does not support JavaScript, certain functionality might be "
+"limited"
+msgstr ""
+
+#: templates/contact.html:9
+msgid "Just send me an email (for ex. whois contains my email)"
+msgstr ""
+
+#: templates/contact.html:14
+msgid "Contact page"
+msgstr ""
+
+#: templates/createnote.html:7
+msgid "Enter your wish into the text box"
+msgstr ""
+
+#: templates/createnote.html:18
+msgid "Your wish..."
+msgstr ""
+
+#: templates/createnote.html:23
+msgid "Send"
+msgstr ""
+
+#: templates/createnote.html:31
+msgid "Page for creating a note"
+msgstr ""
+
+#: templates/editfam.html:7
+msgid "This page lists all the people in this family"
+msgstr ""
+
+#: templates/editfam.html:17
+msgid "Member"
+msgstr ""
+
+#: templates/editfam.html:21
+msgid "Actions"
+msgstr ""
+
+#: templates/editfam.html:36 templates/editgroup.html:30
+#: templates/settings.html:39 templates/settings.html:68
+msgid "Display"
+msgstr ""
+
+#: templates/editfam.html:43 templates/editgroup.html:35
+msgid "Remove"
+msgstr ""
+
+#: templates/editgroup.html:8
+msgid "This page lists all the families that the group contains"
+msgstr ""
+
+#: templates/editgroup.html:19 templates/settings.html:22
+msgid "Family"
+msgstr ""
+
+#: templates/editgroup.html:20 templates/show_notes.html:32
+msgid "Action"
+msgstr ""
+
+#: templates/error.html:12
+msgid "Error ID is: "
+msgstr ""
+
+#: templates/error.html:30
+msgid "Back"
+msgstr ""
+
+#: templates/graph.html:12
+msgid "You are marked with "
+msgstr ""
+
+#: templates/graph.html:13
+msgid "Names are not displayed intentionally"
+msgstr ""
+
+#: templates/home.html:6
+msgid ""
+"Simple and free web service for managing secret santa shuffling, sharing "
+"wishlists and reminding everyone"
+msgstr ""
+
+#: templates/home.html:13
+msgid ""
+"Selle lehe puhul on tegu väga lihtsa lehega enda jõulunimekirja "
+"koostamise jaoks, selle\n"
+"                enda\n"
+"                \"jõuluvanaga\"\n"
+"                jagamiseks 🎅, nimede loosimise korraldamise jaoks. Töötab"
+" hästi nii mobiilil kui arvutil! Katsetamiseks\n"
+"                registreeru (või logi sisse)."
+msgstr ""
+
+#: templates/home.html:19 templates/security/_menu.html:6
+#: templates/security/email/login_instructions.html:5
+#: templates/security/send_login.html:4 templates/security/send_login.html:8
+#: templates/security/title_bar.html:6
+msgid "Log in"
+msgstr ""
+
+#: templates/home.html:21 templates/security/_menu.html:11
+#: templates/security/register_user.html:4
+#: templates/security/register_user.html:7
+msgid "Register"
+msgstr ""
+
+#: templates/index.html:9
+msgid "Hi, which list do you wish to display?"
+msgstr ""
+
+#: templates/index.html:16 templates/title_bar.html:31
+msgid "Receiver's Wishlist"
+msgstr ""
+
+#: templates/index.html:28
+msgid "This web service is in Beta testing, please report any errors you see"
+msgstr ""
+
+#: templates/notes.html:7
+msgid ""
+"Here is your personal wishlist, this can be viewed by anyone in your "
+"group, including your personal santa"
+msgstr ""
+
+#: templates/notes.html:14 templates/security/_menu.html:2
+#: templates/settings.html:23 templates/settings.html:52
+msgid "Options"
+msgstr ""
+
+#: templates/notes.html:32 templates/show_notes.html:28
+msgid "Description"
+msgstr ""
+
+#: templates/notes.html:34 templates/notes.html:47
+msgid "Delete"
+msgstr ""
+
+#: templates/settings.html:7
+msgid "Page for managing your account, families and groups"
+msgstr ""
+
+#: templates/settings.html:15
+msgid "Your ID:"
+msgstr ""
+
+#: templates/settings.html:16
+msgid "Your name:"
+msgstr ""
+
+#: templates/settings.html:18
+msgid "Your families:"
+msgstr ""
+
+#: templates/settings.html:34 templates/settings.html:63
+msgid "Change / Display"
+msgstr ""
+
+#: templates/settings.html:47
+msgid "Your groups:"
+msgstr ""
+
+#: templates/settings.html:51
+msgid "Group"
+msgstr ""
+
+#: templates/show_notes.html:17
+msgid "Here is"
+msgstr "Here's"
+
+#: templates/show_notes.html:18
+msgid "'s wishlist, you can change their wishlist items' statuses"
+msgstr "'s wishlist, you can change their wishlist items' statuses"
+
+#: templates/show_notes.html:30
+msgid "Status"
+msgstr ""
+
+#: templates/show_notes.html:31
+msgid "By whom"
+msgstr ""
+
+#: templates/show_notes.html:64
+msgid "Save"
+msgstr ""
+
+#: templates/show_notes.html:68 templates/show_notes.html:70
+msgid "Bought!"
+msgstr ""
+
+#: templates/shuffle.html:10
+msgid "View wishlist"
+msgstr ""
+
+#: templates/shuffle.html:12
+msgid "View"
+msgstr ""
+
+#: templates/security/title_bar.html:7 templates/title_bar.html:19
+msgid "About"
+msgstr ""
+
+#: templates/security/title_bar.html:8 templates/title_bar.html:20
+msgid "Contact"
+msgstr ""
+
+#: templates/title_bar.html:38
+msgid "Log out"
+msgstr ""
+
+#: templates/security/_menu.html:15
+msgid "Forgot password"
+msgstr ""
+
+#: templates/security/_menu.html:18
+msgid "Confirm account"
+msgstr ""
+
+#: templates/security/change_password.html:4
+#: templates/security/change_password.html:8
+msgid "Change password"
+msgstr ""
+
+#: templates/security/change_password.html:18
+msgid "Password change page"
+msgstr ""
+
+#: templates/security/forgot_password.html:4
+#: templates/security/reset_password.html:4
+#: templates/security/reset_password.html:8
+msgid "Reset password"
+msgstr ""
+
+#: templates/security/forgot_password.html:8
+msgid "Send password reset instructions"
+msgstr ""
+
+#: templates/security/forgot_password.html:18
+#: templates/security/reset_password.html:19
+msgid "Password reset page"
+msgstr ""
+
+#: templates/security/login_user.html:4 templates/security/login_user.html:8
+msgid "Login"
+msgstr ""
+
+#: templates/security/login_user.html:22
+msgid "Login page"
+msgstr ""
+
+#: templates/security/register_user.html:26
+msgid "Register page"
+msgstr ""
+
+#: templates/security/send_confirmation.html:4
+msgid "Confirmation"
+msgstr ""
+
+#: templates/security/send_confirmation.html:7
+msgid "Resend confirmation instructions"
+msgstr ""
+
+#: templates/security/send_confirmation.html:18
+msgid "Confirmation resending page"
+msgstr ""
+
+#: templates/security/email/change_notice.html:1
+msgid "Your password has been changed."
+msgstr ""
+
+#: templates/security/email/change_notice.html:3
+msgid "If you did not change your password,"
+msgstr ""
+
+#: templates/security/email/change_notice.html:4
+msgid "click here to reset it"
+msgstr ""
+
+#: templates/security/email/confirmation_instructions.html:1
+msgid "Please confirm your account using the link below"
+msgstr ""
+
+#: templates/security/email/confirmation_instructions.html:3
+msgid "Confirm"
+msgstr ""
+
+#: templates/security/email/confirmation_instructions.txt:1
+msgid "Please confirm your account using the link below:"
+msgstr ""
+
+#: templates/security/email/login_instructions.html:1
+#: templates/security/email/login_instructions.txt:1
+#: templates/security/email/welcome.txt:1
+#, python-format
+msgid "Welcome %(email)s!"
+msgstr ""
+
+#: templates/security/email/login_instructions.html:3
+msgid "You can log into your account using the link below"
+msgstr ""
+
+#: templates/security/email/login_instructions.txt:3
+msgid "You can log into your account through the link below:"
+msgstr ""
+
+#: templates/security/email/reset_instructions.html:1
+msgid "Click the link below to reset your password"
+msgstr ""
+
+#: templates/security/email/reset_instructions.html:3
+#: templates/security/email/welcome.html:8
+msgid ""
+"If your email client doesn't display links properly then copy-paste the "
+"link into your browser's address bar: "
+msgstr ""
+
+#: templates/security/email/reset_instructions.txt:1
+msgid "Click the link below to reset your password:"
+msgstr ""
+
+#: templates/security/email/reset_notice.html:1
+#: templates/security/email/reset_notice.txt:1
+msgid "Your password has been reset"
+msgstr ""
+
+#: templates/security/email/welcome.html:1
+msgid "Welcome"
+msgstr ""
+
+#: templates/security/email/welcome.html:4
+msgid "You can confirm your account using the link below:"
+msgstr ""
+
+#: templates/security/email/welcome.html:6
+msgid "Confirm my account"
+msgstr ""
+
+#: templates/security/email/welcome.txt:4
+msgid "You can use the link below to confim your email account: "
+msgstr ""
+
+#~ msgid "This page lists all the families that the group contains"
+#~ msgstr ""
+
+#~ msgid "Hi, which list do you wish to display?"
+#~ msgstr ""
+
+#~ msgid "Siin lehel on näha kõik valitud gruppi kuuluvad perekonnad"
+#~ msgstr ""
+
+#~ msgid "Tere, kumba nimekirja soovid vaadata?"
+#~ msgstr ""
+
+#~ msgid "Your ID: {{ user_id }}"
+#~ msgstr ""
+
+#~ msgid "Your name: {{ user_name }}"
+#~ msgstr ""
+

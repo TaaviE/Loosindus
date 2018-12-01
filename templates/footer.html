@@ -1,11 +1,2 @@
 <script integrity="sha256-PCfu4+fnQrp4wNmVbjN1eaX4LbOvOejab0UOhjLezrw="
         src="{{ url_for("static", filename="material/lite/material.min.js") }}"></script>
-<script>try {
-    var element = document.getElementById("link-previous");
-    element.setAttribute("href", document.referrer);
-    element.onclick = function () {
-        history.go({{ back_count }});
-        return false;
-    }
-} catch (e) {
-}</script>

@@ -1,5 +1,5 @@
-<p>Tere {{ user.email }}</p>
+<p>{{ _("Welcome %(email)s!", email=user.email) }}</p>
 
-<p>Saad enda kontosse sisse logida läbi allpool asuva lingi:</p>
+<p>{{ _("You can log into your account using the link below") }}</p>
 
-<p><a href="{{ login_link }}">Logi sisse</a></p>
+<p><a href="{{ login_link }}">{{ _("Log in") }}</a></p>
