@@ -6,7 +6,7 @@ Flask-Mail
 Flask-WTF
 bcrypt
 sqlalchemy
-psycopg2
+psycopg2 --no-binary psycopg2
 matplotlib
 werkzeug
 pycryptodomex
