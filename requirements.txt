@@ -12,3 +12,4 @@ pycryptodomex
 raven
 Celery
 Flask-Babel
+gunicorn

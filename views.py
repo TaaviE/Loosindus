@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # coding=utf-8
 # author=Taavi Eomäe
-
 """
 A simple Secret Santa website in Python
 Copyright (C) 2017-2018 Taavi Eomäe
@@ -48,8 +47,26 @@ from flask_login import current_user
 from flask_mail import Message
 
 # Translation
-from flask_babel import gettext as _
+# Try switching between babelex and babel if you are getting errors
+if Config.DEBUG:
+    from flask_babel import gettext as _
+else:
+    from flask_babelex import gettext as _
 from main import babel
+
+
+@babel.localeselector
+def get_locale():
+    if "user_id" in session.keys():  # If logged in
+        user_id = session["user_id"]
+    else:
+        return request.accept_languages.best_match(["et", "en"])
+    language_code = get_person_language_code(user_id)
+    if language_code is None:
+        return request.accept_languages.best_match(["et", "en"])
+    else:
+        return language_code
+
 
 # Database models
 from main import db
@@ -126,16 +143,6 @@ def test():
 def favicon():
     return send_from_directory("./static",
                                "favicon-16x16.png")
-
-
-@babel.localeselector
-def get_locale():
-    user_id = session["user_id"]
-    language_code = get_person_language_code(user_id)
-    if language_code is None:
-        return request.accept_languages.best_match(["et", "en"])
-    else:
-        return language_code
 
 
 def index():
@@ -650,7 +657,7 @@ def graph_json(graph_id, unhide):
                                                 "value": 0})
 
         if belongs_in_group or unhide:
-            return dumps(people)
+            return dumps(people), 200, {"content-type": "application/json"}
         else:
             return "{}"
     except Exception as e:
@@ -661,7 +668,9 @@ def graph_json(graph_id, unhide):
 @main_page.route("/grapher/<graph_id>", defaults={"unhide": ""})
 @login_required
 def graph_js(graph_id, unhide):
-    return render_template("grapher.js", graph_id=graph_id, unhide=unhide)
+    return render_template("grapher.js", graph_id=graph_id, unhide=unhide), \
+           200, \
+           {"content-type": "application/javascript"}
 
 
 @main_page.route("/settings")
