@@ -7,7 +7,6 @@ Flask-WTF
 bcrypt
 sqlalchemy
 psycopg2 --no-binary psycopg2
-matplotlib
 werkzeug
 pycryptodomex
 raven
