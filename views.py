@@ -462,6 +462,10 @@ def updatenotestatus():
     return redirect("/giftingto?id=" + str(request.args["id"]), code=303)
 
 
+christmasy_emojis = ["🎄", "🎅🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
+                     "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
+
+
 @main_page.route("/giftingto")
 @login_required
 def giftingto():
@@ -552,15 +556,15 @@ def giftingto():
                 else:
                     selections = [NoteState.MODIFIED.value]
                     modifyable = False
-                name = note.purchased_by
+                name = christmasy_emojis[note.purchased_by % len(christmasy_emojis)]
             elif note.status == NoteState.PURCHASED.value["id"]:
                 selections = [NoteState.PURCHASED.value]
-                name = note.purchased_by
+                name = christmasy_emojis[note.purchased_by % len(christmasy_emojis)]
                 modifyable = False
             elif note.status == NoteState.PLANNING_TO_PURCHASE.value["id"]:
                 selections = [NoteState.PLANNING_TO_PURCHASE.value,
                               NoteState.DEFAULT.value, NoteState.PURCHASED.value]
-                name = note.purchased_by
+                name = christmasy_emojis[note.purchased_by % len(christmasy_emojis)]
                 if note.purchased_by == int(user_id):
                     modifyable = True
                 else:
@@ -637,10 +641,10 @@ def graph_json(graph_id, unhide):
                 else:
                     if user.user_id == user_id:
                         belongs_in_group = True
-                        people["nodes"].append({"id": user.user_id,
+                        people["nodes"].append({"id": christmasy_emojis[user.user_id % len(christmasy_emojis)],
                                                 "group": 2})
                     else:
-                        people["nodes"].append({"id": user.user_id,
+                        people["nodes"].append({"id": christmasy_emojis[user.user_id % len(christmasy_emojis)],
                                                 "group": 1})
 
                 shuffles = Shuffle.query.filter(Shuffle.giver == user.user_id).all()
@@ -650,8 +654,9 @@ def graph_json(graph_id, unhide):
                                                 "target": get_person_name(shuffle_element.getter),
                                                 "value": 0})
                     else:
-                        people["links"].append({"source": shuffle_element.giver,
-                                                "target": shuffle_element.getter,
+                        people["links"].append(
+                            {"source": christmasy_emojis[shuffle_element.giver % len(christmasy_emojis)],
+                             "target": christmasy_emojis[shuffle_element.getter % len(christmasy_emojis)],
                                                 "value": 0})
 
         if belongs_in_group or unhide:

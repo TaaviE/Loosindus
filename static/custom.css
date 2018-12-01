@@ -13,3 +13,7 @@
 .custom-wrap {
     overflow: auto;
 }
+
+.custom_large_text {
+    font-size: 200%;
+}

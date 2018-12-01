@@ -253,7 +253,7 @@ msgstr "Te olete tähistatud "
 
 #: templates/graph.html:13
 msgid "Names are not displayed intentionally"
-msgstr "Nimesid ei kuvada sihilikult"
+msgstr "Nimesid ei kuvata sihilikult"
 
 #: templates/home.html:6
 msgid ""
