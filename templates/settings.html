@@ -14,6 +14,18 @@
             <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
             <p>{{ _("Your ID:") }} {{ user_id }}</p>
             <p>{{ _("Your name:") }} {{ user_name }}</p>
+            <p>{{ _("Your language:") }}
+            <form method="post" action="setlanguage">
+                <select class="mdl-textfield__input" id="language" name="status">
+                    <option value="{{ user_language }}">{{ user_language }}</option>
+                    <option value="ee">{{ _("Estonian") }}</option>
+                    <option value="en">{{ _("English") }}</option>
+                </select>
+                <input type="submit"
+                       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       value={{ _("Send") }}>
+            </form>
+            </p>
 
             <p>{{ _("Your families:") }}</p>
             <table class="mdl-data-table">

@@ -84,5 +84,13 @@ def get_timestamp():
     return str(datetime.datetime.isoformat(datetime.datetime.now()))
 
 
+def get_person_language_code(user_id):
+    user = User.query.filter(User.id == int(user_id)).first()
+    if user.language is None:
+        return "ee"
+    else:
+        return user.language
+
+
 def set_recursionlimit():
     sys.setrecursionlimit(2000)

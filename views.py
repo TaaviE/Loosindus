@@ -130,7 +130,12 @@ def favicon():
 
 @babel.localeselector
 def get_locale():
-    return request.accept_languages.best_match(["et", "en"])
+    user_id = session["user_id"]
+    language_code = get_person_language_code(user_id)
+    if language_code is None:
+        return request.accept_languages.best_match(["et", "en"])
+    else:
+        return language_code
 
 
 def index():
@@ -362,6 +367,7 @@ def editnote_edit():
     except Exception as e:
         if not Config.DEBUG:
             sentry.captureException()
+        db.session.rollback()
         raise e
 
     return render_template("success.html",
@@ -693,6 +699,7 @@ def settings():
     return render_template("settings.html",
                            user_id=user_id,
                            user_name=user_obj.username,
+                           user_language=user_obj.language,
                            family_admin=is_in_family,
                            group_admin=is_in_group,
                            families=user_families,
@@ -744,9 +751,24 @@ def editfamily():
                            back_link="/settings")
 
 
+@main_page.route("/setlanguage", methods=["POST"])
+@login_required
+def set_language():
+    user_id = session["user_id"]
+    if request.form["language"] in ["en", "ee"]:
+        user = User.query.filter(User.id == user_id)
+        try:
+            user.language = request.form["language"]
+            db.session.commit()
+        except Exception as e:
+            sentry.captureException(e)
+            db.session.rollback()
+
+
 @main_page.route("/editfam", methods=["POST"])
 @login_required
 def editfamily_with_action():
+    # TODO:
     # user_id = session["user_id"]
 
     # try:
@@ -804,6 +826,7 @@ def editgroup():
 @main_page.route("/editgroup", methods=["POST"])
 @login_required
 def editgroup_with_action():
+    # TODO:
     # user_id = session["user_id"]
     # user_obj = User.query.get(user_id)
     return None
