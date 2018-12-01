@@ -755,14 +755,28 @@ def editfamily():
 @login_required
 def set_language():
     user_id = session["user_id"]
-    if request.form["language"] in ["en", "ee"]:
-        user = User.query.filter(User.id == user_id)
-        try:
-            user.language = request.form["language"]
-            db.session.commit()
-        except Exception as e:
-            sentry.captureException(e)
-            db.session.rollback()
+    try:
+        if request.form["language"] in ["en", "ee"]:
+            user = User.query.filter(User.id == user_id).first()
+            try:
+                user.language = request.form["language"]
+                db.session.commit()
+            except Exception as e:
+                sentry.captureException(e)
+                db.session.rollback()
+                return render_template("error.html",
+                                       message=_("Faulty input"),
+                                       title=_("Error"))
+
+        return render_template("success.html",
+                               action=_("Added"),
+                               link="./notes",
+                               title=_("Added"))
+    except Exception:
+        # No need to capture with Sentry, someone's just meddling
+        return render_template("error.html",
+                               message=_("Faulty input"),
+                               title=_("Error"))
 
 
 @main_page.route("/editfam", methods=["POST"])
