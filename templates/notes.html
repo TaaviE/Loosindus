@@ -11,7 +11,7 @@
 {% block buttons %}
     <div class="mdl-card mdl-shadow--2dp mdl-cell">
         <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
-            <h2 style="color: #fff;" class="mdl-card__title-text">{{ _("Options") }}</h2>
+            <h2 class="custom-white-text mdl-card__title-text">{{ _("Options") }}</h2>
         </div>
         <div class="mdl-card__supporting-text">
 
@@ -26,8 +26,7 @@
 {% block content %}
     <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
 
-    <table style="overflow: auto;"
-           class="mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+    <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
         {% if not empty %}
@@ -40,7 +39,7 @@
 
         {% for item, id in list.items() %}
             <tr>
-                <td style="white-space: pre-line;" class="mdl-data-table__cell--non-numeric">{{ item }}</td>
+                <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
                 {% if not empty %}
                     <td class="mdl-data-table__cell--non-numeric">
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"

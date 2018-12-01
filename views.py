@@ -48,10 +48,8 @@ from flask_mail import Message
 
 # Translation
 # Try switching between babelex and babel if you are getting errors
-if Config.DEBUG:
-    from flask_babel import gettext as _
-else:
-    from flask_babelex import gettext as _
+from flask_babel import gettext as _
+# from flask_babelex import gettext as _
 from main import babel
 
 

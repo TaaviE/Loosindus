@@ -1,0 +1,15 @@
+.custom-white-text {
+    color: #fff;
+}
+
+.custom-height-500 {
+    height: 500px;
+}
+
+.custom-white-space {
+    white-space: pre-line;
+}
+
+.custom-wrap {
+    overflow: auto;
+}

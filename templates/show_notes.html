@@ -22,8 +22,7 @@
 {% block content %}
     <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
 
-    <table style="overflow: auto;"
-           class="mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+    <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
         {% if not invalid %}
@@ -34,7 +33,7 @@
 
         {% for item, (id, enums, modifyable, name) in notes.items() %}
             <tr>
-                <td style="white-space: pre-line;" class="mdl-data-table__cell--non-numeric">{{ item }}</td>
+                <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
 
                 {% if not invalid %}
                     <form action="" method="post">
