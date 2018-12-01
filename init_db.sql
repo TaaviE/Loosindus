@@ -1,132 +1,187 @@
-CREATE TABLE wishlist
+create table groups
 (
-  user_id         SERIAL NOT NULL
-    CONSTRAINT wishlist_user_id_pk
-    PRIMARY KEY,
-  notes           JSON,
-  notes_purchased JSON
+	id serial not null
+		constraint groups_pkey
+			primary key,
+	description varchar(255)
 );
 
-CREATE TABLE role
+create table families
 (
-  id          SERIAL NOT NULL
-    CONSTRAINT role_pkey
-    PRIMARY KEY,
-  name        VARCHAR(80),
-  description VARCHAR(255)
+	id serial not null
+		constraint families_pkey
+			primary key,
+	name varchar(255),
+	"group" integer not null
+		constraint families_group_fkey
+			references groups
 );
 
-CREATE UNIQUE INDEX role_id_uindex
-  ON role (id);
+create unique index families_id_uindex
+	on families (id);
 
-CREATE UNIQUE INDEX role_name_uindex
-  ON role (name);
+create unique index groups_id_uindex
+	on groups (id);
 
-CREATE TABLE "user"
+create table names_genitive
 (
-  id           SERIAL NOT NULL
-    CONSTRAINT user_id_pk
-    PRIMARY KEY,
-  email        VARCHAR(255),
-  password     VARCHAR(255),
-  confirmed_at TIMESTAMP,
-  active       BOOLEAN,
-  username     VARCHAR(255)
+	name varchar(255) not null
+		constraint names_genitive_pkey
+			primary key,
+	genitive varchar(255) not null
 );
 
-CREATE UNIQUE INDEX user_id_uindex
-  ON "user" (id);
+create unique index names_genitive_name_uindex
+	on names_genitive (name);
 
-CREATE UNIQUE INDEX user_email_uindex
-  ON "user" (email);
-
-CREATE UNIQUE INDEX user_username_uindex
-  ON "user" (username);
-
-ALTER TABLE wishlist
-  ADD CONSTRAINT wishlist_user_id_fkey
-FOREIGN KEY (user_id) REFERENCES "user";
-
-CREATE TABLE roles_users
+create table role
 (
-  id      INTEGER
-    CONSTRAINT roles_users_id_fkey
-    REFERENCES "user",
-  role_id INTEGER
-    CONSTRAINT roles_users_role_id_fkey
-    REFERENCES role
+	id serial not null
+		constraint role_pkey
+			primary key,
+	name varchar(80),
+	description varchar(255)
 );
 
-CREATE TABLE families
+create unique index role_id_uindex
+	on role (id);
+
+create unique index role_name_uindex
+	on role (name);
+
+create table "user"
 (
-  id      SERIAL  NOT NULL
-    CONSTRAINT families_pkey
-    PRIMARY KEY,
-  name    VARCHAR(255),
-  "group" INTEGER NOT NULL
+	id serial not null
+		constraint user_id_pk
+			primary key,
+	email varchar(255),
+	password varchar(255),
+	confirmed_at timestamp,
+	active boolean,
+	username varchar(255),
+	last_login_at timestamp,
+	current_login_at timestamp,
+	last_login_ip varchar(255),
+	current_login_ip varchar(255),
+	login_count integer,
+	last_activity_at timestamp,
+	last_activity_ip varchar(255),
+	language varchar(5) default 'en'::character varying
 );
 
-CREATE UNIQUE INDEX families_id_uindex
-  ON families (id);
-
-CREATE TABLE shuffles
+create table roles_users
 (
-  giver  INTEGER NOT NULL
-    CONSTRAINT shuffles_pkey
-    PRIMARY KEY
-    CONSTRAINT shuffles_giver_fkey
-    REFERENCES "user",
-  getter INTEGER NOT NULL
-    CONSTRAINT shuffles_getter_fkey
-    REFERENCES "user"
+	id integer
+		constraint roles_users_id_fkey
+			references "user",
+	role_id integer
+		constraint roles_users_role_id_fkey
+			references role
 );
 
-CREATE UNIQUE INDEX shuffles_giver_uindex
-  ON shuffles (giver);
-
-CREATE UNIQUE INDEX shuffles_getter_uindex
-  ON shuffles (getter);
-
-CREATE TABLE groups
+create table shuffles
 (
-  id          SERIAL NOT NULL
-    CONSTRAINT groups_pkey
-    PRIMARY KEY,
-  description VARCHAR(255)
+	giver integer not null
+		constraint shuffles_pkey
+			primary key
+		constraint shuffles_giver_fkey
+			references "user",
+	getter integer not null
+		constraint shuffles_getter_fkey
+			references "user"
 );
 
-CREATE UNIQUE INDEX groups_id_uindex
-  ON groups (id);
+create unique index user_email_uindex
+	on "user" (email);
 
-ALTER TABLE families
-  ADD CONSTRAINT families_group_fkey
-FOREIGN KEY ("group") REFERENCES groups;
+create unique index user_id_uindex
+	on "user" (id);
 
-CREATE TABLE users_families_admins
+create unique index user_username_uindex
+	on "user" (username);
+
+create table users_families_admins
 (
-  user_id   INTEGER NOT NULL
-    CONSTRAINT users_families_admins_pkey
-    PRIMARY KEY
-    CONSTRAINT users_families_admins_user_id_fkey
-    REFERENCES "user",
-  family_id INTEGER NOT NULL
-    CONSTRAINT users_families_admins_family_id_fkey
-    REFERENCES families,
-  admin     BOOLEAN NOT NULL
+	user_id integer not null
+		constraint users_families_admins_pkey
+			primary key
+		constraint users_families_admins_user_id_fkey
+			references "user",
+	family_id integer not null
+		constraint users_families_admins_family_id_fkey
+			references families,
+	admin boolean not null
 );
 
-COMMENT ON TABLE users_families_admins IS 'Contains all user-family relationships and if the user is the admin of that family';
+comment on table users_families_admins is 'Contains all user-family relationships and if the user is the admin of that family';
 
-CREATE TABLE users_groups_admins
+create table users_groups_admins
 (
-  user_id  INTEGER NOT NULL
-    CONSTRAINT users_groups_admins_user_id_pk
-    PRIMARY KEY
-    CONSTRAINT users_groups_admins_user_id_fkey
-    REFERENCES "user",
-  group_id INTEGER NOT NULL
-    CONSTRAINT users_groups_admins_group_id_fkey
-    REFERENCES groups,
-  admin    BOOLEAN NOT NULL
+	user_id integer not null
+		constraint users_groups_admins_user_id_pk
+			primary key
+		constraint users_groups_admins_user_id_fkey
+			references "user",
+	group_id integer not null
+		constraint users_groups_admins_group_id_fkey
+			references groups,
+	admin boolean not null
 );
+
+create table wishlist
+(
+	user_id serial not null
+		constraint wishlist_user_id_fkey
+			references "user",
+	notes json,
+	notes_purchased json,
+	bought boolean default false not null,
+	bought_by integer
+		constraint wishlist_bought_by_fkey
+			references "user",
+	note_id serial not null
+);
+
+
+create unique index wishlist_note_id_uindex
+	on wishlist (note_id);
+
+create unique index wishlist_user_id_uindex
+	on wishlist (user_id);
+
+create table wishlists
+(
+	user_id integer not null
+		constraint wishlists_user_id_fkey
+			references "user",
+	item varchar(1024) not null,
+	status integer not null,
+	purchased_by integer
+		constraint wishlists_purchased_by_fkey
+			references "user",
+	id bigserial not null
+		constraint wishlists_note_id_pk
+			primary key
+);
+
+create unique index wishlists_note_id_uindex
+	on wishlists (id);
+
+create table families_groups
+(
+	family_id integer not null
+		constraint families_groups_admins_pk
+			primary key
+		constraint families_groups_admins_families_id_fk
+			references families,
+	group_id integer not null
+		constraint families_groups_admins_groups_id_fk
+			references groups
+);
+
+create index families_groups_admins_family_id_index
+	on families_groups (family_id);
+
+create index families_groups_admins_group_id_index
+	on families_groups (group_id);
 
