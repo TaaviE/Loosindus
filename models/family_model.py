@@ -38,12 +38,12 @@ class FamilyGroup(db.Model):
     """
 
     __tablename__ = "families_groups"
-    family_id = db.Column(db.Integer, primary_key=True, unique=False, nullable=False)
-    group_id = db.Column(db.Integer, unique=False, nullable=False)
+    family_id = db.Column(db.Integer, db.ForeignKey("family.id"), primary_key=True, unique=False, nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey("group.id"), unique=False, nullable=False)
 
-    def __init__(self, family_id, family_group):
+    def __init__(self, family_id, group_id):
         self.family_id = family_id
-        self.group_id = family_group
+        self.group_id = group_id
 
     def __repr__(self):
         return "<id {}>".format(self.family_id)
