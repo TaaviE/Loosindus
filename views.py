@@ -462,7 +462,7 @@ def updatenotestatus():
     return redirect("/giftingto?id=" + str(request.args["id"]), code=303)
 
 
-christmasy_emojis = ["🎄", "🎅🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
+christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
                      "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
 
 
@@ -608,7 +608,7 @@ def graph():
             unhide = ""
             user_number = str(user_id)
         return render_template("graph.html",
-                               id=user_number,
+                               id=christmasy_emojis[int(user_number) % len(christmasy_emojis)],
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
