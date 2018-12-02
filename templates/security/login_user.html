@@ -4,19 +4,28 @@
 {% block title %}{{ _("Login") }}{% endblock %}
 
 <div class="container">
-{% block content %}
-    <h1>{{ _("Login") }}</h1>
-    <b>{% include "security/_messages.html" %}</b>
-    <form action="{{ url_for_security("login") }}" method="POST" name="login_user_form">
-        {{ login_user_form.hidden_tag() }}
-        {{ render_field_with_errors(login_user_form.email) }}
-        {{ render_field_with_errors(login_user_form.password) }}
-        {{ render_field_with_errors(login_user_form.remember) }}
-        {{ render_field(login_user_form.next) }}
-        {{ render_field(login_user_form.submit) }}
-    </form>
-    {% include "security/_menu.html" %}
-{% endblock %}
+    {% block content %}
+        <h1>{{ _("Login") }}</h1>
+        <b>{% include "security/_messages.html" %}</b>
+        <form action="{{ url_for_security("login") }}" method="POST" name="login_user_form">
+            {{ login_user_form.hidden_tag() }}
+            <p>{{ render_field_with_errors(login_user_form.email) }}</p>
+            <p>{{ render_field_with_errors(login_user_form.password) }}</p>
+            <p>{{ render_field_with_errors(login_user_form.remember) }}</p>
+            <p>{{ render_field(login_user_form.next) }}</p>
+            <p>{{ render_field(login_user_form.submit) }}</p>
+        </form>
+
+        <form action="{{ url_for('social.login', provider_id="google") }}" method="POST">
+            <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                   type="submit" value="Login with Google"/>
+        </form>
+
+        {# <form action="{{ url_for('social.login', provider_id="facebook") }}" method="POST">
+            <input type="submit" value="Login with {{ display_name }}"/>
+        </form> #}
+        {% include "security/_menu.html" %}
+    {% endblock %}
 </div>
 
 {% block description %}{{ _("Login page") }}{% endblock %}

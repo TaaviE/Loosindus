@@ -4,6 +4,8 @@ Flask-Security
 Flask-Script
 Flask-Mail
 Flask-WTF
+Flask-Babelex
+git+https://github.com/aerickson/flask-social.git
 bcrypt
 sqlalchemy
 psycopg2 --no-binary psycopg2
@@ -11,6 +13,8 @@ werkzeug
 pycryptodomex
 raven
 celery[redis]
-Flask-Babelex
-Flask-Babel
+oauth2client
+google-api-python-client
 gunicorn
+git+https://github.com/pythonforfacebook/facebook-sdk.git
+python-twitter

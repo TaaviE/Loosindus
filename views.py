@@ -48,16 +48,10 @@ from flask_mail import Message
 
 # Translation
 # Try switching between babelex and babel if you are getting errors
-from config import Config
+from flask_babelex import gettext as _
+from flask_babelex import Domain
 
-if Config.DEBUG:
-    from flask_babel import gettext as _
-else:
-    from flask_babelex import gettext as _
-    from flask_babelex import Domain
-
-    domain = Domain(domain="messages")
-# I really don't want to start monkeypatching Babel(Ex) to fix this
+domain = Domain(domain="messages")
 
 from main import babel
 
@@ -76,7 +70,7 @@ def get_locale():
 
 
 # Database models
-from main import db
+from main import db, social
 from models.wishlist_model import NoteState
 from models.family_model import Family
 from models.groups_model import Groups
@@ -168,8 +162,7 @@ def favicon():
 
 
 def index():
-    if not Config.DEBUG:
-        domain = Domain(domain="messages")  # Uncomment this when using babelex
+    domain = Domain(domain="messages")  # Uncomment this when using babelex
 
     try:
         security.datastore.commit()
@@ -759,6 +752,9 @@ def settings():
                            group_admin=is_in_group,
                            families=user_families,
                            groups=user_groups,
+                           # twitter=social.twitter.get_connection(),
+                           # facebook=social.facebook.get_connection(),
+                           google=social.google.get_connection(),
                            title=_("Settings"),
                            back_link="/")
 

@@ -45,3 +45,17 @@ class User(db.Model, UserMixin):
         secondary=RolesUsers.__tablename__,
         backref=backref("User", lazy="dynamic")
     )
+
+
+class Connection(db.Model):
+    __tablename__ = "user_connection"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    provider_id = Column(String(255))
+    provider_user_id = Column(String(255))
+    access_token = Column(String(255))
+    secret = Column(String(255))
+    display_name = Column(String(255))
+    profile_url = Column(String(512))
+    image_url = Column(String(512))
+    rank = Column(Integer)

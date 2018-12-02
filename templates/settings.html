@@ -10,81 +10,119 @@
 
 {% block content %}
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <p>{{ _("Your ID:") }} {{ user_id }}</p>
-            <p>{{ _("Your name:") }} {{ user_name }}</p>
-            <p>{{ _("Your language:") }}
-            <form method="post" action="setlanguage">
-                <select class="mdl-textfield__input" id="language" name="language">
-                    <option value="{{ user_language }}">{{ user_language }}</option>
-                    <option value="ee">{{ _("Estonian") }}</option>
-                    <option value="en">{{ _("English") }}</option>
-                </select>
-                <input type="submit"
-                       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       value={{ _("Send") }}>
-            </form>
-            </p>
+        <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+        <p>{{ _("Your ID:") }} {{ user_id }}</p>
+        <p>{{ _("Your name:") }} {{ user_name }}</p>
+        {# <p>
+            {% if twitter_conn %}
+                <form action="{{ url_for("social.remove_connection", provider_id="twitter", provider_user_id=conn.provider_user_id) }}"
+                      method="DELETE">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           type="submit" value="Link Twitter account"/>
+                </form>
+            {% else %}
+                <form action="{{ url_for("social.connect", provider_id="twitter") }}" method="POST">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           type="submit" value="Unlink Twitter account"/>
+                </form>
+            {% endif %}
+        </p>#}
+        {# {% if facebook_conn %}
+                <form action="{{ url_for("social.remove_connection", provider_id="facebook", provider_user_id=facebook_conn.provider_user_id) }}"
+                      method="DELETE">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       type="submit" value="Unlink Facebook account"/>
+                </form>
+            {% else %}
+                <form action="{{ url_for("social.connect", provider_id="facebook") }}" method="POST">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       type="submit" value="Link Facebook account"/>
+                </form>
+            {% endif %} #}
+        <p>
+            {% if conn %}
+                <form action="{{ url_for("social.remove_connection", provider_id="google", provider_user_id=google_conn.provider_user_id) }}"
+                      method="DELETE">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           type="submit" value="Unlink Google account"/>
+                </form>
+            {% else %}
+                <form action="{{ url_for("social.connect", provider_id="google") }}" method="POST">
+                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           type="submit" value="Link Google account"/>
+                </form>
+            {% endif %}
+        </p>
+        <p>{{ _("Your language:") }}</p>
+        <form method="post" action="setlanguage">
+            <select class="mdl-textfield__input" id="language" name="language">
+                <option value="{{ user_language }}">{{ user_language }}</option>
+                <option value="ee">{{ _("Estonian") }}</option>
+                <option value="en">{{ _("English") }}</option>
+            </select>
+            <input type="submit"
+                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                   value={{ _("Send") }}>
+        </form>
+        </p>
 
-            <p>{{ _("Your families:") }}</p>
-            <table class="mdl-data-table">
-                <thead>
+        <p>{{ _("Your families:") }}</p>
+        <table class="mdl-data-table">
+            <thead>
+            <tr>
+                <th>{{ _("Family") }}</th>
+                <th>{{ _("Options") }}</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for name, family in families.items() %}
                 <tr>
-                    <th>{{ _("Family") }}</th>
-                    <th>{{ _("Options") }}</th>
+                    <td>{{ name }}</td>
+                    {% if family[1] %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                        </td>
+                    {% else %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                        </td>
+                    {% endif %}
                 </tr>
-                </thead>
+            {% endfor %}
+            </tbody>
+        </table>
 
-                <tbody>
-                {% for name, family in families.items() %}
-                    <tr>
-                        <td>{{ name }}</td>
-                        {% if family[1] %}
-                            <td>
-                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
-                            </td>
-                        {% else %}
-                            <td>
-                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Display") }}</a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        <p>{{ _("Your groups:") }}</p>
+        <table class="mdl-data-table">
+            <thead>
+            <tr>
+                <th>{{ _("Group") }}</th>
+                <th>{{ _("Options") }}</th>
+            </tr>
+            </thead>
 
-            <p>{{ _("Your groups:") }}</p>
-            <table class="mdl-data-table">
-                <thead>
+            <tbody>
+            {% for name, group in groups.items() %}
                 <tr>
-                    <th>{{ _("Group") }}</th>
-                    <th>{{ _("Options") }}</th>
+                    <td>{{ name }}</td>
+                    {% if group[1] %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                        </td>
+                    {% else %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                        </td>
+                    {% endif %}
                 </tr>
-                </thead>
-
-                <tbody>
-                {% for name, group in groups.items() %}
-                    <tr>
-                        <td>{{ name }}</td>
-                        {% if group[1] %}
-                            <td>
-                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
-                            </td>
-                        {% else %}
-                            <td>
-                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Display") }}</a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
 
