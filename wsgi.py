@@ -9,7 +9,7 @@ from main import app
 getLogger().setLevel(logging.DEBUG)
 logger = getLogger()
 logger.info("Started with proxyfix")
-ProxyFix(app, num_proxies=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, num_proxies=1)
 basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
