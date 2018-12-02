@@ -25,15 +25,10 @@ if not Config.DEBUG:
 else:
     sentry = Sentry(app, dsn=None, logging=False)
 
-from models.users_model import User, Role, Connection
+from models.users_model import User, Role
 from flask_security import SQLAlchemyUserDatastore, Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-
-from flask_social import Social
-from flask_social.datastore import SQLAlchemyConnectionDatastore
-
-social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
 
 security = Security(app, user_datastore,
                     confirm_register_form=ExtendedRegisterForm,

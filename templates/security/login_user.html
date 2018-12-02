@@ -16,10 +16,10 @@
             <p>{{ render_field(login_user_form.submit) }}</p>
         </form>
 
-        <form action="{{ url_for('social.login', provider_id="google") }}" method="POST">
+        {# <form action="{{ url_for('social.login', provider_id="google") }}" method="POST">
             <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                    type="submit" value="Login with Google"/>
-        </form>
+        </form> #}
 
         {# <form action="{{ url_for('social.login', provider_id="facebook") }}" method="POST">
             <input type="submit" value="Login with {{ display_name }}"/>

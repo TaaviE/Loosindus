@@ -39,7 +39,7 @@
                        type="submit" value="Link Facebook account"/>
                 </form>
             {% endif %} #}
-        <p>
+        {# <p>
             {% if conn %}
                 <form action="{{ url_for("social.remove_connection", provider_id="google", provider_user_id=google_conn.provider_user_id) }}"
                       method="DELETE">
@@ -52,7 +52,7 @@
                            type="submit" value="Link Google account"/>
                 </form>
             {% endif %}
-        </p>
+        </p> #}
         <p>{{ _("Your language:") }}</p>
         <form method="post" action="setlanguage">
             <select class="mdl-textfield__input" id="language" name="language">
