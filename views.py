@@ -371,7 +371,7 @@ def editnote():
 @main_page.route("/editnote", methods=["POST"])
 @login_required
 def editnote_edit():
-    logger.info("Got a post request to edit a note by", end="")
+    logger.info("Got a post request to edit a note by")
     user_id = session["user_id"]
     # username = get_person_name(user_id)
     logger.info(" user id:", user_id)
