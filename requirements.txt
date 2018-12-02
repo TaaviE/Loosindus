@@ -11,5 +11,6 @@ werkzeug
 pycryptodomex
 raven
 Celery
+Flask-Babelex
 Flask-Babel
 gunicorn
