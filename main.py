@@ -10,6 +10,7 @@ else:
     from flask_babelex import Babel
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from celery import Celery
 
 from forms import ExtendedConfirmationForm, ExtendedForgotPasswordForm, ExtendedRegisterForm, ExtendedResetForm
 
@@ -19,6 +20,8 @@ app.config.from_object(Config)
 mail = Mail(app)
 db = SQLAlchemy(app)
 babel = Babel(app)
+celery = Celery()
+celery.conf.update(app.config)
 
 from raven.contrib.flask import Sentry
 

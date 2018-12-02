@@ -57,7 +57,6 @@ else:
     from flask_babelex import Domain
 
     domain = Domain(domain="messages")
-# There is a function call you have to comment out for translations to be loaded when using BabelEx
 # I really don't want to start monkeypatching Babel(Ex) to fix this
 
 from main import babel
@@ -93,6 +92,21 @@ set_recursionlimit()
 
 # Just for assigning members_to_families a few colors
 chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
+
+# Mailing
+from main import celery, security, mail
+
+
+# Send asynchronous email
+@celery.task
+def send_security_email(msg):
+    mail.send(msg)
+
+
+# Override security email sender
+@security.send_mail_task
+def delay_security_email(msg):
+    send_security_email.delay(msg)
 
 
 # Show a friendlier error page

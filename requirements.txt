@@ -10,7 +10,7 @@ psycopg2 --no-binary psycopg2
 werkzeug
 pycryptodomex
 raven
-Celery
+celery[redis]
 Flask-Babelex
 Flask-Babel
 gunicorn
