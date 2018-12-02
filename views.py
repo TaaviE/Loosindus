@@ -170,6 +170,12 @@ def favicon():
 def index():
     if not Config.DEBUG:
         domain = Domain(domain="messages")  # Uncomment this when using babelex
+
+    try:
+        security.datastore.commit()
+    except Exception:
+        pass
+
     user_id = session["user_id"]
     username = get_person_name(user_id)
     no_shuffle = False
@@ -181,8 +187,8 @@ def index():
         user.last_activity_at = datetime.datetime.now()
         user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(' ')[-1]
         db.session.commit()
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry.captureException(e)
 
     return render_template("index.html",
                            auth=username,
