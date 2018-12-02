@@ -70,7 +70,7 @@ def get_locale():
 
 
 # Database models
-from main import db, social
+from main import db
 from models.wishlist_model import NoteState
 from models.family_model import Family
 from models.groups_model import Groups
@@ -752,9 +752,6 @@ def settings():
                            group_admin=is_in_group,
                            families=user_families,
                            groups=user_groups,
-                           # twitter=social.twitter.get_connection(),
-                           # facebook=social.facebook.get_connection(),
-                           google=social.google.get_connection(),
                            title=_("Settings"),
                            back_link="/")
 
