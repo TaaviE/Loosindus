@@ -1,11 +1,16 @@
 import os
 
 from flask import Flask
-from flask_babel import Babel
+
+from config import Config
+
+if Config.DEBUG:
+    from flask_babel import Babel
+else:
+    from flask_babelex import Babel
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 
-from config import Config
 from forms import ExtendedConfirmationForm, ExtendedForgotPasswordForm, ExtendedRegisterForm, ExtendedResetForm
 
 basedir = os.path.abspath(os.path.dirname(__file__))

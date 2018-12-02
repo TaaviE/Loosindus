@@ -48,10 +48,15 @@ from flask_mail import Message
 
 # Translation
 # Try switching between babelex and babel if you are getting errors
-from flask_babel import gettext as _
-# from flask_babelex import Domain
-# from flask_babelex import gettext as _
-# domain = Domain(domain="messages")
+from config import Config
+
+if Config.DEBUG:
+    from flask_babel import gettext as _
+else:
+    from flask_babelex import gettext as _
+    from flask_babelex import Domain
+
+    domain = Domain(domain="messages")
 # There is a function call you have to comment out for translations to be loaded when using BabelEx
 # I really don't want to start monkeypatching Babel(Ex) to fix this
 
@@ -149,7 +154,8 @@ def favicon():
 
 
 def index():
-    # domain = Domain(domain="messages") # Uncomment this when using babelex
+    if not Config.DEBUG:
+        domain = Domain(domain="messages")  # Uncomment this when using babelex
     user_id = session["user_id"]
     username = get_person_name(user_id)
     no_shuffle = False

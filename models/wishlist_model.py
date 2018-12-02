@@ -1,7 +1,11 @@
 from enum import Enum
 
-from flask_babel import gettext as _
+from config import Config
 
+if Config.DEBUG:
+    from flask_babel import gettext as _
+else:
+    from flask_babelex import gettext as _
 from main import db
 
 # To make sure these strings get translated
