@@ -273,6 +273,13 @@ msgid ""
 " hästi nii mobiilil kui arvutil! Katsetamiseks\n"
 "                registreeru (või logi sisse)."
 msgstr ""
+"Selle lehe puhul on tegu väga lihtsa lehega enda jõulunimekirja "
+"koostamise jaoks, selle\n"
+"                enda\n"
+"                \"jõuluvanaga\"\n"
+"                jagamiseks 🎅, nimede loosimise korraldamise jaoks. Töötab"
+" hästi nii mobiilil kui arvutil! Katsetamiseks\n"
+"                registreeru (või logi sisse)."
 
 #: templates/home.html:19 templates/security/_menu.html:6
 #: templates/security/email/login_instructions.html:5
@@ -298,7 +305,7 @@ msgstr "Saaja soovinimekiri"
 #: templates/index.html:28
 msgid "This web service is in Beta testing, please report any errors you see"
 msgstr ""
-"See veebiteenus on beetatestimises, palun teavita kõikidest vigadestmida "
+"See veebiteenus on beetatestimises, palun teavita kõikidest vigadest mida "
 "kohtate"
 
 #: templates/notes.html:7
