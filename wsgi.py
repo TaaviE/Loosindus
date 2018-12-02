@@ -6,10 +6,11 @@ from werkzeug.contrib.fixers import ProxyFix
 from config import Config
 from main import app
 
-ProxyFix(app, num_proxies=1)
-basicConfig(level=logging.DEBUG)
 getLogger().setLevel(logging.DEBUG)
 logger = getLogger()
+logger.info("Started with proxyfix")
+ProxyFix(app, num_proxies=2)
+basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
     if Config.DEBUG:

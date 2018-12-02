@@ -179,7 +179,7 @@ def index():
     try:
         user = User.query.get(int(user_id))
         user.last_activity_at = datetime.datetime.now()
-        user.last_activity_ip = "0.0.0.0"  # TODO: Fix
+        user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(' ')[-1]
         db.session.commit()
     except Exception:
         sentry.captureException()
