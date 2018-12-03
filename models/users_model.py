@@ -50,11 +50,15 @@ class User(db.Model, UserMixin):
 from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
 
 
-class Links(db.Model, OAuthConsumerMixin):
+class AuthLinks(db.Model, OAuthConsumerMixin):
     __tablename__ = "user_connection"
     provider_user_id = Column(String(255), unique=True)
     user_id = Column(Integer, ForeignKey(User.id))
-    user = relationship(User)
+    id = Column(Integer, unique=True, primary_key=True)
+    created_at = Column(DateTime)
+    token = Column(String(255))
+    provider = Column(String(255))
+
 
     def __init__(self, provider_user_id, user_id, provider):
         self.provider_user_id = provider_user_id

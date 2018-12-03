@@ -33,7 +33,6 @@ from logging import getLogger
 import secretsanta
 # App specific config
 from config import Config
-from models.users_model import Links
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
@@ -72,6 +71,7 @@ def get_locale():
 
 # Database models
 from main import db
+from models.users_model import AuthLinks
 from models.wishlist_model import NoteState
 from models.family_model import Family
 from models.groups_model import Groups
@@ -747,10 +747,11 @@ def settings():
         is_in_group = True
 
     id_link_exists = False
+
     try:
-        user_links = Links.query.filter(Links.user_id == int(user_id)).all()
+        user_links = AuthLinks.query.filter(User.id == int(user_id)).all()
         for link in user_links:
-            if "serialNumber" in link.provider_user_id:
+            if "esteid" in link.provider:
                 id_link_exists = True
     except Exception as e:
         sentry.captureException(e)
@@ -1107,7 +1108,7 @@ def log_user_in_with_cert():
                             if "user_id" in session.keys():
                                 logger.debug("User ID exists")
                                 user_id = session["user_id"]
-                                new_link = Links(
+                                new_link = AuthLinks(
                                     user_id=int(user_id),
                                     provider_user_id=request.headers["Tls-Client-Dn"],
                                     provider="esteid"
@@ -1134,8 +1135,8 @@ def log_user_in_with_cert():
                             else:
                                 logger.debug("User ID doesn't exist")
                                 try:
-                                    user_id = Links.query.filter(
-                                        Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
+                                    user_id = AuthLinks.query.filter(
+                                        AuthLinks.provider_user_id == request.headers["Tls-Client-Dn"]).first()
                                     if user_id is not None:
                                         user_id = user_id.user_id
                                     else:
@@ -1164,8 +1165,8 @@ def log_user_in_with_cert():
                         else:
                             try:
                                 logger.debug("User ID doesn't exist")
-                                user_id = Links.query.filter(
-                                    Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
+                                user_id = AuthLinks.query.filter(
+                                    AuthLinks.provider_user_id == request.headers["Tls-Client-Dn"]).first()
                                 if user_id is not None:
                                     user_id = user_id.user_id
                                 else:

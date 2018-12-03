@@ -25,7 +25,7 @@ if not Config.DEBUG:
 else:
     sentry = Sentry(app, dsn=None, logging=False)
 
-from models.users_model import User, Role, Links
+from models.users_model import User, Role, AuthLinks
 from flask_security import SQLAlchemyUserDatastore, Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -54,5 +54,5 @@ google_blueprint = make_google_blueprint(
 
 from flask_login import current_user
 
-google_blueprint.backend = SQLAlchemyBackend(Links, db.session, user=current_user)
+google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
 app.register_blueprint(google_blueprint, url_prefix="/login")
