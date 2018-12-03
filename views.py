@@ -1112,7 +1112,8 @@ def log_user_in_with_cert():
                                 return redirect("https://jolod.aegrel.ee/settings")
                             else:
                                 try:
-                                    user_id = Links.query.get(request.headers["Tls-Client-Dn"]).user_id
+                                    user_id = Links.query.filter(
+                                        Links.provider_user_id == request.headers["Tls-Client-Dn"]).filter().user_id
                                     login_user(User.query.get(user_id))
                                     return redirect("https://jolod.aegrel.ee/")
                                 except Exception as e:
@@ -1120,7 +1121,8 @@ def log_user_in_with_cert():
                                     return redirect("https://jolod.aegrel.ee/")
                         else:
                             try:
-                                user_id = Links.query.get(request.headers["Tls-Client-Dn"]).user_id
+                                user_id = Links.query.filter(
+                                    Links.provider_user_id == request.headers["Tls-Client-Dn"]).first().user_id
                                 login_user(User.query.get(user_id))
                                 return redirect("https://jolod.aegrel.ee/")
                             except Exception as e:
