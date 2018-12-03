@@ -1081,7 +1081,7 @@ def test_mail():
                            title=_("Sent"))
 
 
-@main_page.route("/clientcert", subdomain="cert")
+@main_page.route("/clientcert")
 def log_user_in_with_cert():
     """
     This functionality requires another subdomain requiring client cert
