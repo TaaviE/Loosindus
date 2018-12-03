@@ -25,7 +25,7 @@ if not Config.DEBUG:
 else:
     sentry = Sentry(app, dsn=None, logging=False)
 
-from models.users_model import User, Role
+from models.users_model import User, Role, Links
 from flask_security import SQLAlchemyUserDatastore, Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -39,3 +39,20 @@ security = Security(app, user_datastore,
 from views import main_page
 
 app.register_blueprint(main_page)
+
+from flask_dance.contrib.google import make_google_blueprint
+from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
+
+google_blueprint = make_google_blueprint(
+    scope=[
+        "https://www.googleapis.com/auth/plus.me",
+        "https://www.googleapis.com/auth/userinfo.email",
+    ],
+    client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
+    client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
+)
+
+from flask_login import current_user
+
+google_blueprint.backend = SQLAlchemyBackend(Links, db.session, user=current_user)
+app.register_blueprint(google_blueprint, url_prefix="/login")

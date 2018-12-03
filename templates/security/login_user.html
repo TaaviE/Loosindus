@@ -16,6 +16,9 @@
             <p>{{ render_field(login_user_form.submit) }}</p>
         </form>
 
+        <a href="{{ url_for("log_user_in_with_cert") }}"
+           class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+        >{{ _("Log in using Estonian ID card") }}</a>
         {# <form action="{{ url_for('social.login', provider_id="google") }}" method="POST">
             <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                    type="submit" value="Login with Google"/>

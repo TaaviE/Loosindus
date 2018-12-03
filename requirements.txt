@@ -5,6 +5,7 @@ Flask-Script
 Flask-Mail
 Flask-WTF
 Flask-Babelex
+Flask-Dance
 bcrypt
 sqlalchemy
 psycopg2 --no-binary psycopg2

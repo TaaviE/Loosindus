@@ -48,6 +48,13 @@ class Config(object):
     REMEMBER_COOKIE_SECURE = False  # TODO: Enable in production
     SESSION_COOKIE_HTTPONLY = False  # TODO: Enable in production
     REMEMBER_COOKIE_HTTPONLY = False  # TODO: Enable in production
+    SESSION_COOKIE_SAMESITE = "Lax"
+    REMEMBER_COOKIE_SAMESITE = "Lax"
+
+    REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
+
+    TLS_PROXY_SECRET = ""  # TODO: Make sure TLS-Client-Secret header value matches,
+    # this is a countermeasure to forgetting to proxy
 
     LOGLEVEL = logging.DEBUG
 

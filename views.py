@@ -33,6 +33,7 @@ from logging import getLogger
 import secretsanta
 # App specific config
 from config import Config
+from models.users_model import Links
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
@@ -43,7 +44,7 @@ import copy
 # Flask
 from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint
 from flask_security import login_required, logout_user
-from flask_login import current_user
+from flask_login import current_user, login_user
 from flask_mail import Message
 
 # Translation
@@ -744,6 +745,15 @@ def settings():
             user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), group_admin.admin)
         is_in_group = True
 
+    id_link_exists = False
+    try:
+        links = Links.query.filter(Links.user_id == user_id).all()
+        for link in links:
+            if "serialNumber" in link.provider_user_id:
+                id_link_exists = True
+    except Exception as e:
+        sentry.captureException(e)
+
     return render_template("settings.html",
                            user_id=user_id,
                            user_name=user_obj.username,
@@ -753,6 +763,7 @@ def settings():
                            families=user_families,
                            groups=user_groups,
                            title=_("Settings"),
+                           id_connected=id_link_exists,
                            back_link="/")
 
 
@@ -1068,3 +1079,52 @@ def test_mail():
                            action=_("Sent"),
                            link="./testmail",
                            title=_("Sent"))
+
+
+@main_page.route("/clientcert", subdomain="cert")
+def log_user_in_with_cert():
+    """
+    This functionality requires another subdomain requiring client cert
+
+    proxy_set_header Tls-Client-Secret Config.TLS_PROXY_SECRET;
+    proxy_set_header Tls-Client-Verify $ssl_client_verify;
+    proxy_set_header Tls-Client-Dn     $ssl_client_s_dn;
+    proxy_set_header Tls-Client-Cert   $ssl_client_cert;
+    """
+    if "Tls-Client-Secret" in request.headers.keys():
+        if Config.TLS_PROXY_SECRET in request.headers["Tls-Client-Secret"]:
+            if "Tls-Client-Verify" in request.headers.keys():
+                if "SUCCESS" in request.headers["Tls-Client-Verify"]:
+                    if "Tls-Client-Dn" in request.headers.keys():
+                        if session:
+                            if "user_id" in session.keys():
+                                user_id = session["user_id"]
+                                new_link = Links(
+                                    user_id=int(user_id),
+                                    provider_user_id=request.headers["Tls-Client-Dn"]
+                                )
+                                try:
+                                    db.session.add(new_link)
+                                    db.session.commit()
+                                except Exception:
+                                    db.session.rollback()
+                                    db.session.commit()
+                                return redirect("https://jolod.aegrel.ee/settings")
+                            else:
+                                try:
+                                    user_id = Links.query.get(request.headers["Tls-Client-Dn"]).user_id
+                                    login_user(User.query.get(user_id))
+                                    return redirect("https://jolod.aegrel.ee/")
+                                except Exception as e:
+                                    sentry.captureException(e)
+                                    return redirect("https://jolod.aegrel.ee/")
+                        else:
+                            try:
+                                user_id = Links.query.get(request.headers["Tls-Client-Dn"]).user_id
+                                login_user(User.query.get(user_id))
+                                return redirect("https://jolod.aegrel.ee/")
+                            except Exception as e:
+                                sentry.captureException(e)
+                                return redirect("https://jolod.aegrel.ee/")
+
+    return redirect("https://jolod.aegrel.ee/login")
