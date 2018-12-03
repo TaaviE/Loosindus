@@ -1109,7 +1109,8 @@ def log_user_in_with_cert():
                                 user_id = session["user_id"]
                                 new_link = Links(
                                     user_id=int(user_id),
-                                    provider_user_id=request.headers["Tls-Client-Dn"]
+                                    provider_user_id=request.headers["Tls-Client-Dn"],
+                                    provider="esteid"
                                 )
                                 try:
                                     db.session.add(new_link)
