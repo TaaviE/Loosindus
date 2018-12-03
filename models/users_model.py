@@ -59,7 +59,6 @@ class AuthLinks(db.Model, OAuthConsumerMixin):
     token = Column(String(255))
     provider = Column(String(255))
 
-
     def __init__(self, provider_user_id, user_id, provider):
         self.provider_user_id = provider_user_id
         self.user_id = user_id

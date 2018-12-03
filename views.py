@@ -1130,6 +1130,7 @@ def log_user_in_with_cert():
                                                            title=_("Error"))
                                 return render_template("success.html",
                                                        action=_("Linked"),
+                                                       message=_("Linked"),
                                                        link="./notes",
                                                        title=_("Linked"))
                             else:
@@ -1149,6 +1150,7 @@ def log_user_in_with_cert():
                                                                title=_("Error"))
                                     login_user(User.query.get(user_id))
                                     return render_template("success.html",
+                                                           message=_("Logged in"),
                                                            action=_("Logged in"),
                                                            link="./notes",
                                                            title=_("Logged in"))
@@ -1180,6 +1182,7 @@ def log_user_in_with_cert():
                                                            title=_("Error"))
                                 login_user(User.query.get(user_id))
                                 return render_template("success.html",
+                                                       message=_("Added!"),
                                                        action=_("Added"),
                                                        link="./notes",
                                                        title=_("Added"))
