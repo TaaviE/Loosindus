@@ -1092,12 +1092,19 @@ def log_user_in_with_cert():
     proxy_set_header Tls-Client-Cert   $ssl_client_cert;
     """
     if "Tls-Client-Secret" in request.headers.keys():
+        logger.debug("Tls-Client-Secret exists")
         if Config.TLS_PROXY_SECRET in request.headers["Tls-Client-Secret"]:
+            logger.debug("Tls-Client-Secret is correct")
             if "Tls-Client-Verify" in request.headers.keys():
+                logger.debug("Tls-Client-Verify exists")
                 if "SUCCESS" in request.headers["Tls-Client-Verify"]:
+                    logger.debug("Tls-Client-Verify is correct")
                     if "Tls-Client-Dn" in request.headers.keys():
+                        logger.debug("Tls-Client-Dn exists")
                         if session:
+                            logger.debug("Session exists")
                             if "user_id" in session.keys():
+                                logger.debug("User ID exists")
                                 user_id = session["user_id"]
                                 new_link = Links(
                                     user_id=int(user_id),
@@ -1107,6 +1114,7 @@ def log_user_in_with_cert():
                                     db.session.add(new_link)
                                     db.session.commit()
                                 except Exception as e:
+                                    logger.debug("Error adding link")
                                     db.session.rollback()
                                     db.session.commit()
                                     sentry.captureException(e)
@@ -1122,6 +1130,7 @@ def log_user_in_with_cert():
                                                        link="./notes",
                                                        title=_("Linked"))
                             else:
+                                logger.debug("User ID doesn't exist")
                                 try:
                                     user_id = Links.query.filter(
                                         Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
@@ -1142,6 +1151,7 @@ def log_user_in_with_cert():
                                                            title=_("Logged in"))
                                 except Exception as e:
                                     sentry.captureException(e)
+                                    logger.debug("Error loging user in")
                                     return render_template("error.html",
                                                            sentry_enabled=True,
                                                            sentry_ask_feedback=True,
@@ -1151,11 +1161,13 @@ def log_user_in_with_cert():
                                                            title=_("Error"))
                         else:
                             try:
+                                logger.debug("User ID doesn't exist")
                                 user_id = Links.query.filter(
                                     Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
                                 if user_id is not None:
                                     user_id = user_id.user_id
                                 else:
+                                    logger.debug("User with the link doesn't exist")
                                     return render_template("error.html",
                                                            sentry_enabled=True,
                                                            sentry_ask_feedback=True,
@@ -1169,6 +1181,7 @@ def log_user_in_with_cert():
                                                        link="./notes",
                                                        title=_("Added"))
                             except Exception as e:
+                                logger.debug("Exception when trying to log user in")
                                 sentry.captureException(e)
                                 return render_template("error.html",
                                                        sentry_enabled=True,
@@ -1177,5 +1190,11 @@ def log_user_in_with_cert():
                                                        sentry_public_dsn=sentry.client.get_public_dsn("https"),
                                                        message=_("Error!"),
                                                        title=_("Error"))
-
-    return redirect("https://jolod.aegrel.ee/login")
+    logger.debug("Check failed")
+    return render_template("error.html",
+                           sentry_enabled=True,
+                           sentry_ask_feedback=True,
+                           sentry_event_id=g.sentry_event_id,
+                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                           message=_("Error!"),
+                           title=_("Error"))
