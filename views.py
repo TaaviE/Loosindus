@@ -701,6 +701,7 @@ def graph_json(graph_id, unhide):
         else:
             return "{}"
     except Exception as e:
+        sentry.captureException(e)
         return "{}"
 
 
@@ -747,7 +748,7 @@ def settings():
 
     id_link_exists = False
     try:
-        links = Links.query.filter(Links.user_id == user_id).all()
+        links = Links.query.filter(Links.user_id == int(user_id)).all()
         for link in links:
             if "serialNumber" in link.provider_user_id:
                 id_link_exists = True
