@@ -13,11 +13,13 @@
         <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
         <p>{{ _("Your ID:") }} {{ user_id }}</p>
         <p>{{ _("Your name:") }} {{ user_name }}</p>
-        <p>{{ _("Connect Estonian ID card:") }} <a
+        <p>{% if id_connected %}{{ _("Estonian ID card is linked") }}{% else %}
+            {{ _("Connect Estonian ID card:") }}{% endif %} <a
+                {% if id_connected %}disabled{% endif %}
                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                 href="{{ url_for("main_page.log_user_in_with_cert") }}">
             {% if id_connected %}{{ _("Linked") }}{% else %}{{ _("Link") }}{% endif %}</a>
-        {# <p>
+            {# <p>
             {% if twitter_conn %}
                 <form action="{{ url_for("social.remove_connection", provider_id="twitter", provider_user_id=conn.provider_user_id) }}"
                       method="DELETE">
@@ -31,7 +33,7 @@
                 </form>
             {% endif %}
         </p>#}
-        {# {% if facebook_conn %}
+            {# {% if facebook_conn %}
                 <form action="{{ url_for("social.remove_connection", provider_id="facebook", provider_user_id=facebook_conn.provider_user_id) }}"
                       method="DELETE">
                     <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
@@ -43,7 +45,7 @@
                        type="submit" value="Link Facebook account"/>
                 </form>
             {% endif %} #}
-        {# <p>
+            {# <p>
             {% if conn %}
                 <form action="{{ url_for("social.remove_connection", provider_id="google", provider_user_id=google_conn.provider_user_id) }}"
                       method="DELETE">
