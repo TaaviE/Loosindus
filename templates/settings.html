@@ -15,7 +15,7 @@
         <p>{{ _("Your name:") }} {{ user_name }}</p>
         <p>{{ _("Connect Estonian ID card:") }} <a
                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                href="{{ url_for("log_user_in_with_cert") }}">
+                href="{{ url_for("main_page.log_user_in_with_cert") }}">
             {% if id_connected %}{{ _("Linked") }}{% else %}{{ _("Link") }}{% endif %}</a>
         {# <p>
             {% if twitter_conn %}

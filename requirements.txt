@@ -14,3 +14,4 @@ pycryptodomex
 raven
 celery[redis]
 gunicorn
+sqlalchemy-utils
