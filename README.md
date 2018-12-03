@@ -1,6 +1,7 @@
-# SecretSanta
+# Django version of SecretSanta
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_shield)
 
+# THIS VERSION IS JUST FOR TESTING OUT DJANGO, IT'S NOT PRODUCTION SUITABLE AND WILL NOT BE DEVELOPED FURTHER
 Really rather simple to set-up and to use system for secret santa but with some important additions like secretly shared
 shopping lists and gifting constraints (avoid gifts between family members for ex.).
 
