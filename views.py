@@ -1113,20 +1113,28 @@ def log_user_in_with_cert():
                             else:
                                 try:
                                     user_id = Links.query.filter(
-                                        Links.provider_user_id == request.headers["Tls-Client-Dn"]).filter().user_id
+                                        Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
+                                    if user_id is not None:
+                                        user_id = user_id.user_id
+                                    else:
+                                        return redirect("https://jolod.aegrel.ee/login")
                                     login_user(User.query.get(user_id))
                                     return redirect("https://jolod.aegrel.ee/")
                                 except Exception as e:
                                     sentry.captureException(e)
-                                    return redirect("https://jolod.aegrel.ee/")
+                                    return redirect("https://jolod.aegrel.ee/login")
                         else:
                             try:
                                 user_id = Links.query.filter(
-                                    Links.provider_user_id == request.headers["Tls-Client-Dn"]).first().user_id
+                                    Links.provider_user_id == request.headers["Tls-Client-Dn"]).first()
+                                if user_id is not None:
+                                    user_id = user_id.user_id
+                                else:
+                                    return redirect("https://jolod.aegrel.ee/login")
                                 login_user(User.query.get(user_id))
                                 return redirect("https://jolod.aegrel.ee/")
                             except Exception as e:
                                 sentry.captureException(e)
-                                return redirect("https://jolod.aegrel.ee/")
+                                return redirect("https://jolod.aegrel.ee/login")
 
     return redirect("https://jolod.aegrel.ee/login")
