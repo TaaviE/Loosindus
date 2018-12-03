@@ -1106,10 +1106,21 @@ def log_user_in_with_cert():
                                 try:
                                     db.session.add(new_link)
                                     db.session.commit()
-                                except Exception:
+                                except Exception as e:
                                     db.session.rollback()
                                     db.session.commit()
-                                return redirect("https://jolod.aegrel.ee/settings")
+                                    sentry.captureException(e)
+                                    return render_template("error.html",
+                                                           sentry_enabled=True,
+                                                           sentAddedry_ask_feedback=True,
+                                                           sentry_event_id=g.sentry_event_id,
+                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                                                           message=_("Error!"),
+                                                           title=_("Error"))
+                                return render_template("success.html",
+                                                       action=_("Linked"),
+                                                       link="./notes",
+                                                       title=_("Linked"))
                             else:
                                 try:
                                     user_id = Links.query.filter(
@@ -1117,12 +1128,27 @@ def log_user_in_with_cert():
                                     if user_id is not None:
                                         user_id = user_id.user_id
                                     else:
-                                        return redirect("https://jolod.aegrel.ee/login")
+                                        return render_template("error.html",
+                                                               sentry_enabled=True,
+                                                               sentry_ask_feedback=True,
+                                                               sentry_event_id=g.sentry_event_id,
+                                                               sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                                                               message=_("Error!"),
+                                                               title=_("Error"))
                                     login_user(User.query.get(user_id))
-                                    return redirect("https://jolod.aegrel.ee/")
+                                    return render_template("success.html",
+                                                           action=_("Logged in"),
+                                                           link="./notes",
+                                                           title=_("Logged in"))
                                 except Exception as e:
                                     sentry.captureException(e)
-                                    return redirect("https://jolod.aegrel.ee/login")
+                                    return render_template("error.html",
+                                                           sentry_enabled=True,
+                                                           sentry_ask_feedback=True,
+                                                           sentry_event_id=g.sentry_event_id,
+                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                                                           message=_("Error!"),
+                                                           title=_("Error"))
                         else:
                             try:
                                 user_id = Links.query.filter(
@@ -1130,11 +1156,26 @@ def log_user_in_with_cert():
                                 if user_id is not None:
                                     user_id = user_id.user_id
                                 else:
-                                    return redirect("https://jolod.aegrel.ee/login")
+                                    return render_template("error.html",
+                                                           sentry_enabled=True,
+                                                           sentry_ask_feedback=True,
+                                                           sentry_event_id=g.sentry_event_id,
+                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                                                           message=_("Error!"),
+                                                           title=_("Error"))
                                 login_user(User.query.get(user_id))
-                                return redirect("https://jolod.aegrel.ee/")
+                                return render_template("success.html",
+                                                       action=_("Added"),
+                                                       link="./notes",
+                                                       title=_("Added"))
                             except Exception as e:
                                 sentry.captureException(e)
-                                return redirect("https://jolod.aegrel.ee/login")
+                                return render_template("error.html",
+                                                       sentry_enabled=True,
+                                                       sentry_ask_feedback=True,
+                                                       sentry_event_id=g.sentry_event_id,
+                                                       sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                                                       message=_("Error!"),
+                                                       title=_("Error"))
 
     return redirect("https://jolod.aegrel.ee/login")
