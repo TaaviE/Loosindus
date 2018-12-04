@@ -2,15 +2,7 @@
 
 {% block title %}🎄{{ target }} {{ title }}{% endblock %}
 
-{% block additional_head %}
-    <script {# integrity="sha256-PCfu4+fnQrp4wNmVbjN1eaX4LbOvOejab0UOhjLezrw=" #}
-            src="{{ url_for("static", filename="material/lite/mdl-selectfield.js") }}"></script>
-    <link rel="stylesheet"
-          type="text/css"
-            {# crossorigin="use-credentials"
-      integrity="sha512-a14ICq+f2dfUBQT/as+9i+KecV2raU7On6RdgVTSKpzoVhOi7lCW3aJSRROmw8iuAFlIO5ovhHzOF3oeORi70A==" #}
-          href="{{ url_for("static", filename="material/lite/mdl-selectfield.css") }}">
-{% endblock %}
+{% block additional_head %}{% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
