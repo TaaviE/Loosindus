@@ -497,7 +497,7 @@ def get_christmasy_emoji(user_id):
     :type user_id: int
     """
     if user_id is not None:
-        emoji = christmasy_emojis[user_id % len(christmasy_emojis)]
+        emoji = christmasy_emojis[int(user_id) % len(christmasy_emojis)]
     else:
         emoji = ""
     return emoji
