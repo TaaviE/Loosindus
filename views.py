@@ -43,7 +43,7 @@ import copy
 # Flask
 from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint
 from flask_security import login_required, logout_user
-from flask_security.utils import hash_password
+from hashlib import sha3_512
 from flask_login import current_user, login_user
 from flask_mail import Message
 
@@ -1110,7 +1110,7 @@ def log_user_in_with_cert():
                             if "user_id" in session.keys():
                                 logger.debug("User ID exists")
                                 user_id = AuthLinks.query.filter(
-                                    AuthLinks.provider_user_id == hash_password(
+                                    AuthLinks.provider_user_id == sha3_512(
                                         request.headers["Tls-Client-Dn"])).first()
 
                                 if user_id is not None:
@@ -1119,7 +1119,7 @@ def log_user_in_with_cert():
                                 user_id = session["user_id"]
                                 new_link = AuthLinks(
                                     user_id=int(user_id),
-                                    provider_user_id=hash_password(request.headers["Tls-Client-Dn"]),
+                                    provider_user_id=sha3_512(request.headers["Tls-Client-Dn"]),
                                     provider="esteid"
                                 )
                                 try:
@@ -1142,7 +1142,7 @@ def log_user_in_with_cert():
                                 logger.debug("User ID doesn't exist")
                                 try:
                                     user_id = AuthLinks.query.filter(
-                                        AuthLinks.provider_user_id == hash_password(
+                                        AuthLinks.provider_user_id == sha3_512(
                                             request.headers["Tls-Client-Dn"])).first()
                                     if user_id is not None:
                                         user_id = user_id.user_id
@@ -1174,7 +1174,7 @@ def log_user_in_with_cert():
                             try:
                                 logger.debug("User ID doesn't exist")
                                 user_id = AuthLinks.query.filter(
-                                    AuthLinks.provider_user_id == hash_password(
+                                    AuthLinks.provider_user_id == sha3_512(
                                         request.headers["Tls-Client-Dn"])).first()
                                 if user_id is not None:
                                     user_id = user_id.user_id
@@ -1193,7 +1193,7 @@ def log_user_in_with_cert():
                                                        action=_("Added"),
                                                        link="./notes",
                                                        title=_("Added"))
-                            except Exception as e:
+                            except Exception:
                                 logger.debug("Exception when trying to log user in")
                                 sentry.captureException()
                                 return render_template("error.html",
