@@ -649,7 +649,8 @@ def graph():
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
-    except Exception:
+    except Exception as e:
+        sentry.captureException(e)
         return render_template("error.html",
                                message=_("Shuffling has not yet been done for your group!"),
                                title=_("Error"))
@@ -1128,11 +1129,7 @@ def log_user_in_with_cert():
                                                            sentry_public_dsn=sentry.client.get_public_dsn("https"),
                                                            message=_("Error!"),
                                                            title=_("Error"))
-                                return render_template("success.html",
-                                                       action=_("Linked"),
-                                                       message=_("Linked"),
-                                                       link="./notes",
-                                                       title=_("Linked"))
+                                return redirect("/")
                             else:
                                 logger.debug("User ID doesn't exist")
                                 try:
