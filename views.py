@@ -181,8 +181,8 @@ def index():
         user.last_activity_at = datetime.datetime.now()
         user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(' ')[-1]
         db.session.commit()
-    except Exception as e:
-        sentry.captureException(e)
+    except Exception:
+        sentry.captureException()
 
     return render_template("index.html",
                            auth=username,
@@ -650,7 +650,7 @@ def graph():
                                unhide=unhide,
                                title=_("Graph"))
     except Exception as e:
-        sentry.captureException(e)
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Shuffling has not yet been done for your group!"),
                                title=_("Error"))
@@ -702,7 +702,7 @@ def graph_json(graph_id, unhide):
         else:
             return "{}"
     except Exception as e:
-        sentry.captureException(e)
+        sentry.captureException()
         return "{}"
 
 
@@ -754,8 +754,8 @@ def settings():
         for link in user_links:
             if "esteid" in link.provider:
                 id_link_exists = True
-    except Exception as e:
-        sentry.captureException(e)
+    except Exception:
+        sentry.captureException()
 
     return render_template("settings.html",
                            user_id=user_id,
@@ -824,7 +824,7 @@ def set_language():
                 user.language = request.form["language"]
                 db.session.commit()
             except Exception as e:
-                sentry.captureException(e)
+                sentry.captureException()
                 db.session.rollback()
                 return render_template("error.html",
                                        message=_("Faulty input"),
@@ -1117,11 +1117,11 @@ def log_user_in_with_cert():
                                 try:
                                     db.session.add(new_link)
                                     db.session.commit()
-                                except Exception as e:
+                                except Exception:
                                     logger.debug("Error adding link")
                                     db.session.rollback()
                                     db.session.commit()
-                                    sentry.captureException(e)
+                                    sentry.captureException()
                                     return render_template("error.html",
                                                            sentry_enabled=True,
                                                            sentAddedry_ask_feedback=True,
@@ -1151,8 +1151,8 @@ def log_user_in_with_cert():
                                                            action=_("Logged in"),
                                                            link="./notes",
                                                            title=_("Logged in"))
-                                except Exception as e:
-                                    sentry.captureException(e)
+                                except Exception:
+                                    sentry.captureException()
                                     logger.debug("Error loging user in")
                                     return render_template("error.html",
                                                            sentry_enabled=True,
@@ -1185,7 +1185,7 @@ def log_user_in_with_cert():
                                                        title=_("Added"))
                             except Exception as e:
                                 logger.debug("Exception when trying to log user in")
-                                sentry.captureException(e)
+                                sentry.captureException()
                                 return render_template("error.html",
                                                        sentry_enabled=True,
                                                        sentry_ask_feedback=True,
