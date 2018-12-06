@@ -38,7 +38,7 @@ class User(db.Model, UserMixin):
     last_activity_at = Column(DateTime())
     last_activity_ip = Column(String(255))
     current_login_ip = Column(String(255))
-    language = Column(String(5))
+    language = Column(String(5), default="en", nullable=False)
     login_count = Column(Integer)
     roles = relationship(
         "Role",
