@@ -1,0 +1,31 @@
+{
+  "short_name": "Jolod",
+  "name": "Jõulurakendus",
+  "icons": [
+    {
+      "src": "/static/favicon/favicon-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "/static/favicon/favicon-196x196.png",
+      "type": "image/png",
+      "sizes": "196x196"
+    },
+    {
+      "src": "/static/favicon/favicon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/static/favicon/favicon-1024x1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#D32F2F",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#2E7D32"
+}
