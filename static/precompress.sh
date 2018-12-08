@@ -21,6 +21,9 @@ find . -type f -name "*.svg" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 find . -type f -name "*.js" -exec sh -c "touch {} && brotli --quality=11 < {} > {}.br" \;
 find . -type f -name "*.js" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 
+find . -type f -name "*.map" -exec sh -c "touch {} && brotli --quality=11 < {} > {}.br" \;
+find . -type f -name "*.map" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
+
 brotli --quality=11 < sitemap.xml > sitemap.xml.br
 gzip -9 < sitemap.xml > sitemap.xml.gz
 
