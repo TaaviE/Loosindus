@@ -116,6 +116,8 @@ generated_graphs/
 remind_*
 *.swp
 .bash_history
+*.br
+*.gz
 
 # IntelliJ and PyCharm
 .idea
