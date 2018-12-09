@@ -95,16 +95,16 @@ from main import celery, security, mail
 # Send asynchronous email
 @celery.task()
 def send_security_email(message):
-    try:
-        msg = Message(message["subject"],
-                      message["recipients"])
-        msg.body = message["body"]
-        msg.html = message["html"]
-        msg.sender = message["sender"]
-        with app.app_context():
+    with app.app_context():
+        try:
+            msg = Message(message["subject"],
+                          message["recipients"])
+            msg.body = message["body"]
+            msg.html = message["html"]
+            msg.sender = message["sender"]
             mail.send(msg)
-    except Exception:
-        sentry.captureException()
+        except Exception:
+            sentry.captureException()
 
 
 # Override security email sender
