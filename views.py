@@ -101,6 +101,7 @@ def send_security_email(msg):
     except:
         sentry.captureException()
 
+
 # Override security email sender
 @security.send_mail_task
 def delay_security_email(msg):
@@ -1114,9 +1115,8 @@ def log_user_in_with_cert():
                             logger.debug("Session exists")
                             if "user_id" in session.keys():
                                 logger.debug("User ID exists")
-                                user_id = AuthLinks.query.filter(
-                                    AuthLinks.provider_user_id == sha3_512(
-                                        request.headers["Tls-Client-Dn"])).first()
+                                hashed_dn = sha3_512(request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()
+                                user_id = AuthLinks.query.filter(AuthLinks.provider_user_id == hashed_dn).first()
 
                                 if user_id is not None:
                                     return redirect("/")
@@ -1124,7 +1124,7 @@ def log_user_in_with_cert():
                                 user_id = session["user_id"]
                                 new_link = AuthLinks(
                                     user_id=int(user_id),
-                                    provider_user_id=sha3_512(request.headers["Tls-Client-Dn"]),
+                                    provider_user_id=hashed_dn,
                                     provider="esteid"
                                 )
                                 try:
@@ -1148,7 +1148,7 @@ def log_user_in_with_cert():
                                 try:
                                     user_id = AuthLinks.query.filter(
                                         AuthLinks.provider_user_id == sha3_512(
-                                            request.headers["Tls-Client-Dn"])).first()
+                                            request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()).first()
                                     if user_id is not None:
                                         user_id = user_id.user_id
                                     else:
@@ -1180,7 +1180,7 @@ def log_user_in_with_cert():
                                 logger.debug("User ID doesn't exist")
                                 user_id = AuthLinks.query.filter(
                                     AuthLinks.provider_user_id == sha3_512(
-                                        request.headers["Tls-Client-Dn"])).first()
+                                        request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()).first()
                                 if user_id is not None:
                                     user_id = user_id.user_id
                                 else:
