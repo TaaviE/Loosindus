@@ -112,7 +112,7 @@ def send_security_email(message):
 def delay_security_email(msg):
     try:
         send_security_email.delay(
-            {"subject": msg.subject, "recipients": msg.receipients, "body": msg.body, "html": msg.html,
+            {"subject": msg.subject, "recipients": msg.recipients, "body": msg.body, "html": msg.html,
              "sender": msg.sender})
     except:
         sentry.captureException()
