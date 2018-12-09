@@ -15,7 +15,9 @@ app.config.from_object(Config)
 mail = Mail(app)
 db = SQLAlchemy(app)
 babel = Babel(app)
-celery = Celery()
+celery = Celery(app.import_name,
+                backend=Config.CELERY_RESULT_BACKEND,
+                broker=Config.CELERY_BROKER_URL)
 celery.conf.update(app.config)
 
 from raven.contrib.flask import Sentry
