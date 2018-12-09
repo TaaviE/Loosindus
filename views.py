@@ -103,7 +103,7 @@ def send_security_email(message):
         msg.sender = message["sender"]
         with app.app_context():
             mail.send(msg)
-    except:
+    except Exception:
         sentry.captureException()
 
 
@@ -661,7 +661,7 @@ def graph():
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
-    except Exception as e:
+    except Exception:
         sentry.captureException()
         return render_template("error.html",
                                message=_("Shuffling has not yet been done for your group!"),
@@ -713,7 +713,7 @@ def graph_json(graph_id, unhide):
             return dumps(people), 200, {"content-type": "application/json"}
         else:
             return "{}"
-    except Exception as e:
+    except Exception:
         sentry.captureException()
         return "{}"
 
@@ -835,7 +835,7 @@ def set_language():
             try:
                 user.language = request.form["language"]
                 db.session.commit()
-            except Exception as e:
+            except Exception:
                 sentry.captureException()
                 db.session.rollback()
                 return render_template("error.html",
