@@ -59,3 +59,6 @@ class Config(object):
     LOGLEVEL = logging.DEBUG
 
     BABEL_DEFAULT_LOCALE = "ee"  # TODO: You might want to change this to "en" if you want to default to English
+
+    CELERY_BROKER_URL = ""  # TODO: URL to your Celery broker
+    CELERY_RESULT_BACKEND = ""  # TODO: URL to your Celery result backend

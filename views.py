@@ -80,8 +80,7 @@ from models.user_group_admin_model import UserGroupAdmin
 
 main_page = Blueprint("main_page", __name__, template_folder="templates")
 
-from main import sentry
-
+from main import sentry, app
 from utility import *
 
 set_recursionlimit()
@@ -102,7 +101,8 @@ def send_security_email(message):
         msg.body = message["body"]
         msg.html = message["html"]
         msg.sender = message["sender"]
-        mail.send(msg)
+        with app.app_context():
+            mail.send(msg)
     except:
         sentry.captureException()
 
@@ -114,7 +114,7 @@ def delay_security_email(msg):
         send_security_email.delay(
             {"subject": msg.subject, "recipients": msg.recipients, "body": msg.body, "html": msg.html,
              "sender": msg.sender})
-    except:
+    except Exception:
         sentry.captureException()
 
 
@@ -249,11 +249,9 @@ def logout():
 def shuffle():
     user_id = session["user_id"]
     username = get_person_name(user_id)
-    info(username)
     gifter = get_person_id(username)
-    info(gifter)
     giftee = get_target_id(gifter)
-    info(giftee)
+    info("Username: %s, From: %d, To: %d", username, gifter, giftee)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
                            id=giftee)

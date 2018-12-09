@@ -7,6 +7,8 @@ Flask-WTF
 Flask-Babelex
 Flask-Dance
 bcrypt
+git+https://github.com/celery/celery.git
+git+https://github.com/celery/kombu.git
 sqlalchemy
 psycopg2 --no-binary psycopg2
 werkzeug
