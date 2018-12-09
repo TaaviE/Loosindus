@@ -94,9 +94,14 @@ from main import celery, security, mail
 
 
 # Send asynchronous email
-@celery.task
-def send_security_email(msg):
+@celery.task()
+def send_security_email(message):
     try:
+        msg = Message(message["subject"],
+                      message["recipients"])
+        msg.body = message["body"]
+        msg.html = message["html"]
+        msg.sender = message["sender"]
         mail.send(msg)
     except:
         sentry.captureException()
@@ -106,7 +111,9 @@ def send_security_email(msg):
 @security.send_mail_task
 def delay_security_email(msg):
     try:
-        send_security_email.delay(msg)
+        send_security_email.delay(
+            {"subject": msg.subject, "recipients": msg.receipients, "body": msg.body, "html": msg.html,
+             "sender": msg.sender})
     except:
         sentry.captureException()
 
@@ -186,7 +193,7 @@ def index():
     try:
         user = User.query.get(int(user_id))
         user.last_activity_at = datetime.datetime.now()
-        user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(' ')[-1]
+        user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(" ")[-1]
         db.session.commit()
     except Exception:
         sentry.captureException()
