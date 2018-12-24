@@ -857,8 +857,14 @@ def editfamily():
         if member.user_id == user_id:
             is_person = True
 
+        birthday = None
+        try:
+            birthday = str(User.query.filter(User.id == member.user_id).first().birthday.strftime("%d.%m"))
+        except Exception:
+            pass
+
         family.append(
-            (get_person_name(member.user_id), member.birthday, encrypt_id(member.user_id), is_admin, is_person))
+            (get_person_name(member.user_id), encrypt_id(member.user_id), is_admin, is_person, birthday))
 
     return render_template("editfam.html",
                            family=family,

@@ -18,6 +18,7 @@
             {% if admin %}
                 <th>ID</th>
             {% endif %}
+            <th>{{ _("Birthday") }}</th>
             <th>{{ _("Actions") }}</th>
             {% if admin %}
                 <th></th>
@@ -28,6 +29,12 @@
                 <td>{{ member[0] }}</td>
                 {% if admin %}
                     <td>{{ member[1] }}</td>
+                {% endif %}
+
+                {% if member[4] is not none %}
+                    <td>{{ member[4] }}</td>
+                {% else %}
+                    <td>{{ _("Unknown") }}</td>
                 {% endif %}
 
                 {% if not member[3] %}

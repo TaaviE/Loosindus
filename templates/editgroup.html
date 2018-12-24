@@ -25,15 +25,14 @@
                 {% for family in families %}
                     <tr>
                         <td>{{ family[0] }}</td>
-                        <td>{{ family[1] }}</td>
                         <td>
                             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="./editfam?id={{ family[2] }}">{{ _("Display") }}</a>
+                               href="./editfam?id={{ family[1] }}">{{ _("Display") }}</a>
                         </td>
-                        {% if family[3] %}
+                        {% if family[2] %}
                             <td>
                                 <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[2] }}">{{ _("Remove") }}</a>
+                                   href="./editfam?id={{ family[1] }}">{{ _("Remove") }}</a>
                             </td>
                         {% endif %}
                     </tr>
