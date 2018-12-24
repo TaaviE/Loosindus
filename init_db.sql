@@ -7,8 +7,6 @@ create table groups
 	description integer
 );
 
-
-
 create table families
 (
 	id serial not null
@@ -20,8 +18,6 @@ create table families
 			references groups,
 	creation timestamp default now() not null
 );
-
-
 
 create unique index families_id_uindex
 	on families (id);
@@ -37,8 +33,6 @@ create table names_genitive
 	genitive varchar(255) not null
 );
 
-alter table names_genitive owner to jolod;
-
 create unique index names_genitive_name_uindex
 	on names_genitive (name);
 
@@ -50,8 +44,6 @@ create table role
 	name varchar(80),
 	description varchar(255)
 );
-
-
 
 create unique index role_id_uindex
 	on role (id);
@@ -80,8 +72,6 @@ create table "user"
 	first_seen timestamp default now() not null
 );
 
-alter table "user" owner to jolod;
-
 create table roles_users
 (
 	id integer
@@ -92,8 +82,6 @@ create table roles_users
 			references role
 );
 
-alter table roles_users owner to jolod;
-
 create table shuffles
 (
 	giver integer not null
@@ -103,10 +91,21 @@ create table shuffles
 			references "user",
 	getter integer not null
 		constraint shuffles_getter_fkey
-			references "user"
+			references "user",
+	year timestamp not null,
+	"group" integer not null
+		constraint shuffles_groups_id_fk
+			references groups
 );
 
+create index shuffles_group_index
+	on shuffles ("group");
 
+create index shuffles_group_giver_index
+	on shuffles ("group", giver);
+
+create unique index shuffles_giver_group_getter_year_uindex
+	on shuffles (giver, "group", getter, year);
 
 create unique index user_email_uindex
 	on "user" (email);
@@ -114,7 +113,7 @@ create unique index user_email_uindex
 create unique index user_id_uindex
 	on "user" (id);
 
-create unique index user_username_uindex
+create index user_username_index
 	on "user" (username);
 
 create table users_families_admins
@@ -132,8 +131,6 @@ create table users_families_admins
 
 comment on table users_families_admins is 'Contains all user-family relationships and if the user is the admin of that family';
 
-alter table users_families_admins owner to jolod;
-
 create table users_groups_admins
 (
 	user_id integer not null
@@ -146,30 +143,6 @@ create table users_groups_admins
 			references groups,
 	admin boolean not null
 );
-
-alter table users_groups_admins owner to jolod;
-
-create table wishlist
-(
-	user_id serial not null
-		constraint wishlist_user_id_fkey
-			references "user",
-	notes json,
-	notes_purchased json,
-	bought boolean default false not null,
-	bought_by integer
-		constraint wishlist_bought_by_fkey
-			references "user",
-	note_id serial not null
-);
-
-
-
-create unique index wishlist_note_id_uindex
-	on wishlist (note_id);
-
-create unique index wishlist_user_id_uindex
-	on wishlist (user_id);
 
 create table wishlists
 (
@@ -186,8 +159,6 @@ create table wishlists
 			primary key
 );
 
-
-
 create unique index wishlists_note_id_uindex
 	on wishlists (id);
 
@@ -203,8 +174,6 @@ create table families_groups
 			references groups
 );
 
-alter table families_groups owner to jolod;
-
 create index families_groups_admins_family_id_index
 	on families_groups (family_id);
 
@@ -219,18 +188,26 @@ create table user_connection
 	user_id integer not null
 		constraint user_connection_user_id_fk
 			references "user",
-	provider_id varchar(255) not null,
 	provider_user_id varchar(255),
-	access_token varchar(255),
-	secret varchar(255),
-	display_name varchar(255),
-	profile_url varchar(512),
-	image_url varchar(512),
-	rank integer
+	created_at timestamp default now(),
+	token varchar(255),
+	provider varchar(255)
 );
-
-alter table user_connection owner to jolod;
 
 create unique index user_connection_id_uindex
 	on user_connection (id);
+
+create table reminders
+(
+	"group" integer not null
+		constraint reminders_pk
+			primary key
+		constraint reminders_groups_id_fk
+			references groups,
+	last_check timestamp default now() not null,
+	type varchar(4)
+);
+
+create index reminders_group_index
+	on reminders ("group");
 

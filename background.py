@@ -43,7 +43,7 @@ def remind_to_add(rate_limit=True):
 
 
 def remind_to_buy(rate_limit=True):
-    info(" Started sending purchase reminders")
+    info("Started sending purchase reminders")
     now = datetime.datetime.now()
     try:
         with open("remind_to_buy", "r+") as timer_file:
@@ -51,7 +51,7 @@ def remind_to_buy(rate_limit=True):
             lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
 
             if now - lastexec < datetime.timedelta(days=15):
-                info(" Buying reminders were rate-limited")
+                info("Buying reminders were rate-limited")
                 if rate_limit:
                     return
             else:

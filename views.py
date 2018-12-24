@@ -782,6 +782,48 @@ def settings():
                            back_link="/")
 
 
+@main_page.route("/error")
+def error_page():
+    message = _("Broken link")
+    title = _("Error")
+
+    try:
+        title = request.args["title"]
+        message = request.args["message"]
+    except Exception:
+        pass
+
+    return render_template("error.html",
+                           sentry_enabled=True,
+                           sentry_ask_feedback=True,
+                           sentry_event_id=g.sentry_event_id,
+                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                           message=message,
+                           title=title)
+
+
+@main_page.route("/success")
+def success_page():
+    message = _("Broken link")
+    title = _("Error")
+    action = ""
+    link = ""
+
+    try:
+        title = request.args["title"]
+        message = request.args["message"]
+        action = request.args["action"]
+        link = request.args["link"]
+    except Exception:
+        pass
+
+    return render_template("success.html",
+                           message=message,
+                           action=(action if action != "" else title),
+                           link="./" + link,
+                           title=title)
+
+
 @main_page.route("/editfam")
 @login_required
 def editfamily():
@@ -957,6 +999,7 @@ def regraph():
     family_id = get_family_id(user_id)
     family_obj = Family.query.get(family_id)
     family_group = family_obj.group
+    time_right_now = datetime.datetime.now()
 
     database_families = Family.query.filter(Family.group == family_group).all()
     database_all_families_with_members = []
@@ -993,10 +1036,10 @@ def regraph():
     for connection in Shuffle.query.filter(Shuffle.group == family_group).all():
         last_connections.add(connection.source, connection.target, Shuffle.year.year)
 
-    info(datetime.datetime.now().year, "is the year of Linux Desktop")
+    info(time_right_now.year, "is the year of Linux Desktop")
 
     santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
-    new_connections = santa.generate_connections(datetime.datetime.now().year)
+    new_connections = santa.generate_connections(time_right_now.year)
 
     shuffled_ids_str = {}
     for connection in new_connections:
@@ -1011,7 +1054,7 @@ def regraph():
         db_entry_shuffle = Shuffle(
             giver=giver,
             getter=getter,
-            year=datetime.datetime.now(),
+            year=time_right_now,
             group=family_group
         )
         try:
@@ -1090,13 +1133,7 @@ def log_user_in_with_cert():
                                     db.session.rollback()
                                     db.session.commit()
                                     sentry.captureException()
-                                    return render_template("error.html",
-                                                           sentry_enabled=True,
-                                                           sentAddedry_ask_feedback=True,
-                                                           sentry_event_id=g.sentry_event_id,
-                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                                                           message=_("Error!"),
-                                                           title=_("Error"))
+                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
                                 return redirect("/")
                             else:
                                 logger.debug("User ID doesn't exist")
@@ -1106,29 +1143,13 @@ def log_user_in_with_cert():
                                     if user_id is not None:
                                         user_id = user_id.user_id
                                     else:
-                                        return render_template("error.html",
-                                                               sentry_enabled=True,
-                                                               sentry_ask_feedback=True,
-                                                               sentry_event_id=g.sentry_event_id,
-                                                               sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                                                               message=_("Error!"),
-                                                               title=_("Error"))
+                                        return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
                                     login_user(User.query.get(user_id))
-                                    return render_template("success.html",
-                                                           message=_("Logged in"),
-                                                           action=_("Logged in"),
-                                                           link="./notes",
-                                                           title=_("Logged in"))
+                                    return
                                 except Exception:
                                     sentry.captureException()
                                     logger.debug("Error loging user in")
-                                    return render_template("error.html",
-                                                           sentry_enabled=True,
-                                                           sentry_ask_feedback=True,
-                                                           sentry_event_id=g.sentry_event_id,
-                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                                                           message=_("Error!"),
-                                                           title=_("Error"))
+                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
                         else:
                             try:
                                 logger.debug("User ID doesn't exist")
@@ -1138,34 +1159,13 @@ def log_user_in_with_cert():
                                     user_id = user_id.user_id
                                 else:
                                     logger.debug("User with the link doesn't exist")
-                                    return render_template("error.html",
-                                                           sentry_enabled=True,
-                                                           sentry_ask_feedback=True,
-                                                           sentry_event_id=g.sentry_event_id,
-                                                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                                                           message=_("Error!"),
-                                                           title=_("Error"))
+                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
                                 login_user(User.query.get(user_id))
-                                return render_template("success.html",
-                                                       message=_("Added!"),
-                                                       action=_("Added"),
-                                                       link="./notes",
-                                                       title=_("Added"))
+                                return redirect("/success.html?" + "message=" + _("Added!") + "&action=" + _(
+                                    "Added") + "&link=" + "notes" + "&title=" + _("Added"))
                             except Exception:
                                 logger.debug("Exception when trying to log user in")
                                 sentry.captureException()
-                                return render_template("error.html",
-                                                       sentry_enabled=True,
-                                                       sentry_ask_feedback=True,
-                                                       sentry_event_id=g.sentry_event_id,
-                                                       sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                                                       message=_("Error!"),
-                                                       title=_("Error"))
+                                return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
     logger.debug("Check failed")
-    return render_template("error.html",
-                           sentry_enabled=True,
-                           sentry_ask_feedback=True,
-                           sentry_event_id=g.sentry_event_id,
-                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                           message=_("Error!"),
-                           title=_("Error"))
+    return redirect("error?message=" + _("Error!") + "&title=" + _("Error"))
