@@ -2,21 +2,21 @@ import collections
 import random
 
 
-class SecretSanta:
+class SecretSantaGraph:
     def __init__(self, families_to_members, members_to_families, old_connections):
         self.members_to_families = members_to_families
         self.families_to_members = families_to_members
-        self.oldConnections = old_connections
+        self.old_connections = old_connections
 
     def connection_is_valid(self, conn, connections):
         source_fam = self.members_to_families[conn.source]
         target_fam = self.members_to_families[conn.target]
 
         return (source_fam != target_fam
-                and not self.oldConnections.has(
+                and not self.old_connections.has(
                     conn.source,
                     conn.target)
-                and not self.oldConnections.has(
+                and not self.old_connections.has(
                     conn.target,
                     conn.source)
                 and not conn.reverse() in connections)
@@ -27,16 +27,16 @@ class SecretSanta:
                           target_queue,
                           year):
 
-        s = len(source_queue) - 1
-        t = len(target_queue) - 1
+        source = len(source_queue) - 1
+        destination = len(target_queue) - 1
 
         change_sources = True
 
-        while s >= 0 and t >= 0:
-            source = source_queue[s]
-            target = target_queue[t]
+        while source >= 0 and destination >= 0:
+            source = source_queue[source]
+            target = target_queue[destination]
 
-            conn = self.oldConnections.make_weighted_conn(
+            conn = self.old_connections.make_weighted_conn(
                 source,
                 target,
                 year
@@ -44,22 +44,22 @@ class SecretSanta:
 
             if self.connection_is_valid(conn, connections):
 
-                if s < len(source_queue) - 1:
-                    source_queue[s] = source_queue.pop()
+                if source < len(source_queue) - 1:
+                    source_queue[source] = source_queue.pop()
                 else:
                     source_queue.pop()
 
-                if t < len(target_queue) - 1:
-                    target_queue[t] = target_queue.pop()
+                if destination < len(target_queue) - 1:
+                    target_queue[destination] = target_queue.pop()
                 else:
                     target_queue.pop()
 
                 return conn
 
             if change_sources:
-                s -= 1
+                source -= 1
             else:
-                t -= 1
+                destination -= 1
 
             change_sources = not change_sources
 
@@ -79,7 +79,6 @@ class SecretSanta:
         matched_targets = set()
 
         while len(source_queue) > 0 and len(target_queue) > 0:
-
             # Attempt to generate random connection
             # using unmatched nodes from queues
             conn = self.random_connection(connections,

@@ -1,3 +1,3 @@
-import secretsanta.Connection as Connection
-import secretsanta.ConnectionGraph as ConnectionGraph
-import secretsanta.secretsanta as secretsanta
+import secretsanta.connection as Connection
+import secretsanta.connectiongraph as ConnectionGraph
+import secretsanta.secretsantagraph as secretsanta

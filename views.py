@@ -24,7 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # * 
 #
 # Known flaws:
-# * SecretSanta can't match less than two people or people from less than one family
+# * SecretSantaGraph can't match less than two people or people from less than one family
 ####
 
 from logging import getLogger
@@ -75,7 +75,7 @@ from main import db
 from models.users_model import AuthLinks
 from models.wishlist_model import NoteState
 from models.family_model import Family
-from models.groups_model import Groups
+from models.groups_model import Group
 from models.user_group_admin_model import UserGroupAdmin
 
 main_page = Blueprint("main_page", __name__, template_folder="templates")
@@ -744,7 +744,7 @@ def settings():
         family = Family.query.get(family_relationship.family_id)
         user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
         is_in_family = True
-        db_groups_user_has_conn += (Groups.query.filter(Family.group == family.group).all())
+        db_groups_user_has_conn += (Group.query.filter(Family.group == family.group).all())
 
     user_groups = {}
     for group_relationship in db_groups_user_has_conn:
@@ -920,21 +920,6 @@ def editgroup_with_action():
     return None
 
 
-@main_page.route("/secretgraph")
-@login_required
-def secretgraph():
-    check = check_if_admin()
-    if check is not None:
-        return check
-
-    request_id = str(request.args["id"])
-
-    return render_template("graph.html",
-                           id=str(get_person_name(session["user_id"])),
-                           image="s" + request_id + ".png",
-                           title=_("Secret graph"))
-
-
 def check_if_admin():
     user_id = session["user_id"]
     requester = get_person_name(user_id)
@@ -990,45 +975,6 @@ def regraph():
 
     families_shuf_nam = {}
     families_shuf_ids = {}
-    #    logger.info("Starting finding matches")
-    """""
-    # This comment block contains self-written algorithm that isn't as robust 
-    # as the library's solution thus this is not used for now
-    
-    families_give_copy = copy.deepcopy(families)  # Does the person need to give a gift
-    for family_index, family_members in enumerate(families_give_copy):
-        for person in family_members:
-            families_give_copy[family_index][person] = True
-
-    families_take_copy = copy.deepcopy(families)  # Does the person need to take a gift
-    for family_index, family_members in enumerate(families_take_copy):
-        for person in family_members:
-            families_take_copy[family_index][person] = True
-    
-    for index, family in enumerate(families_list_copy):  # For each family among every family
-        for person in family:  # For each person in given family
-            if families_give_copy[index][person] == True:  # If person needs to gift
-                #                print("Looking for a match for:", person, get_person_id(person))
-                familynumbers = list(range(0, index))
-                familynumbers.extend(range(index + 1, len(family) - 1))
-                
-                random.shuffle(familynumbers)
-                for number in familynumbers:
-                    receiving_family_index = number
-                    receiving_family = families_take_copy[number]  # For each receiving family
-                    #                    print("Looking at other members_to_families:", receiving_family)
-
-                    for receiving_person in receiving_family:  # For each person in other family
-                        if families_take_copy[receiving_family_index][receiving_person] == True and \
-                                families_give_copy[index][person] == True:  # If person needs to receive
-                            families_take_copy[receiving_family_index][receiving_person] = False  
-                            #print("Receiving:", receiving_family_index, receiving_person)
-                            families_give_copy[index][person] = False  # ; print("Giving:", index, person)
-                            families_shuf_nam[person] = receiving_person
-                            families_shuf_ids[get_person_id(person)] = get_person_id(receiving_person)
-                            #                             print("Breaking")
-                            break
-    """""
 
     members_to_families = {}
     for family_id, family_members in enumerate(families):
@@ -1042,13 +988,15 @@ def regraph():
             currentset = families_to_members[family_id]
             currentset.update([person_id])
 
-    last_connections = secretsanta.ConnectionGraph.ConnectionGraph(members_to_families, families_to_members)
-    # connections.add(source, target, year)
-    current_year = datetime.datetime.now().year
-    info(current_year, "is the year of Linux Desktop")
+    last_connections = secretsanta.connectiongraph.ConnectionGraph(members_to_families, families_to_members)
 
-    santa = secretsanta.secretsanta.SecretSanta(families_to_members, members_to_families, last_connections)
-    new_connections = santa.generate_connections(current_year)
+    for connection in Shuffle.query.filter(Shuffle.group == family_group).all():
+        last_connections.add(connection.source, connection.target, Shuffle.year.year)
+
+    info(datetime.datetime.now().year, "is the year of Linux Desktop")
+
+    santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
+    new_connections = santa.generate_connections(datetime.datetime.now().year)
 
     shuffled_ids_str = {}
     for connection in new_connections:
@@ -1063,6 +1011,8 @@ def regraph():
         db_entry_shuffle = Shuffle(
             giver=giver,
             getter=getter,
+            year=datetime.datetime.now(),
+            group=family_group
         )
         try:
             db.session.add(db_entry_shuffle)

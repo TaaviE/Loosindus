@@ -1,5 +1,5 @@
 """
-Contains all the models used in SecretSanta
+Contains all the models used in SecretSantaGraph
 """
 import models.familiy_user_admin_model
 import models.family_model

@@ -1,7 +1,7 @@
 from main import db
 
 
-class Groups(db.Model):
+class Group(db.Model):
     """
     Specifies how groups are modeled in the database
 

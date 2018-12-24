@@ -1,4 +1,4 @@
-import secretsanta.Connection as SantaConnection
+import secretsanta.connection as SantaConnection
 
 
 class ConnectionGraph:

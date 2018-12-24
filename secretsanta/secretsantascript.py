@@ -1,10 +1,10 @@
 # coding=utf-8
-# Small python script to show how the graphing algorith works
+# Small python script to show how the graphing algorithm works
 import datetime as dt
 import sys
 
 import secretsanta
-import secretsanta.secretsanta as ss
+import secretsanta.secretsantagraph as ss
 
 # CSV column mappings 
 FAM_MEMBER_COL = 0
@@ -40,10 +40,10 @@ def load_family_members(csv_path):
 
 def load_connections(csv_path, families, members):
     with open(csv_path, "r") as file:
-        connections = secretsanta.ConnectionGraph.ConnectionGraph(families, members)
+        connections = secretsanta.connectiongraph.ConnectionGraph(families, members)
 
         for line in file:
-            data = line.strip().split(',')
+            data = line.strip().split(",")
             source = data[CONN_SOURCE_COL]
             target = data[CONN_TARGET_COL]
             year = data[CONN_YEAR_COL]
@@ -83,7 +83,7 @@ def main():
                                        families_to_members,
                                        members_to_families)
 
-    santa = ss.SecretSanta(families_to_members, members_to_families, old_connections)
+    santa = ss.SecretSantaGraph(families_to_members, members_to_families, old_connections)
 
     new_connections = santa.generate_connections(conn_year)
 
