@@ -112,8 +112,12 @@ def send_security_email(message):
 def delay_security_email(msg):
     try:
         send_security_email.delay(
-            {"subject": msg.subject, "recipients": msg.recipients, "body": msg.body, "html": msg.html,
-             "sender": msg.sender})
+            {"subject": msg.subject,
+             "recipients": msg.recipients,
+             "body": msg.body,
+             "html": msg.html,
+             "sender": msg.sender}
+        )
     except Exception:
         sentry.captureException()
 
@@ -251,7 +255,7 @@ def shuffle():
     username = get_person_name(user_id)
     gifter = get_person_id(username)
     giftee = get_target_id(gifter)
-    info("Username: %s, From: %d, To: %d", username, gifter, giftee)
+    logger.info("Username: {}, From: {}, To: {}", username, gifter, giftee)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
                            id=giftee)
@@ -297,8 +301,8 @@ def createnote_add():
     logger.info("Got a post request to add a note")
     user_id = session["user_id"]
     username = get_person_name(user_id)
-    logger.info("Found user:", username)
-    logger.info("Found user id:", user_id)
+    logger.info("Found user: {}", username)
+    logger.info("Found user id: {}", user_id)
     currentnotes = {}
     addednote = request.form["note"]
 
@@ -311,9 +315,9 @@ def createnote_add():
                                message=_("Santa can't bring you nothin', ") + username + "!",
                                title=_("Error"))
 
-    logger.info("Trying to add a note:", addednote)
+    logger.info("Trying to add a note: {}", addednote)
     try:
-        logger.info("Opening file", user_id)
+        logger.info("Opening file: {}", user_id)
         #    with open("./notes/" + useridno, "r") as file:
         #        currentnotes = json.load(file)
         db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
@@ -359,7 +363,7 @@ def editnote():
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
 
-        info(user_id, "is trying to remove a note", request_id)
+        logger.info("{} is trying to remove a note {}", user_id, request_id)
     except Exception:
         if not Config.DEBUG:
             sentry.captureException()
@@ -368,7 +372,7 @@ def editnote():
                                title=_("Error"))
 
     try:
-        info(user_id, " is editing notes of ", request_id)
+        logger.info("{} is editing notes of {}", user_id, request_id)
         db_note = Wishlist.query.get(request_id)
     except Exception as e:
         if not Config.DEBUG:
@@ -387,7 +391,7 @@ def editnote_edit():
     logger.info("Got a post request to edit a note by")
     user_id = session["user_id"]
     # username = get_person_name(user_id)
-    logger.info(" user id:", user_id)
+    logger.info(" user id: {}", user_id)
 
     addednote = request.form["note"]
     try:
@@ -429,7 +433,7 @@ def deletenote():
         request_id = request.args["id"]
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
-        info(user_id, " is trying to remove a note", request_id)
+        logger.info("{} is trying to remove a note {}", user_id, request_id)
     except Exception:
         if not Config.DEBUG:
             sentry.captureException()
@@ -450,7 +454,7 @@ def deletenote():
     #    with open("./notes/" + useridno, "w") as file:
     #        file.write(json.dumps(currentnotes))
 
-    logger.info("Removed", username, "note with ID", request_id)
+    logger.info("Removed {} note with ID {}", username, request_id)
     return render_template("success.html",
                            action=_("Removed"),
                            link="./notes",
@@ -488,7 +492,7 @@ def updatenotestatus():
         if not Config.DEBUG:
             sentry.captureException()
         else:
-            logger.info("Failed toggling:", e)
+            logger.info("Failed toggling: {}", e)
         return render_template("error.html",
                                message=_("Could not edit"),
                                title=_("Error"),
@@ -535,7 +539,7 @@ def giftingto():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception as e:
-        logger.info("Failed decrypting or missing:", e)
+        logger.info("Failed decrypting or missing: {}", e)
         request_id = get_target_id(user_id)
 
     try:  # Yeah, only valid IDs please
@@ -581,7 +585,7 @@ def giftingto():
     currentnotes = {}
 
     try:
-        info(user_id, "is opening file:", request_id)
+        logger.info("{} is opening file: {}", user_id, request_id)
         db_notes = Wishlist.query.filter(Wishlist.user_id == request_id).all()
         if len(db_notes) <= 0:
             raise Exception
@@ -626,7 +630,7 @@ def giftingto():
     except Exception as e:
         currentnotes = {_("Right now there isn't anything on the list"): (-1, -1, False, "")}
         invalid_notes = True
-        logger.info("Error displaying notes, there might be none:", e)
+        logger.info("Error displaying notes, there might be none: {}", e)
 
     return render_template("show_notes.html",
                            notes=currentnotes,
@@ -1043,7 +1047,7 @@ def regraph():
     for connection in Shuffle.query.filter(Shuffle.group == family_group).all():
         last_connections.add(connection.source, connection.target, Shuffle.year.year)
 
-    info(time_right_now.year, "is the year of Linux Desktop")
+    logger.info("{} is the year of Linux Desktop", time_right_now.year)
 
     santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
     new_connections = santa.generate_connections(time_right_now.year)
@@ -1054,8 +1058,8 @@ def regraph():
         families_shuf_nam[get_person_name(connection.source)] = get_person_name(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
-        #    info( shuffled_names)
-        #    info( shuffled_ids)
+        #    logger.info( shuffled_names)
+        #    logger.info( shuffled_ids)
 
     for giver, getter in families_shuf_ids.items():  # TODO: Add date
         db_entry_shuffle = Shuffle(
@@ -1084,7 +1088,7 @@ def regraph():
 def test_mail():
     from main import mail
     with mail.connect() as conn:
-        info(conn.configure_host().vrfy)
+        logger.info("Mail verify: {}", conn.configure_host().vrfy)
         msg = Message(recipients=["root@localhost"],
                       body="test",
                       subject="test2")

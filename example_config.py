@@ -17,10 +17,12 @@ class Config(object):
                          "id",
                          "email"]
 
-    AES_KEY = b"yFrstBQ&iKi1OwugdJ?EnIfPWundVBPO"
+    AES_KEY = b""  # TODO: Update AES key
     SECRET_KEY = ""  # TODO: Update secret key info
+
     SQLALCHEMY_DATABASE_URI = ""  # TODO: Add database URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     MAIL_SERVER = "localhost"
     MAIL_PORT = 25
     MAIL_USE_SSL = False
@@ -62,3 +64,6 @@ class Config(object):
 
     CELERY_BROKER_URL = ""  # TODO: URL to your Celery broker
     CELERY_RESULT_BACKEND = ""  # TODO: URL to your Celery result backend
+
+    DATA_AD_CLIENT = "ca-pub-asdfghjklmnopqrstuvxy"  # TODO: Update AD client field value
+    DATA_AD_SLOT = "1234567890"  # TODO: Update AD slot field value

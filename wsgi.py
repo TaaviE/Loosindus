@@ -17,5 +17,5 @@ if __name__ == "__main__":
         logger.info("Starting in debug!")
         app.run(debug=True, use_evalex=True, host="0.0.0.0", port=5000)
     else:
-        logger.info("Starting in production.")
+        logger.info("Starting in production")
         app.run(debug=True, use_evalex=False, host="127.0.0.1")

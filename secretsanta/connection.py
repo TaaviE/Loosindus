@@ -6,10 +6,10 @@ class Connection:
         self.weight = weight
 
     def __str__(self):
-        return "{}|{}|{}|{}".format(self.source,
-                                    self.target,
-                                    self.year,
-                                    self.weight)
+        return " From: {}, To: {}, Year: {}, Weight: {}".format(self.source,
+                                                                self.target,
+                                                                self.year,
+                                                                self.weight)
 
     def __repr__(self):
         return self.__str__()
