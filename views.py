@@ -857,7 +857,8 @@ def editfamily():
         if member.user_id == user_id:
             is_person = True
 
-        family.append((get_person_name(member.user_id), encrypt_id(member.user_id), is_admin, is_person))
+        family.append(
+            (get_person_name(member.user_id), member.birthday, encrypt_id(member.user_id), is_admin, is_person))
 
     return render_template("editfam.html",
                            family=family,
