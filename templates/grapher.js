@@ -4,7 +4,7 @@ let width = parseInt(computedsvgelementstyle.width.match(/\d+/));
 let height = parseInt(computedsvgelementstyle.height.match(/\d+/)) + 100;
 let color = d3.scaleOrdinal(d3.schemeCategory10);
 
-d3.json("graph/{{ graph_id }}{{ unhide }}").then(function (graph) {
+d3.json("graph/{{ graph_id }}/{{ unhide }}").then(function (graph) {
     let label = {
         'nodes': [],
         'links': []
