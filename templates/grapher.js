@@ -1,13 +1,13 @@
 let svgelement = document.getElementById("viz");
 let computedsvgelementstyle = getComputedStyle(svgelement);
-let width = parseInt(computedsvgelementstyle.width.match(/\d+/));
-let height = parseInt(computedsvgelementstyle.height.match(/\d+/)) + 100;
+let width = parseInt(computedsvgelementstyle.width.match(/\d+/), 10);
+let height = parseInt(computedsvgelementstyle.height.match(/\d+/), 10) + 100;
 let color = d3.scaleOrdinal(d3.schemeCategory10);
 
 d3.json("graph/{{ graph_id }}/{{ unhide }}").then(function (graph) {
     let label = {
-        'nodes': [],
-        'links': []
+        "nodes": [],
+        "links": []
     };
     graph.nodes.forEach(function (d, i) {
         label.nodes.push({node: d});
@@ -38,7 +38,7 @@ d3.json("graph/{{ graph_id }}/{{ unhide }}").then(function (graph) {
     });
 
     function neigh(a, b) {
-        return a == b || adjlist[a + "-" + b];
+        return a === b || adjlist[a + "-" + b];
     }
 
     let svg = d3.select("#viz").attr("width", width).attr("height", height);
@@ -99,7 +99,7 @@ d3.json("graph/{{ graph_id }}/{{ unhide }}").then(function (graph) {
         .enter()
         .append("text")
         .text(function (d, i) {
-            return i % 2 == 0 ? "" : d.node.id;
+            return i % 2 === 0 ? "" : d.node.id;
         })
         .style("fill", "#555")
         .style("font-family", "Arial")
@@ -159,18 +159,21 @@ d3.json("graph/{{ graph_id }}/{{ unhide }}").then(function (graph) {
             return fixna(d.source.x);
         })
             .attr("y1", function (d) {
+                // noinspection JSSuspiciousNameCombination
                 return fixna(d.source.y);
             })
             .attr("x2", function (d) {
                 return fixna(d.target.x);
             })
             .attr("y2", function (d) {
+                // noinspection JSSuspiciousNameCombination
                 return fixna(d.target.y);
             });
     }
 
     function updateNode(node) {
         node.attr("transform", function (d) {
+            // noinspection JSSuspiciousNameCombination
             return "translate(" + fixna(d.x) + "," + fixna(d.y) + ")";
         });
     }
