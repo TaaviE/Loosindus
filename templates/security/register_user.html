@@ -4,23 +4,25 @@
 {% block title %}{{ _("Register") }}{% endblock %}
 
 {% block content %}
-    <h1>{{ _("Register") }}</h1>
-    {% include "security/_messages.html" %}
+    <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-color-text--grey-600 mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <h1>{{ _("Register") }}</h1>
+        {% include "security/_messages.html" %}
 
-    <form action="{{ url_for_security("register") }}" method="POST" name="register_user_form">
-        <table>
-            {{ register_user_form.hidden_tag() }}
-            {{ render_field_with_errors(register_user_form.username) }}
-            {{ render_field_with_errors(register_user_form.email) }}
-            {{ render_field_with_errors(register_user_form.password) }}
-            {% if register_user_form.password_confirm %}
-                {{ render_field_with_errors(register_user_form.password_confirm) }}
-            {% endif %}
-            {{ render_field_with_errors(register_user_form.recaptcha) }}
-            {{ render_field(register_user_form.submit) }}
-        </table>
-    </form>
-    {% include "security/_menu.html" %}
+        <form action="{{ url_for_security("register") }}" method="POST" name="register_user_form">
+            <table>
+                {{ register_user_form.hidden_tag() }}
+                {{ render_field_with_errors(register_user_form.username) }}
+                {{ render_field_with_errors(register_user_form.email) }}
+                {{ render_field_with_errors(register_user_form.password) }}
+                {% if register_user_form.password_confirm %}
+                    {{ render_field_with_errors(register_user_form.password_confirm) }}
+                {% endif %}
+                {{ render_field_with_errors(register_user_form.recaptcha) }}
+                {{ render_field(register_user_form.submit) }}
+            </table>
+        </form>
+        {% include "security/_menu.html" %}
+    </div>
 {% endblock %}
 
 {% block description %}{{ _("Register page") }}{% endblock %}

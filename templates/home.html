@@ -7,18 +7,16 @@
 {% endblock %}
 
 {% block content %}
-    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <p class="center">{{ _("Selle lehe puhul on tegu väga lihtsa lehega enda jõulunimekirja koostamise jaoks, selle
+    <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-color-text--grey-600 mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+        <p class="center">{{ _("Selle lehe puhul on tegu väga lihtsa lehega enda jõulunimekirja koostamise jaoks, selle
                 enda
                 \"jõuluvanaga\"
                 jagamiseks 🎅, nimede loosimise korraldamise jaoks. Töötab hästi nii mobiilil kui arvutil! Katsetamiseks
                 registreeru (või logi sisse).") }}</p>
-            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               href="./login">{{ _("Log in") }}</a>
-            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               href="./register">{{ _("Register") }}</a>
-        </div>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+           href="./login">{{ _("Log in") }}</a>
+        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+           href="./register">{{ _("Register") }}</a>
     </div>
 {% endblock %}
