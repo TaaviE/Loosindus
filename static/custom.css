@@ -17,3 +17,8 @@
 .custom_large_text {
     font-size: 200%;
 }
+
+.adsbygoogle {
+    display: block;
+    text-align: center;
+}

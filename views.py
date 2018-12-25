@@ -731,6 +731,28 @@ def graph_js(graph_id, unhide):
            {"content-type": "application/javascript"}
 
 
+@main_page.route("/custom.js")
+@login_required
+def custom_js():
+    sentry_feedback = False
+    sentry_event_id = ""
+    sentry_public_dns = ""
+
+    if "sentry_event_id" in request.args.keys():
+        sentry_feedback = True
+        sentry_event_id = request.args["sentry_event_id"]
+        sentry_public_dns = request.args["sentry_public_dsn"]
+
+    return render_template("custom.js",
+                           sentry_feedback=sentry_feedback,
+                           user_id=int(session["user_id"]),
+                           sentry_event_id=sentry_event_id,
+                           sentry_public_dsn=sentry_public_dns,
+                           ), \
+           200, \
+           {"content-type": "application/javascript"}
+
+
 @main_page.route("/settings")
 @login_required
 def settings():
