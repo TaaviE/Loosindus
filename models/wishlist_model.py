@@ -1,11 +1,7 @@
 from enum import Enum
 
-from config import Config
+from flask_babelex import gettext as _
 
-if Config.DEBUG:
-    from flask_babel import gettext as _
-else:
-    from flask_babelex import gettext as _
 from main import db
 
 # To make sure these strings get translated
@@ -13,20 +9,23 @@ unclaimed = _("Unclaimed")
 reserved = _("Reserved")
 purchased = _("Purchased")
 modified = _("Modified")
+archived = _("Archived")
 
 
 class NoteState(Enum):
     """
     Describes all the possible states of a wishlist item
     """
-    DEFAULT = {"id": -1, "description": "Unclaimed", "color": "#4CAF50"}
+    DEFAULT = {"id": -1, "description": _("Unclaimed"), "color": "#4CAF50"}
     """Default state"""
-    PLANNING_TO_PURCHASE = {"id": 0, "description": "Reserved", "color": "#FFEB3B"}
+    PLANNING_TO_PURCHASE = {"id": 0, "description": _("Reserved"), "color": "#FFEB3B"}
     """Plans to purchase"""
-    PURCHASED = {"id": 2, "description": "Purchased", "color": "#F44336"}
+    PURCHASED = {"id": 2, "description": _("Purchased"), "color": "#F44336"}
     """Purchased"""
-    MODIFIED = {"id": 3, "description": "Modified", "color": "#4CAF50"}
+    MODIFIED = {"id": 3, "description": _("Modified"), "color": "#4CAF50"}
     """Modified"""
+    ARCHIVED = {"id": 4, "description": _("Archived"), "color": "#4CAF50"}
+    """Archived"""
 
 
 class Wishlist(db.Model):
