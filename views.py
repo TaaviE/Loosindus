@@ -652,7 +652,7 @@ def graph():
         family_group = family_obj.group
         if "unhide" in request.args.keys():  # Make prettier
             if request.args["unhide"] in "True":
-                unhide = "/True"
+                unhide = "True"
                 user_number = _("or with your own name")
             else:
                 unhide = ""
