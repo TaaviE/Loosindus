@@ -1,3 +1,4 @@
+{% if no_ads != true %}
 try {
     (adsbygoogle = window.adsbygoogle || []).push({});
 } catch (e) {
@@ -14,6 +15,7 @@ window.onload = function () {
         console.log(e);
     }
 };
+{% endif %}
 
 {% if sentry_feedback %}
 try {
@@ -26,6 +28,7 @@ try {
 }
 {% endif %}
 
+{% if no_tracking != true %}
 try {
     gtag("set",
         {"user_id": "{{ user_id }}"}
@@ -33,3 +36,4 @@ try {
 } catch (e) {
     console.log(e);
 }
+{% endif %}

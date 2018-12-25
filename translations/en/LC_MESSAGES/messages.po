@@ -269,12 +269,12 @@ msgid ""
 " hästi nii mobiilil kui arvutil! Katsetamiseks\n"
 "                registreeru (või logi sisse)."
 msgstr ""
-"This website tries to make handling everything Secret Santa related "
-"as easy as possible. Creating shuffles, wishlists and sharing them "
-"with each other has never been this easy (if you actually know of a "
-"service that makes it easier, let me know).\n"
-"Sign up or log in to test it out, you may need more than one user "
-"to test out full functionality"
+"This website tries to make handling everything Secret Santa related as "
+"easy as possible. Creating shuffles, wishlists and sharing them with each "
+"other has never been this easy (if you actually know of a service that "
+"makes it easier, let me know).\n"
+"Sign up or log in to test it out, you may need more than one user to test "
+"out full functionality"
 
 #: templates/home.html:19 templates/security/_menu.html:6
 #: templates/security/email/login_instructions.html:5

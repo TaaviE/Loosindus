@@ -305,8 +305,8 @@ msgstr "Saaja soovinimekiri"
 #: templates/index.html:28
 msgid "This web service is in Beta testing, please report any errors you see"
 msgstr ""
-"See veebiteenus on beetatestimises, palun teavita kõikidest vigadest mida "
-"kohtate"
+"See veebiteenus on beetatestimises, palun teavita kõikidest vigadest mida"
+" kohtate"
 
 #: templates/notes.html:7
 msgid ""
@@ -506,8 +506,8 @@ msgid ""
 "If your email client doesn't display links properly then copy-paste the "
 "link into your browser's address bar: "
 msgstr ""
-"Kui teie emailiklient ei kuva linke õigesti siis kopeerige ja kleepige allpool"
-"asuv link enda brauseri aadressiribale: "
+"Kui teie emailiklient ei kuva linke õigesti siis kopeerige ja kleepige "
+"allpool asuv link enda brauseri aadressiribale: "
 
 #: templates/security/email/reset_instructions.txt:1
 msgid "Click the link below to reset your password:"

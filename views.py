@@ -661,7 +661,7 @@ def graph():
             unhide = ""
             user_number = str(user_id)
         return render_template("graph.html",
-                               id=get_christmasy_emoji(user_number),
+                               id=get_christmasy_emoji(user_id),
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
