@@ -65,5 +65,6 @@ class Config(object):
     CELERY_BROKER_URL = ""  # TODO: URL to your Celery broker
     CELERY_RESULT_BACKEND = ""  # TODO: URL to your Celery result backend
 
+    GOOGLE_ADS = False  # TODO: If you want to display unintrusive ads CONFIGURE BELOW
     DATA_AD_CLIENT = "ca-pub-asdfghjklmnopqrstuvxy"  # TODO: Update AD client field value
     DATA_AD_SLOT = "1234567890"  # TODO: Update AD slot field value
