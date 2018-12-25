@@ -656,12 +656,12 @@ def graph():
                 user_number = _("or with your own name")
             else:
                 unhide = ""
-                user_number = str(user_id)
+                user_number = get_christmasy_emoji(user_id)
         else:
             unhide = ""
-            user_number = str(user_id)
+            user_number = get_christmasy_emoji(user_id)
         return render_template("graph.html",
-                               id=get_christmasy_emoji(user_id),
+                               id=user_number,
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
