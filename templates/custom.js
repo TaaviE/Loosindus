@@ -15,8 +15,7 @@ window.onload = function () {
     }
 };
 
-{%
-    if sentry_feedback %}
+{% if sentry_feedback %}
 try {
     Raven.showReportDialog({
         eventId: "{{ sentry_event_id }}",
@@ -25,9 +24,7 @@ try {
 } catch (e) {
     console.log(e);
 }
-{%
-    endif %
-}
+{% endif %}
 
 try {
     gtag("set",
