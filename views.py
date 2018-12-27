@@ -226,20 +226,7 @@ def home():
 
 @main_page.route("/contact")
 def contact():
-    return render_template("contact.html",
-                           no_sidebar=True)
-
-
-@main_page.route("/robots.txt")
-def robots():
-    return send_from_directory("./static",
-                               "robots.txt")
-
-
-@main_page.route("/sitemap.xml")
-def sitemap():
-    return send_from_directory("./static",
-                               "sitemap.xml")
+    return render_template("contact.html", no_sidebar=True)
 
 
 @main_page.route("/logout")
