@@ -68,3 +68,5 @@ class Config(object):
     GOOGLE_ADS = False  # TODO: If you want to display unintrusive ads CONFIGURE BELOW
     DATA_AD_CLIENT = "ca-pub-asdfghjklmnopqrstuvxy"  # TODO: Update AD client field value
     DATA_AD_SLOT = "1234567890"  # TODO: Update AD slot field value
+
+    GAUA = "UA-1234314234-2"  # TODO: Google Analytics User ID

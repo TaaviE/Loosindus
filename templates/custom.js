@@ -30,6 +30,15 @@ try {
 
 {% if no_tracking != true %}
 try {
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+    gtag("set", "anonymizeIp", true);
+    gtag("config", "{{ config.GAUA}}");
     gtag("set",
         {"user_id": "{{ user_id }}"}
     );
