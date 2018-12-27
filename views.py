@@ -1139,6 +1139,8 @@ def api_login():
             login_user(user)
         else:
             return "{\"error\": \"error\"}"
+
+        return redirect("/")
     except Exception:
         sentry.captureException()
         info("Api login failed for user {}", username)
