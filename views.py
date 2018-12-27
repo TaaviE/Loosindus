@@ -1147,6 +1147,11 @@ def api_login():
         return "{\"error\": \"error\"}"
 
 
+@main_page.route("/ads.txt", methods=["GET"])
+def ads_txt():
+    return render_template("ads.txt")
+
+
 @main_page.route("/clientcert")
 def log_user_in_with_cert():
     """
