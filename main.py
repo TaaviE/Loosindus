@@ -7,7 +7,8 @@ from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
-from forms import ExtendedConfirmationForm, ExtendedForgotPasswordForm, ExtendedRegisterForm, ExtendedResetForm
+from forms import ExtendedConfirmationForm, ExtendedForgotPasswordForm, ExtendedRegisterForm, ExtendedResetForm, \
+    ExtendedLoginForm
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -36,7 +37,8 @@ security = Security(app, user_datastore,
                     confirm_register_form=ExtendedRegisterForm,
                     reset_password_form=ExtendedResetForm,
                     send_confirmation_form=ExtendedConfirmationForm,
-                    forgot_password_form=ExtendedForgotPasswordForm)
+                    forgot_password_form=ExtendedForgotPasswordForm,
+                    login_form=ExtendedLoginForm)
 
 from views import main_page
 
