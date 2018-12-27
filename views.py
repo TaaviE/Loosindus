@@ -1149,7 +1149,17 @@ def api_login():
 
 @main_page.route("/ads.txt", methods=["GET"])
 def ads_txt():
-    return render_template("ads.txt")
+    return render_template("ads.txt"), {"content-type": "text/plain"}
+
+
+@main_page.route("/sitemap.xml", methods=["GET"])
+def sitemap():
+    return render_template("sitemap.xml")
+
+
+@main_page.route("/robots.txt", methods=["GET"])
+def robots():
+    return render_template("robots.txt")
 
 
 @main_page.route("/clientcert")

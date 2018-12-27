@@ -109,8 +109,7 @@ config.py
 notes
 __pycache__
 venv
-*/*sitemap.xml*
-*/*robots.txt*
+.venv
 generated_graphs/
 .directory
 remind_*

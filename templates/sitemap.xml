@@ -5,9 +5,8 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-
     <url>
-        <loc>https://jolod.aegrel.ee</loc>
+        <loc>{{ config.FQDN }}</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -15,28 +14,28 @@
 
 
     <url>
-        <loc>https://jolod.aegrel.ee/about</loc>
+        <loc>{{ config.FQDN }}/about</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>https://jolod.aegrel.ee/contact</loc>
+        <loc>{{ config.FQDN }}/contact</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>https://jolod.aegrel.ee/login</loc>
+        <loc>{{ config.FQDN }}/login</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
     </url>
 
     <url>
-        <loc>https://jolod.aegrel.ee/register</loc>
+        <loc>{{ config.FQDN }}/register</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
