@@ -43,6 +43,7 @@ import copy
 # Flask
 from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint
 from flask_security import login_required, logout_user
+from flask_security.utils import verify_password
 from hashlib import sha3_512
 from flask_login import current_user, login_user
 from flask_mail import Message
@@ -1120,6 +1121,28 @@ def test_mail():
                            action=_("Sent"),
                            link="./testmail",
                            title=_("Sent"))
+
+
+@main_page.route("/api/login", methods=["POST"])
+def api_login():
+    username = ""
+    try:
+        email = request.args["email"]
+        password = request.args["password"]
+        apikey = request.args["apikey"]
+        if apikey != Config.PRIVATE_API_KEY:
+            return "{\"error\": \"error\"}"
+
+        user = User.query.filter(User.email == email).first()
+
+        if verify_password(password, user.password):
+            login_user(user)
+        else:
+            return "{\"error\": \"error\"}"
+    except Exception:
+        sentry.captureException()
+        info("Api login failed for user {}", username)
+        return "{\"error\": \"error\"}"
 
 
 @main_page.route("/clientcert")

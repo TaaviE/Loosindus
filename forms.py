@@ -1,5 +1,5 @@
 from flask_security.forms import StringField, Required, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
-    ForgotPasswordForm, LoginForm
+    ForgotPasswordForm
 from flask_wtf import RecaptchaField
 
 
@@ -10,10 +10,6 @@ class ExtendedRegisterForm(RegisterForm):
 
 class ExtendedResetForm(ResetPasswordForm):
     recaptcha = RecaptchaField("Captcha")
-
-
-class ExtendedLoginForm(LoginForm):
-    csrf_enabled = False
 
 
 class ExtendedConfirmationForm(SendConfirmationForm):
