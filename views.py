@@ -1146,7 +1146,7 @@ def sitemap():
 
 @main_page.route("/robots.txt", methods=["GET"])
 def robots():
-    return render_template("robots.txt")
+    return render_template("robots.txt"), {"content-type": "text/plain"}
 
 
 @main_page.route("/clientcert")
