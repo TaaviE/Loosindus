@@ -1127,9 +1127,9 @@ def test_mail():
 def api_login():
     username = ""
     try:
-        email = request.args["email"]
-        password = request.args["password"]
-        apikey = request.args["apikey"]
+        email = request.form["email"]
+        password = request.form["password"]
+        apikey = request.form["apikey"]
         if apikey != Config.PRIVATE_API_KEY:
             return "{\"error\": \"error\"}"
 
