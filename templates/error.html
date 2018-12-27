@@ -2,18 +2,7 @@
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
-{% block additional_head %}
-    <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
-    {% if sentry_ask_feedback %}
-        {% if g.sentry_event_id %}
-            <script src="/custom.js?event_id={{ g.sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
-        {% else %}
-            <script src="/custom.js?event_id={{ sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
-        {% endif %}
-    {% else %}
-
-    {% endif %}
-{% endblock %}
+{% block additional_head %}{% endblock %}
 
 {% block content %}
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
@@ -29,4 +18,16 @@
                href="/">{{ _("Back") }}</a>
         </div>
     </div>
+{% endblock %}
+
+{% block footer %}
+    <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
+    {% if sentry_ask_feedback %}
+        {% if g.sentry_event_id %}
+            <script src="/custom.js?event_id={{ g.sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
+        {% else %}
+            <script src="/custom.js?event_id={{ sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
+        {% endif %}
+    {% else %}
+    {% endif %}
 {% endblock %}

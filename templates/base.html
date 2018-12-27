@@ -51,6 +51,10 @@
     </main>
 </div>
 {% include "footer.html" %}
+{% if footer %}
 {% block footer %}{% endblock %}
+{% else %}
+    <script src="/custom.js"></script>
+{% endif %}
 </body>
 </html>
