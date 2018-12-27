@@ -6,9 +6,9 @@
     <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
     {% if sentry_ask_feedback %}
         {% if g.sentry_event_id %}
-            <script src="./custom.js?event_id={{ g.sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
+            <script src="/custom.js?event_id={{ g.sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
         {% else %}
-            <script src="./custom.js?event_id={{ sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
+            <script src="/custom.js?event_id={{ sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
         {% endif %}
     {% else %}
 
