@@ -24,8 +24,6 @@ class NoteState(Enum):
     """Purchased"""
     MODIFIED = {"id": 3, "description": _("Modified"), "color": "#4CAF50"}
     """Modified"""
-    ARCHIVED = {"id": 4, "description": _("Archived"), "color": "#4CAF50"}
-    """Archived"""
 
 
 class Wishlist(db.Model):
@@ -47,6 +45,7 @@ class Wishlist(db.Model):
     item = db.Column(db.VARCHAR(255))
     status = db.Column(db.Integer)
     purchased_by = db.Column(db.Integer, nullable=True)
+    received = db.Column(db.TIMESTAMP, nullable=True)
     id = db.Column(db.BIGINT, primary_key=True, autoincrement=True, nullable=False)
 
     def __init__(self, user_id, item, status=NoteState.DEFAULT.value["id"], purchased_by=None):
