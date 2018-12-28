@@ -1,6 +1,9 @@
 {% if no_ads != true %}
 try {
-    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "{{ config.DATA_AD_CLIENT }}",
+        enable_page_level_ads: false,
+    });
 } catch (e) {
     console.log(e);
 }
