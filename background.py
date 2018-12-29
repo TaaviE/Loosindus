@@ -66,8 +66,8 @@ def remind_to_buy(rate_limit=True):
         marked_entries = get_person_marked(user.id)
         items_to_purchase = []
         for entry in marked_entries:
-            if entry.status == NoteState.PLANNING_TO_PURCHASE.value["id"] or entry.status == NoteState.MODIFIED.value[
-                "id"]:
+            if entry.status == NoteState.PLANNING_TO_PURCHASE.value["id"] or \
+                    entry.status == NoteState.MODIFIED.value["id"]:
                 items_to_purchase.append((entry.item, get_person_name(entry.user_id)))
 
         if len(items_to_purchase) == 0:

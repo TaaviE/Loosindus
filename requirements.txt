@@ -5,7 +5,7 @@ Flask-Script
 Flask-Mail
 Flask-WTF
 Flask-Babelex
-Flask-Dance
+Flask-Dance[sqla]
 bcrypt
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git

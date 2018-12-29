@@ -776,7 +776,7 @@ def settings():
     id_link_exists = False
 
     try:
-        user_links = AuthLinks.query.filter(User.id == int(user_id)).all()
+        user_links = AuthLinks.query.filter(AuthLinks.user_id == int(user_id)).all()
         for link in user_links:
             if "esteid" in link.provider:
                 id_link_exists = True

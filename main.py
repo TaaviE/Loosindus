@@ -43,6 +43,7 @@ from views import main_page
 app.register_blueprint(main_page)
 
 from flask_dance.contrib.google import make_google_blueprint
+from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
 
 google_blueprint = make_google_blueprint(
@@ -54,7 +55,13 @@ google_blueprint = make_google_blueprint(
     client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
 )
 
+github_blueprint = make_github_blueprint(
+    client_id=Config.GITHUB_OAUTH_CLIENT_ID,
+    client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
+)
+
 from flask_login import current_user
 
 google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-app.register_blueprint(google_blueprint, url_prefix="/login")
+app.register_blueprint(google_blueprint, url_prefix="/google")
+app.register_blueprint(github_blueprint, url_prefix="/github")
