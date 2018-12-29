@@ -28,7 +28,7 @@ def get_family_id(passed_person_id):
     passed_person_id = int(passed_person_id)
     db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
 
-    db_family = db_families_user_has_conn[0]
+    db_family = db_families_user_has_conn[0]  # TODO: User might have more than one family
     family_id = db_family.family_id
     return family_id
 

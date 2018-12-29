@@ -67,6 +67,23 @@ class Config(object):
     CELERY_BROKER_URL = ""  # TODO: URL to your Celery broker
     CELERY_RESULT_BACKEND = ""  # TODO: URL to your Celery result backend
 
+    OAUTHLIB_INSECURE_TRANSPORT = False
+    OAUTHLIB_RELAX_TOKEN_SCOPE = True
+
+    GOOGLE_OAUTH = False
+    GOOGLE_OAUTH_CLIENT_ID = ""
+    GOOGLE_OAUTH_CLIENT_SECRET = ""
+
+    GITHUB_OAUTH = False
+    GITHUB_OAUTH_CLIENT_ID = ""
+    GITHUB_OAUTH_CLIENT_SECRET = ""
+
+    FACEBOOK_OAUTH = False
+    FACEBOOK_OAUTH_CLIENT_ID = ""
+    FACEBOOK_OAUTH_CLIENT_SECRET = ""
+
+    ESTEID_AUTH = False  # TODO: Requires web server configuration
+
     GOOGLE_ADS = False  # TODO: If you want to display unintrusive ads CONFIGURE BELOW
     DATA_AD_CLIENT = "ca-pub-asdfghjklmnopqrstuvxy"  # TODO: Update AD client field value
     DATA_AD_SLOT = "1234567890"  # TODO: Update AD slot field value
