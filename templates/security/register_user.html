@@ -21,6 +21,25 @@
                 {{ render_field(register_user_form.submit) }}
             </table>
         </form>
+        <p></p>
+        {% if config.GITHUB_OAUTH %}
+            <p><a href="{{ url_for("main_page.githubsignup") }}"
+                  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            >{{ _("Sign up using Github") }}</a></p>
+        {% endif %}
+
+        {% if config.GOOGLE_OAUTH %}
+            <p><a href="{{ url_for("main_page.googlesignup") }}"
+                  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            >{{ _("Sign up using Google") }}</a></p>
+        {% endif %}
+
+        {% if config.FACEBOOK_OAUTH %}
+            <p><a href="{{ url_for("main_page.facebooksignup") }}"
+                  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            >{{ _("Sign up using Facebook") }}</a></p>
+        {% endif %}
+
         {% include "security/_menu.html" %}
     </div>
 {% endblock %}
