@@ -2,7 +2,7 @@
 [![Liberapay Status](https://img.shields.io/liberapay/patrons/Taavi.svg?logo=liberapay)](https://liberapay.com/Taavi)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_shield)
 
-Really rather simple to set-up and to use system for secret santa but with some important additions like secretly shared
+A really simple to configure and to use system for secret santa but with some important additions like secretly shared
 shopping lists and gifting constraints (avoid gifts between family members for ex.). Minimum 4 users for minimal functionality. The [version hosted by](https://jolod.aegrel.ee) me (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break.
 
 ## Eesti keeles
