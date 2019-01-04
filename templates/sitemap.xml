@@ -6,7 +6,7 @@
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
     <url>
-        <loc>{{ config.SERVER_NAME }}</loc>
+        <loc>https://{{ config.SERVER_NAME }}</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
@@ -14,28 +14,28 @@
 
 
     <url>
-        <loc>{{ config.SERVER_NAME }}/about</loc>
+        <loc>https://{{ config.SERVER_NAME }}/about</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>{{ config.SERVER_NAME }}/contact</loc>
+        <loc>https://{{ config.SERVER_NAME }}/contact</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.4</priority>
     </url>
 
     <url>
-        <loc>{{ config.SERVER_NAME }}/login</loc>
+        <loc>https://{{ config.SERVER_NAME }}/login</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
     </url>
 
     <url>
-        <loc>{{ config.SERVER_NAME }}/register</loc>
+        <loc>https://{{ config.SERVER_NAME }}/register</loc>
         <lastmod>2018-01-13</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
