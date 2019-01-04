@@ -1232,7 +1232,7 @@ if Config.FACEBOOK_OAUTH:
 
 def oauth_handler(blueprint, token):
     if token is None:  # Failed
-        logger.info("Failed to log in with {provider}.", provider=blueprint.name)
+        logger.info("Failed to log in with {}.".format(blueprint.name))
         flash(_("Error logging in"))
         return False
 
@@ -1244,7 +1244,7 @@ def oauth_handler(blueprint, token):
         return False
 
     if not response.ok:  # Failed
-        logger.info("Failed to fetch user info from {provider}.", provider=blueprint.name)
+        logger.info("Failed to fetch user info from {}.".format(blueprint.name))
         flash(_("Error logging in"))
         return False
 
