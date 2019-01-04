@@ -665,6 +665,7 @@ def graph():
 
 @main_page.route("/graph/<graph_id>/<unhide>")
 @main_page.route("/graph/<graph_id>", defaults={"unhide": False})
+@main_page.route("/graph/<graph_id>/", defaults={"unhide": False})
 @login_required
 def graph_json(graph_id, unhide):
     user_id = int(session["user_id"])
