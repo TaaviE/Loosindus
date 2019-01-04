@@ -1184,7 +1184,7 @@ if Config.GITHUB_OAUTH:
             scope=["user:email"],
             client_id=Config.GITHUB_OAUTH_CLIENT_ID,
             client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
-            redirect_url=url_for("login")
+            redirect_url=url_for("security.login")
         )
         github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
         app.register_blueprint(github_blueprint, url_prefix="/github")
