@@ -1,5 +1,8 @@
+from datetime import datetime
+
+from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, FetchedValue
 from sqlalchemy.orm import backref, relationship
 
 from main import db
@@ -7,7 +10,7 @@ from main import db
 
 class Role(db.Model, RoleMixin):
     __tablename__ = "role"
-    id = Column(Integer(), primary_key=True, unique=True)
+    id = Column(Integer(), db.Sequence("role_id_seq", start=1, increment=1), primary_key=True, unique=True)
     name = Column(String(80), unique=True)
     description = Column(String(255))
 
@@ -26,7 +29,8 @@ class RolesUsers(db.Model):
 
 class User(db.Model, UserMixin):
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True, unique=True, nullable=False)
+    id = Column(Integer, db.Sequence("user_id_seq", start=1, increment=1), default=None, server_default=FetchedValue(),
+                autoincrement=True, primary_key=True, unique=True, nullable=False)
     email = Column(String(255), unique=True)
     username = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
@@ -47,20 +51,25 @@ class User(db.Model, UserMixin):
         backref=backref("User", lazy="dynamic")
     )
 
-
-from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
+    def __init__(self, email, username, password, active=False):
+        self.email = email
+        self.username = username
+        self.password = password
+        self.active = active
 
 
 class AuthLinks(db.Model, OAuthConsumerMixin):
     __tablename__ = "user_connection"
     provider_user_id = Column(String(255), unique=True)
     user_id = Column(Integer, ForeignKey(User.id))
-    id = Column(Integer, unique=True, primary_key=True)
-    created_at = Column(DateTime)
+    id = Column(Integer, db.Sequence("user_connection_id_seq", start=1, increment=1), server_default=FetchedValue(),
+                autoincrement=True, unique=True, primary_key=True)
+    created_at = Column(DateTime, default=datetime.now())
     token = Column(String(255))
-    provider = Column(String(255))
+    provider = Column(String(255), nullable=False)
 
-    def __init__(self, provider_user_id, user_id, provider):
+    def __init__(self, provider_user_id, provider, token=None, user_id=None):
         self.provider_user_id = provider_user_id
         self.user_id = user_id
         self.provider = provider
+        self.token = token

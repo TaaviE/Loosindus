@@ -1,3 +1,5 @@
+from sqlalchemy import FetchedValue
+
 from main import db
 
 
@@ -14,7 +16,8 @@ class Family(db.Model):
     """
 
     __tablename__ = "families"
-    id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
+    id = db.Column(db.Integer, db.Sequence("families_id_seq", start=1, increment=1), server_default=FetchedValue(),
+                   autoincrement=True, primary_key=True, unique=True, nullable=False)
     group = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(255), nullable=False)
 

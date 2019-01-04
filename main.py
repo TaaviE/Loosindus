@@ -27,7 +27,7 @@ if not Config.DEBUG:
 else:
     sentry = Sentry(app, dsn=None, logging=False)
 
-from models.users_model import User, Role, AuthLinks
+from models.users_model import User, Role
 from flask_security import SQLAlchemyUserDatastore, Security
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -41,36 +41,3 @@ security = Security(app, user_datastore,
 from views import main_page
 
 app.register_blueprint(main_page)
-
-from flask_dance.contrib.google import make_google_blueprint
-from flask_dance.contrib.github import make_github_blueprint
-from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
-from flask_login import current_user
-
-if Config.GOOGLE_OAUTH:
-    google_blueprint = make_google_blueprint(
-        scope=[
-            "https://www.googleapis.com/auth/plus.me",
-            "https://www.googleapis.com/auth/userinfo.email",
-        ],
-        client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
-        client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
-    )
-    google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-    app.register_blueprint(google_blueprint, url_prefix="/google")
-
-if Config.GITHUB_OAUTH:
-    github_blueprint = make_github_blueprint(
-        client_id=Config.GITHUB_OAUTH_CLIENT_ID,
-        client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
-    )
-    github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-    app.register_blueprint(github_blueprint, url_prefix="/github")
-
-if Config.FACEBOOK_OAUTH:
-    facebook_blueprint = make_github_blueprint(
-        client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
-        client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
-    )
-    facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-    app.register_blueprint(facebook_blueprint, url_prefix="/facebook")

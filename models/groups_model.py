@@ -1,3 +1,5 @@
+from sqlalchemy import FetchedValue
+
 from main import db
 
 
@@ -12,7 +14,8 @@ class Group(db.Model):
     """
     __tablename__ = "groups"
 
-    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    id = db.Column(db.Integer, db.Sequence("groups_id_seq", start=1, increment=1), server_default=FetchedValue(),
+                   autoincrement=True, nullable=False, primary_key=True)
     name = db.Column(db.VARCHAR(255), nullable=True)
     description = db.Column(db.VARCHAR(255), nullable=True)
 

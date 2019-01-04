@@ -18,15 +18,6 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-
-#####
-# TODO:
-# * 
-#
-# Known flaws:
-# * SecretSantaGraph can't match less than two people or people from less than one family
-####
-
 from logging import getLogger
 
 # Graphing
@@ -39,14 +30,21 @@ logger = getLogger()
 
 # Utilities
 import copy
+from secrets import token_bytes
 
 # Flask
-from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint
+from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint, flash
 from flask_security import login_required, logout_user
-from flask_security.utils import verify_password
+from flask_security.utils import verify_password, hash_password, get_url
 from hashlib import sha3_512
 from flask_login import current_user, login_user
 from flask_mail import Message
+from flask_dance.consumer import oauth_authorized
+from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
+from flask_dance.contrib.facebook import make_facebook_blueprint
+from flask_dance.contrib.github import make_github_blueprint
+from flask_dance.contrib.google import make_google_blueprint
+from sqlalchemy.orm.exc import NoResultFound
 
 # Translation
 # Try switching between babelex and babel if you are getting errors
@@ -1147,6 +1145,227 @@ def sitemap():
 @main_page.route("/robots.txt", methods=["GET"])
 def robots():
     return render_template("robots.txt"), {"content-type": "text/plain"}
+
+
+if Config.GOOGLE_OAUTH:
+    google_blueprint = make_google_blueprint(
+        scope=[
+            "https://www.googleapis.com/auth/plus.me",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ],
+        client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
+        client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
+        redirect_url="/login"
+    )
+    google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(google_blueprint, url_prefix="/google")
+
+
+    @oauth_authorized.connect_via(google_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
+
+
+    @main_page.route("/googleregister")
+    def googlesignup():
+        session["oauth_sign_up"] = True
+        return redirect(get_url("google.login"))
+
+
+    @main_page.route("/googlelogin")
+    def googlelogin():
+        session["oauth_sign_up"] = False
+        return redirect(get_url("google.login"))
+
+if Config.GITHUB_OAUTH:
+    github_blueprint = make_github_blueprint(
+        scope=["user:email"],
+        client_id=Config.GITHUB_OAUTH_CLIENT_ID,
+        client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
+        redirect_url="/login"
+    )
+    github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(github_blueprint, url_prefix="/github")
+
+
+    @oauth_authorized.connect_via(github_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
+
+
+    @main_page.route("/githublogin")
+    def githublogin():
+        session["oauth_sign_up"] = False
+        return redirect(get_url("github.login"))
+
+
+    @main_page.route("/githubregister")
+    def githubsignup():
+        session["oauth_sign_up"] = True
+        return redirect(get_url("github.login"))
+
+if Config.FACEBOOK_OAUTH:
+    facebook_blueprint = make_facebook_blueprint(
+        client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
+        client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
+    )
+    facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
+
+
+    @oauth_authorized.connect_via(facebook_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
+
+
+    @main_page.route("/facebookregister")
+    def facebooksignup():
+        session["oauth_sign_up"] = True
+        return redirect(get_url("facebook.login"))
+
+
+    @main_page.route("/facebooklogin")
+    def facebooklogin():
+        session["oauth_sign_up"] = False
+        return redirect(get_url("facebook.login"))
+
+
+def oauth_handler(blueprint, token):
+    if token is None:  # Failed
+        logger.info("Failed to log in with {provider}.", provider=blueprint.name)
+        flash(_("Error logging in"))
+        return False
+
+    try:
+        response = blueprint.session.get("/user")
+    except ValueError:
+        sentry.captureException()
+        flash(_("Error logging in"))
+        return False
+
+    if not response.ok:  # Failed
+        logger.info("Failed to fetch user info from {provider}.", provider=blueprint.name)
+        flash(_("Error logging in"))
+        return False
+
+    response = response.json()
+    oauth_user_id = response["id"]  # Get user ID
+
+    try:  # Check if existing service link
+        authentication_link = AuthLinks.query.filter_by(
+            provider=blueprint.name,
+            provider_user_id=str(oauth_user_id),
+        ).one()
+    except NoResultFound:  # New service link, at least store the token
+        authentication_link = AuthLinks(
+            provider=blueprint.name,
+            provider_user_id=str(oauth_user_id),
+            token=token["access_token"],
+        )
+        logger.info("User not found, keeping token in memory")
+    except Exception as e:  # Failure in query!
+        sentry.captureException()
+        logger.error("Failed querying authentication links")
+        flash(_("Error logging in"))
+        return False
+
+    # Link exists and it is associated with an user
+    if authentication_link is not None and authentication_link.user_id is not None:
+        login_user(User.query.get(authentication_link.user_id))
+        db.session.commit()
+        logger.info("Successfully signed in with {}.".format(blueprint.name))
+        return False
+    else:  # Link does not exist or not associated
+        user_email = response["email"] if "email" in response.keys() else None
+        user_name = response["name"]
+
+        if "oauth_sign_up" in session.keys() and session["oauth_sign_up"]:  # If registration
+            if user_email is None or \
+                    len(user_email) < len("a@b.cc") or \
+                    "@" not in user_email:
+                logger.info("User email is wrong or missing, trying other API endpoint")
+                try:
+                    if blueprint.name == "github":
+                        response = blueprint.session.get("/user/emails")
+                        if not response.ok:
+                            flash(_("Error signing up"))
+                            logger.info("Error requesting email addresses")
+                            return False
+                        else:
+                            response = response.json()
+                            user_email = response[0]["email"] if len(response) > 0 and "email" in response[
+                                0].keys() else None
+                            # Take the first email
+                            if not response[0]["verified"] or \
+                                    user_email is None or \
+                                    len(user_email) < len("a@b.cc") or \
+                                    "@" not in user_email:
+                                flash(_("You have no associated email addresses with your account"))
+                                logger.error("User does not have any emails")
+                                return False
+                            else:
+                                pass  # All is okay again
+                            pass  # New email is fine
+                    else:
+                        logger.info("No email addresses associated with the account")
+                        flash(_("You have no associated email addresses with your account"))
+                        return False
+                except Exception:
+                    logger.info("Error asking for another emails")
+                    flash(_("Error signing up"))
+                    return False
+            else:
+                pass  # Email is okay
+
+            try:  # Check if existing service link
+                User.query.filter(User.email == user_email).one()
+                flash(_("This email address is in use, you must log in with your password to link {provider}"
+                        .format(provider=blueprint.name)))
+                logger.debug("Email address is in use, but not linked, to avoid hijacks the user must login")
+                return False
+            except NoResultFound:  # Do not allow same email to sign up again
+                pass
+
+            user = User(
+                email=user_email,
+                username=user_name,
+                password=hash_password(token_bytes(100)),
+                active=True
+            )
+
+            try:
+                db.session.add(user)  # Populate User ID first
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                sentry.captureException()
+                logger.error("Could not store user and oauth link")
+                flash(_("Error signing up"))
+                return False
+
+            try:
+                authentication_link.user_id = user.id  # Update link with user id
+                db.session.add(authentication_link)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                sentry.captureException()
+                logger.error("Could not store user and oauth link")
+                flash(_("Error signing up"))
+                return False
+
+            login_user(user)
+            db.session.commit()
+            logger.info("Successfully signed up with {}.".format(blueprint.name))
+            return False
+        else:
+            logger.debug("User does not wish to sign up")
+            flash(_("You do not have an account"))
+            return False
+
+    flash(_("Error logging in"))
+    logger.critical("Impossible case!")
+    return False
 
 
 @main_page.route("/clientcert")
