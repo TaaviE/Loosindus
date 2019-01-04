@@ -1155,6 +1155,7 @@ if Config.GOOGLE_OAUTH:
         ],
         client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
         client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
+        redirect_url=Config.SERVER_NAME + "/login"
     )
     google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(google_blueprint, url_prefix="/google")
@@ -1181,6 +1182,7 @@ if Config.GITHUB_OAUTH:
         scope=["user:email"],
         client_id=Config.GITHUB_OAUTH_CLIENT_ID,
         client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
+        redirect_url=Config.SERVER_NAME + "/login"
     )
     github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(github_blueprint, url_prefix="/github")
@@ -1206,6 +1208,7 @@ if Config.FACEBOOK_OAUTH:
     facebook_blueprint = make_facebook_blueprint(
         client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
         client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
+        redirect_url=Config.SERVER_NAME + "/login"
     )
     facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
