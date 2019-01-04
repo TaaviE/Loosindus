@@ -62,7 +62,12 @@ def get_locale():
         user_id = session["user_id"]
     else:
         return request.accept_languages.best_match(["et", "en"])
-    language_code = get_person_language_code(user_id)
+
+    try:
+        language_code = get_person_language_code(user_id)
+    except Exception:
+        return request.accept_languages.best_match(["et", "en"])
+
     if language_code is None:
         return request.accept_languages.best_match(["et", "en"])
     else:
@@ -1238,7 +1243,12 @@ def oauth_handler(blueprint, token):
         return False
 
     try:
-        response = blueprint.session.get("/user")
+        if blueprint.name == "github":
+            response = blueprint.session.get("/user")
+        elif blueprint.name == "google":
+            response = blueprint.session.get("/plus/v1/people/me")
+        else:
+            logger.critical("Missing blueprint handler")
     except ValueError:
         sentry.captureException()
         flash(_("Error logging in"))
@@ -1246,7 +1256,7 @@ def oauth_handler(blueprint, token):
 
     if not response.ok:  # Failed
         logger.info("Failed to fetch user info from {}.".format(blueprint.name))
-        logger.info(response.json())
+        logger.info(response)
         flash(_("Error logging in"))
         return False
 
@@ -1265,7 +1275,7 @@ def oauth_handler(blueprint, token):
             token=token["access_token"],
         )
         logger.info("User not found, keeping token in memory")
-    except Exception as e:  # Failure in query!
+    except Exception:  # Failure in query!
         sentry.captureException()
         logger.error("Failed querying authentication links")
         flash(_("Error logging in"))
@@ -1278,16 +1288,37 @@ def oauth_handler(blueprint, token):
         logger.info("Successfully signed in with {}.".format(blueprint.name))
         return False
     else:  # Link does not exist or not associated
-        user_email = response["email"] if "email" in response.keys() else None
-        user_name = response["name"]
-
         if "oauth_sign_up" in session.keys() and session["oauth_sign_up"]:  # If registration
-            if user_email is None or \
-                    len(user_email) < len("a@b.cc") or \
-                    "@" not in user_email:
+            session["oauth_sign_up"] = False
+            if "email" in response.keys():
+                user_email = response["email"]
+            else:
+                if "emails" in response.keys() and len(response["emails"]) > 0:
+                    user_email = response["emails"][0]["value"]
+                else:
+                    user_email = None
+
+            if "name" in response.keys():
+                if blueprint.name == "google":
+                    if "givenName" in response["name"].keys():
+                        user_name = response["name"]["givenName"]
+                    else:
+                        logger.info("Google user does not have a givenName")
+                        flash(_("Error signing up"))
+                        return False
+                else:
+                    user_name = response["name"]
+            else:
+                logger.info("User does not have a name!")
+                flash(_("Error signing up"))
+                return False
+
+            if user_email is None or len(user_email) < len("a@b.cc") or \
+                    "@" not in user_email:  # I'll assume noone with their own TLD will use this
                 logger.info("User email is wrong or missing, trying other API endpoint")
                 try:
-                    if blueprint.name == "github":
+                    if blueprint.name == "github":  # If we're authenticating against GitHub then we have to do
+                        # another get
                         response = blueprint.session.get("/user/emails")
                         if not response.ok:
                             flash(_("Error signing up"))
