@@ -715,6 +715,7 @@ def graph_json(graph_id, unhide):
 
 @main_page.route("/grapher/<graph_id>/<unhide>")
 @main_page.route("/grapher/<graph_id>", defaults={"unhide": ""})
+@main_page.route("/grapher/<graph_id>/", defaults={"unhide": ""})
 @login_required
 def graph_js(graph_id, unhide):
     return render_template("grapher.js", graph_id=graph_id, unhide=unhide), \
