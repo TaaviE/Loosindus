@@ -18,53 +18,73 @@
                 {{ _("Connect Estonian ID card:") }}{% endif %} <a
                     {% if id_connected %}disabled{% endif %}
                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                    href="{{ url_for("main_page.log_user_in_with_cert") }}">
+                    {% if not id_connected %}
+                    href="{{ url_for("main_page.log_user_in_with_cert") }}"
+                    {% else %}
+                    href="#"
+                    {% endif %}>
                 {% if id_connected %}
                     {{ _("Linked") }}
                 {% else %}
                     {{ _("Link") }}
                 {% endif %}
-            </a>
-                {# <p>
-            {% if twitter_conn %}
-                <form action="{{ url_for("social.remove_connection", provider_id="twitter", provider_user_id=conn.provider_user_id) }}"
-                      method="DELETE">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           type="submit" value="Link Twitter account"/>
-                </form>
-            {% else %}
-                <form action="{{ url_for("social.connect", provider_id="twitter") }}" method="POST">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           type="submit" value="Unlink Twitter account"/>
-                </form>
+            </a></p>
+
+            {% if config.GOOGLE_OAUTH %}
+                <p>{% if google_connected %}{{ _("Google account is linked") }}{% else %}
+                    {{ _("Connect Google account:") }}{% endif %} <a
+                        {% if google_connected %}disabled{% endif %}
+                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        {% if not google_connected %}
+                        href="{{ url_for("main_page.googlelogin") }}"
+                        {% else %}
+                        href="#"
+                        {% endif %}>
+                    {% if google_connected %}
+                        {{ _("Linked") }}
+                    {% else %}
+                        {{ _("Link") }}
+                    {% endif %}
+                </a></p>
             {% endif %}
-        </p>#}
-                {# {% if facebook_conn %}
-                <form action="{{ url_for("social.remove_connection", provider_id="facebook", provider_user_id=facebook_conn.provider_user_id) }}"
-                      method="DELETE">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       type="submit" value="Unlink Facebook account"/>
-                </form>
-            {% else %}
-                <form action="{{ url_for("social.connect", provider_id="facebook") }}" method="POST">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       type="submit" value="Link Facebook account"/>
-                </form>
-            {% endif %} #}
-                {# <p>
-            {% if conn %}
-                <form action="{{ url_for("social.remove_connection", provider_id="google", provider_user_id=google_conn.provider_user_id) }}"
-                      method="DELETE">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           type="submit" value="Unlink Google account"/>
-                </form>
-            {% else %}
-                <form action="{{ url_for("social.connect", provider_id="google") }}" method="POST">
-                    <input class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           type="submit" value="Link Google account"/>
-                </form>
+
+            {% if config.GITHUB_OAUTH %}
+                <p>{% if github_connected %}{{ _("Github account is linked") }}{% else %}
+                    {{ _("Connect Github account:") }}{% endif %} <a
+                        {% if github_connected %}disabled{% endif %}
+                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        {% if not github_connected %}
+                        href="{{ url_for("main_page.githublogin") }}"
+                        {% else %}
+                        href="#"
+                        {% endif %}>
+                    {% if github_connected %}
+                        {{ _("Linked") }}
+                    {% else %}
+                        {{ _("Link") }}
+                    {% endif %}
+                </a></p>
             {% endif %}
-        </p> #}
+
+
+            {% if config.FACEBOOK_OAUTH %}
+                <p>{% if github_connected %}{{ _("Facebook account is linked") }}{% else %}
+                    {{ _("Connect Facebook account:") }}{% endif %} <a
+                        {% if facebook_connected %}disabled{% endif %}
+                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        {% if not facebook_connected %}
+                        href="{{ url_for("main_page.facebooklogin") }}"
+                        {% else %}
+                        href="#"
+                        {% endif %}>
+                    {% if facebook_connected %}
+                        {{ _("Linked") }}
+                    {% else %}
+                        {{ _("Link") }}
+                    {% endif %}
+                </a></p>
+            {% endif %}
+
             <p>{{ _("Your language:") }}</p>
             <form method="post" action="setlanguage">
                 <select class="mdl-textfield__input" id="language" name="language">

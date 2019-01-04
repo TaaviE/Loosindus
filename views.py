@@ -777,12 +777,17 @@ def settings():
         is_in_group = True
 
     id_link_exists = False
-
+    google_link_exists = False
+    github_link_exists = False  # TODO: Store them all in a dictionary and render based on that
     try:
         user_links = AuthLinks.query.filter(AuthLinks.user_id == int(user_id)).all()
         for link in user_links:
-            if "esteid" in link.provider:
+            if "esteid" == link.provider:
                 id_link_exists = True
+            elif "google" == link.provider:
+                google_link_exists = True
+            elif "github" == link.provider:
+                github_link_exists = True
     except Exception:
         sentry.captureException()
 
@@ -796,6 +801,8 @@ def settings():
                            groups=user_groups,
                            title=_("Settings"),
                            id_connected=id_link_exists,
+                           google_connected=google_link_exists,
+                           github_connected=github_link_exists,
                            back_link="/")
 
 
@@ -1249,6 +1256,8 @@ def oauth_handler(blueprint, token):
             response = blueprint.session.get("/plus/v1/people/me")
         else:
             logger.critical("Missing blueprint handler")
+            flash(_("Error logging in"))
+            return False
     except ValueError:
         sentry.captureException()
         flash(_("Error logging in"))
@@ -1287,6 +1296,18 @@ def oauth_handler(blueprint, token):
         db.session.commit()
         logger.info("Successfully signed in with {}.".format(blueprint.name))
         return False
+    elif authentication_link is not None and authentication_link.user_id is None and "user_id" in session["user_id"]:
+        try:
+            authentication_link.user_id = int(session["user_id"])  # Update link with user id
+            db.session.add(authentication_link)
+            db.session.commit()
+            return False
+        except Exception:
+            db.session.rollback()
+            sentry.captureException()
+            logger.error("Could not store user and oauth link")
+            flash(_("Error signing up"))
+            return False
     else:  # Link does not exist or not associated
         if "oauth_sign_up" in session.keys() and session["oauth_sign_up"]:  # If registration
             session["oauth_sign_up"] = False
@@ -1380,7 +1401,7 @@ def oauth_handler(blueprint, token):
                 authentication_link.user_id = user.id  # Update link with user id
                 db.session.add(authentication_link)
                 db.session.commit()
-            except Exception as e:
+            except Exception:
                 db.session.rollback()
                 sentry.captureException()
                 logger.error("Could not store user and oauth link")
