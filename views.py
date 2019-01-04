@@ -1148,29 +1148,27 @@ def robots():
 
 
 if Config.GOOGLE_OAUTH:
-    with app.app_context():
-        google_blueprint = make_google_blueprint(
-            scope=[
-                "https://www.googleapis.com/auth/plus.me",
-                "https://www.googleapis.com/auth/userinfo.email",
-            ],
-            client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
-            client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
-            redirect_url=url_for("security.login")
-        )
-        google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-        app.register_blueprint(google_blueprint, url_prefix="/google")
+    google_blueprint = make_google_blueprint(
+        scope=[
+            "https://www.googleapis.com/auth/plus.me",
+            "https://www.googleapis.com/auth/userinfo.email",
+        ],
+        client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
+        client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
+    )
+    google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(google_blueprint, url_prefix="/google")
 
 
-        @oauth_authorized.connect_via(google_blueprint)
-        def google_oauth(blueprint, token):
-            return oauth_handler(blueprint, token)
+    @oauth_authorized.connect_via(google_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
 
 
-        @main_page.route("/googleregister")
-        def googlesignup():
-            session["oauth_sign_up"] = True
-            return redirect(url_for("google.login"))
+    @main_page.route("/googleregister")
+    def googlesignup():
+        session["oauth_sign_up"] = True
+        return redirect(url_for("google.login"))
 
 
     @main_page.route("/googlelogin")
@@ -1179,26 +1177,24 @@ if Config.GOOGLE_OAUTH:
         return redirect(url_for("google.login"))
 
 if Config.GITHUB_OAUTH:
-    with app.app_context():
-        github_blueprint = make_github_blueprint(
-            scope=["user:email"],
-            client_id=Config.GITHUB_OAUTH_CLIENT_ID,
-            client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
-            redirect_url=url_for("security.login")
-        )
-        github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-        app.register_blueprint(github_blueprint, url_prefix="/github")
+    github_blueprint = make_github_blueprint(
+        scope=["user:email"],
+        client_id=Config.GITHUB_OAUTH_CLIENT_ID,
+        client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
+    )
+    github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(github_blueprint, url_prefix="/github")
 
 
-        @oauth_authorized.connect_via(github_blueprint)
-        def google_oauth(blueprint, token):
-            return oauth_handler(blueprint, token)
+    @oauth_authorized.connect_via(github_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
 
 
-        @main_page.route("/githublogin")
-        def githublogin():
-            session["oauth_sign_up"] = False
-            return redirect(url_for("github.login"))
+    @main_page.route("/githublogin")
+    def githublogin():
+        session["oauth_sign_up"] = False
+        return redirect(url_for("github.login"))
 
 
     @main_page.route("/githubregister")
@@ -1207,25 +1203,23 @@ if Config.GITHUB_OAUTH:
         return redirect(url_for("github.login"))
 
 if Config.FACEBOOK_OAUTH:
-    with app.app_context():
-        facebook_blueprint = make_facebook_blueprint(
-            client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
-            client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
-            redirect_url=url_for("security.login")
-        )
-        facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
-        app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
+    facebook_blueprint = make_facebook_blueprint(
+        client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
+        client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
+    )
+    facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
 
 
-        @oauth_authorized.connect_via(facebook_blueprint)
-        def google_oauth(blueprint, token):
-            return oauth_handler(blueprint, token)
+    @oauth_authorized.connect_via(facebook_blueprint)
+    def google_oauth(blueprint, token):
+        return oauth_handler(blueprint, token)
 
 
-        @main_page.route("/facebookregister")
-        def facebooksignup():
-            session["oauth_sign_up"] = True
-            return redirect(url_for("facebook.login"))
+    @main_page.route("/facebookregister")
+    def facebooksignup():
+        session["oauth_sign_up"] = True
+        return redirect(url_for("facebook.login"))
 
 
     @main_page.route("/facebooklogin")
