@@ -33,9 +33,9 @@ import copy
 from secrets import token_bytes
 
 # Flask
-from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint, flash
+from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint, flash, url_for
 from flask_security import login_required, logout_user
-from flask_security.utils import verify_password, hash_password, get_url
+from flask_security.utils import verify_password, hash_password
 from hashlib import sha3_512
 from flask_login import current_user, login_user
 from flask_mail import Message
@@ -1155,7 +1155,7 @@ if Config.GOOGLE_OAUTH:
         ],
         client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
         client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
-        redirect_url=get_url("security.login")
+        redirect_url=url_for("security.login")
     )
     google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(google_blueprint, url_prefix="/google")
@@ -1169,20 +1169,20 @@ if Config.GOOGLE_OAUTH:
     @main_page.route("/googleregister")
     def googlesignup():
         session["oauth_sign_up"] = True
-        return redirect(get_url("google.login"))
+        return redirect(url_for("google.login"))
 
 
     @main_page.route("/googlelogin")
     def googlelogin():
         session["oauth_sign_up"] = False
-        return redirect(get_url("google.login"))
+        return redirect(url_for("google.login"))
 
 if Config.GITHUB_OAUTH:
     github_blueprint = make_github_blueprint(
         scope=["user:email"],
         client_id=Config.GITHUB_OAUTH_CLIENT_ID,
         client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
-        redirect_url=get_url("security.login")
+        redirect_url=url_for("login")
     )
     github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(github_blueprint, url_prefix="/github")
@@ -1196,19 +1196,19 @@ if Config.GITHUB_OAUTH:
     @main_page.route("/githublogin")
     def githublogin():
         session["oauth_sign_up"] = False
-        return redirect(get_url("github.login"))
+        return redirect(url_for("github.login"))
 
 
     @main_page.route("/githubregister")
     def githubsignup():
         session["oauth_sign_up"] = True
-        return redirect(get_url("github.login"))
+        return redirect(url_for("github.login"))
 
 if Config.FACEBOOK_OAUTH:
     facebook_blueprint = make_facebook_blueprint(
         client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
         client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
-        redirect_url=get_url("security.login")
+        redirect_url=url_for("security.login")
     )
     facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
     app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
@@ -1222,13 +1222,13 @@ if Config.FACEBOOK_OAUTH:
     @main_page.route("/facebookregister")
     def facebooksignup():
         session["oauth_sign_up"] = True
-        return redirect(get_url("facebook.login"))
+        return redirect(url_for("facebook.login"))
 
 
     @main_page.route("/facebooklogin")
     def facebooklogin():
         session["oauth_sign_up"] = False
-        return redirect(get_url("facebook.login"))
+        return redirect(url_for("facebook.login"))
 
 
 def oauth_handler(blueprint, token):

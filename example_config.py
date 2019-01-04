@@ -23,7 +23,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = ""  # TODO: Add database URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    FQDN = "https://example.com"  # TODO: Fill this to make sure sitemap and robots.txt gets filled properly
+    SERVER_NAME = "https://example.com"  # TODO: Fill this to make sure sitemap and robots.txt gets filled properly
 
     MAIL_SERVER = "localhost"
     MAIL_PORT = 25
