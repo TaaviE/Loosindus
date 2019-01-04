@@ -1243,6 +1243,7 @@ def oauth_handler(blueprint, token):
 
     if not response.ok:  # Failed
         logger.info("Failed to fetch user info from {}.".format(blueprint.name))
+        logger.info(response.json())
         flash(_("Error logging in"))
         return False
 
