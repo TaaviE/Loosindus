@@ -44,6 +44,7 @@ from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
 # Translation
@@ -261,7 +262,9 @@ def notes():
     empty = False
 
     try:
-        db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
+        # noinspection PyComparisonWithNone
+        # SQLAlchemy doesn't like "is None"
+        db_notes = Wishlist.query.filter(and_(Wishlist.user_id == user_id, Wishlist.received == None)).all()
         for note in db_notes:
             notes_from_file[note.item] = encrypt_id(note.id)
     except Exception as e:
@@ -587,6 +590,9 @@ def giftingto():
             selections = []
             modifyable = False
             name = ""
+
+            if note.received is not None:
+                continue
 
             if note.status == NoteState.DEFAULT.value["id"]:
                 selections = all_states
