@@ -3,22 +3,27 @@
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_shield)
 
 A really simple to configure and to use system for secret santa but with some important additions like secretly shared
-shopping lists and gifting constraints (avoid gifts between family members for ex.). Minimum 4 users for minimal functionality. The [version hosted by](https://jolod.aegrel.ee) me (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break.
+shopping lists and gifting constraints (avoid gifts between family members for ex.). Minimum of 4 users are required for minimal functionality. The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break. 
 
 ## Eesti keeles
 
 Lihtne veebiliides loosipakkide tegemiseks - lubab igal kasutajal koostada enda soovinimekirja ning seda enda salajase "jõuluvanaga" jagada (tegelikult saavad nimekirja vaadata ka ülejäänud grupi liikmed). Loosipakid üksteise vahel jagab süsteem soovi korral automaatselt, vältides perekonnaliikmetevahelisi kinke ja eelmisel aastal loodud kombinatsioone. Süsteem lubab pärast seadistamist sisse logida ka ID-kaardiga. Minimaalne soovituslik kasutajate hulk tarkvara kasutamiseks on neli inimest. Minu hallatud [versioon](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid ma kasutan seda muudatuste aktiivseks testimises seega see võib vahepeal mõne veaga olla.
 
 ## Setup (if you wish to self-host)
- 1. Install Python 3 (Developed on 3.7)
+
+My aim is to keep this as simple as possible 
+
+ 1. Install Python 3 (This application is developed on 3.7)
  2. Make a virtual environment (`python3 -m venv .venv && source .venv/bin/activate`)
  3. Install wheel with pip (`python3 -m pip install wheel`)
  4. Install requirements (`python3 -m pip install -r requirements.txt`)
  5. Set up PostgreSQL with the script in `init_db.sql`
  6. Set up uwsgi/gunicorn and nginx as you wish (to provide TLS)
- 7. **UPDATE THE CONFIGURATION** and sitemap to your own URL 
+ 7. **UPDATE THE CONFIGURATION** - this is so critical that everything will break if you don't
  8. Estonian ID card support requires a subdomain and additional nginx configuration, if you don't configure it the option will just not work
- 9. You're done. Use `/profile` or `/settings` to configure your account. Configuring groups and families currently has to be done manually in the database
+ 9. You're done. Use `/profile` or `/settings` to configure your account. `/recreategraph` to regenerate the gifting graph. Configuring groups and families currently has to be done manually in the database (trivial many-to-many relationship) but UI is actively being developed. 
+
+In case this above was too complex you can just use the version hosted by me and ask if you need any help.
 
 ## My wishlist for future changes
 
