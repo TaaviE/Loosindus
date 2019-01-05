@@ -3,7 +3,7 @@
 # author=Taavi Eomäe
 """
 A simple Secret Santa website in Python
-Copyright (C) 2017-2018 Taavi Eomäe
+Copyright (C) 2017-2019 Taavi Eomäe
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
