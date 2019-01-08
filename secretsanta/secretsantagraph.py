@@ -27,14 +27,14 @@ class SecretSantaGraph:
                           target_queue,
                           year):
 
-        source = len(source_queue) - 1
-        destination = len(target_queue) - 1
+        source_index = len(source_queue) - 1
+        target_index = len(target_queue) - 1
 
         change_sources = True
 
-        while source >= 0 and destination >= 0:
-            source = source_queue[source]
-            target = target_queue[destination]
+        while source_index >= 0 and target_index >= 0:
+            source = source_queue[source_index]
+            target = target_queue[target_index]
 
             conn = self.old_connections.make_weighted_conn(
                 source,
@@ -43,23 +43,22 @@ class SecretSantaGraph:
             )
 
             if self.connection_is_valid(conn, connections):
-
-                if source < len(source_queue) - 1:
-                    source_queue[source] = source_queue.pop()
+                if source_index < len(source_queue) - 1:
+                    source_queue[source_index] = source_queue.pop()
                 else:
                     source_queue.pop()
 
-                if destination < len(target_queue) - 1:
-                    target_queue[destination] = target_queue.pop()
+                if target_index < len(target_queue) - 1:
+                    target_queue[target_index] = target_queue.pop()
                 else:
                     target_queue.pop()
 
                 return conn
 
             if change_sources:
-                source -= 1
+                source_index -= 1
             else:
-                destination -= 1
+                target_index -= 1
 
             change_sources = not change_sources
 

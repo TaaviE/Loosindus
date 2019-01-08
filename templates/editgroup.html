@@ -6,39 +6,41 @@
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
         <p>{{ _("This page lists all the families that the group contains") }}</p>
+        {% if admin %}
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               href="./addfam">{{ _("Add new") }}</a>
+        {% endif %}
     </div>
 {% endblock %}
 
 {% block content %}
-    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
-                <tbody>
-                <tr>
-                    <th>{{ _("Family") }}</th>
-                    <th>{{ _("Action") }}</th>
-                    {% if admin %}
-                        <th></th>
-                    {% endif %}
-                </tr>
-                {% for family in families %}
-                    <tr>
-                        <td>{{ family[0] }}</td>
-                        <td>
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="./editfam?id={{ family[1] }}">{{ _("Display") }}</a>
-                        </td>
-                        {% if family[2] %}
-                            <td>
-                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[1] }}">{{ _("Remove") }}</a>
-                            </td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+        <tbody>
+        <tr>
+            <th>{{ _("Family") }}</th>
+            <th>{{ _("Action") }}</th>
+            {% if admin %}
+                <th></th>
+            {% endif %}
+        </tr>
+        {% for family in families %}
+            <tr>
+                <td>{{ family[0] }}</td>
+                <td>
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="./editfam?id={{ family[1] }}">{{ _("Display") }}</a>
+                </td>
+                {% if admin %}
+                    <td>
+                        <form method="post" action="./editgroup">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                    name="id" type="submit" value="{{ family[1] }}">{{ _("Remove") }}</button>
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

@@ -11,7 +11,7 @@
 
 {% block content %}
     <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-    <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+    <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <tbody>
         <tr>
             <th>{{ _("Member") }}</th>
@@ -44,10 +44,13 @@
                     </td>
                 {% endif %}
 
-                {% if member[2] %}
+                {% if admin %}
                     <td>
-                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./removefromfam?id={{ member[1] }}">{{ _("Remove") }}</a>
+                        <form method="post" action="./editfam">
+                            <input id="action" name="next" type="hidden" value="DELETE">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                    name="id" type="submit" value="{{ member[1] }}">{{ _("Remove") }}</button>
+                        </form>
                     </td>
                 {% endif %}
             </tr>

@@ -7,6 +7,7 @@ create table groups
 	description integer
 );
 
+
 create table families
 (
 	id serial not null
@@ -18,6 +19,8 @@ create table families
 			references groups,
 	creation timestamp default now() not null
 );
+
+
 
 create unique index families_id_uindex
 	on families (id);
@@ -33,6 +36,8 @@ create table names_genitive
 	genitive varchar(255) not null
 );
 
+alter table names_genitive owner to jolod;
+
 create unique index names_genitive_name_uindex
 	on names_genitive (name);
 
@@ -45,6 +50,8 @@ create table role
 	description varchar(255)
 );
 
+
+
 create unique index role_id_uindex
 	on role (id);
 
@@ -56,11 +63,11 @@ create table "user"
 	id serial not null
 		constraint user_id_pk
 			primary key,
-	email varchar(255),
-	password varchar(255),
+	email varchar(255) not null,
+	password varchar(255) not null,
 	confirmed_at timestamp,
 	active boolean,
-	username varchar(255),
+	username varchar(255) not null,
 	last_login_at timestamp,
 	current_login_at timestamp,
 	last_login_ip varchar(255),
@@ -69,43 +76,57 @@ create table "user"
 	last_activity_at timestamp,
 	last_activity_ip varchar(255),
 	language varchar(5) default 'en'::character varying not null,
-	first_seen timestamp default now() not null
+	first_seen timestamp default now() not null,
+	birthday timestamp
 );
+
+
 
 create table roles_users
 (
-	id integer
+	id integer not null
 		constraint roles_users_id_fkey
 			references "user",
-	role_id integer
+	role_id integer not null
 		constraint roles_users_role_id_fkey
 			references role
 );
 
+alter table roles_users owner to jolod;
+
 create table shuffles
 (
 	giver integer not null
-		constraint shuffles_pkey
-			primary key
 		constraint shuffles_giver_fkey
 			references "user",
 	getter integer not null
 		constraint shuffles_getter_fkey
 			references "user",
-	year timestamp not null,
 	"group" integer not null
 		constraint shuffles_groups_id_fk
-			references groups
+			references groups,
+	year integer not null,
+	id serial not null
+		constraint shuffles_pk
+			primary key
 );
+
+
 
 create index shuffles_group_index
 	on shuffles ("group");
 
-create index shuffles_group_giver_index
-	on shuffles ("group", giver);
+create index shuffles_year_index
+	on shuffles (year);
 
-create unique index shuffles_giver_group_getter_year_uindex
-	on shuffles (giver, "group", getter, year);
+create unique index shuffles_giver_getter_group_year_uindex
+	on shuffles (giver, getter, "group", year);
+
+create unique index shuffles_id_uindex
+	on shuffles (id);
+
+create unique index shuffles_giver_year_uindex
+	on shuffles (giver, year);
 
 create unique index user_email_uindex
 	on "user" (email);
@@ -126,10 +147,13 @@ create table users_families_admins
 	family_id integer not null
 		constraint users_families_admins_family_id_fkey
 			references families,
-	admin boolean not null
+	admin boolean not null,
+	confirmed boolean default false not null
 );
 
 comment on table users_families_admins is 'Contains all user-family relationships and if the user is the admin of that family';
+
+alter table users_families_admins owner to jolod;
 
 create table users_groups_admins
 (
@@ -141,8 +165,11 @@ create table users_groups_admins
 	group_id integer not null
 		constraint users_groups_admins_group_id_fkey
 			references groups,
-	admin boolean not null
+	admin boolean not null,
+	confirmed boolean default false not null
 );
+
+alter table users_groups_admins owner to jolod;
 
 create table wishlists
 (
@@ -156,8 +183,11 @@ create table wishlists
 			references "user",
 	id bigserial not null
 		constraint wishlists_note_id_pk
-			primary key
+			primary key,
+	received timestamp
 );
+
+
 
 create unique index wishlists_note_id_uindex
 	on wishlists (id);
@@ -171,8 +201,11 @@ create table families_groups
 			references families,
 	group_id integer not null
 		constraint families_groups_admins_groups_id_fk
-			references groups
+			references groups,
+	confirmed boolean default false not null
 );
+
+alter table families_groups owner to jolod;
 
 create index families_groups_admins_family_id_index
 	on families_groups (family_id);
@@ -194,6 +227,8 @@ create table user_connection
 	provider varchar(255)
 );
 
+alter table user_connection owner to jolod;
+
 create unique index user_connection_id_uindex
 	on user_connection (id);
 
@@ -208,6 +243,39 @@ create table reminders
 	type varchar(4)
 );
 
+
+
 create index reminders_group_index
 	on reminders ("group");
+
+create table subscription_types
+(
+	id serial not null
+		constraint subscription_types_pk
+			primary key,
+	name varchar(255)
+);
+
+alter table subscription_types owner to jolod;
+
+create table subscriptions
+(
+	user_id integer not null
+		constraint subscriptions_pk
+			primary key
+		constraint subscriptions_user_id_fk
+			references "user",
+	type integer not null
+		constraint subscriptions_subscription_types_id_fk
+			references subscription_types,
+	until timestamp not null
+);
+
+
+
+create unique index subscriptions_user_id_type_uindex
+	on subscriptions (user_id, type);
+
+create unique index subscription_types_id_uindex
+	on subscription_types (id);
 

@@ -17,6 +17,7 @@ class UserGroupAdmin(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
 
     def __init__(self, user_id, group_id, admin):
         self.user_id = user_id

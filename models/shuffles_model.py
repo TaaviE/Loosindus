@@ -7,9 +7,11 @@ from models.users_model import User
 
 class Shuffle(db.Model):
     __tablename__ = "shuffles"
-    giver = db.Column(db.Integer(), db.ForeignKey(User.id), primary_key=True, nullable=False)
+
+    id = db.Column(db.BigInteger, primary_key=True, nullable=False, autoincrement=True)
+    giver = db.Column(db.Integer(), db.ForeignKey(User.id), nullable=False)
     getter = db.Column(db.Integer(), db.ForeignKey(User.id), nullable=False)
-    year = db.Column(db.DateTime(), nullable=False, default=datetime.now())
+    year = db.Column(db.Integer(), default=datetime.now().year, nullable=False)
     group = db.Column(db.Integer(), db.ForeignKey(Group.id))
 
     def __str__(self):

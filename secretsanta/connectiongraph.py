@@ -1,4 +1,4 @@
-import secretsanta.connection as SantaConnection
+import secretsanta.connection as santaconnection
 
 
 class ConnectionGraph:
@@ -56,4 +56,4 @@ class ConnectionGraph:
                 if vertice in self.members_to_families and source_family == self.members_to_families[vertice]:
                     weight += len(self.vertices[target])
 
-        return SantaConnection.Connection(source, target, year, weight)
+        return santaconnection.Connection(source, target, year, weight)

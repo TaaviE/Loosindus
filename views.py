@@ -18,7 +18,11 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+# Utilities
+import copy
+from hashlib import sha3_512
 from logging import getLogger
+from secrets import token_bytes
 
 # Graphing
 import secretsanta
@@ -28,15 +32,10 @@ from config import Config
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
 
-# Utilities
-import copy
-from secrets import token_bytes
-
 # Flask
 from flask import g, request, render_template, session, redirect, send_from_directory, Blueprint, flash, url_for
 from flask_security import login_required, logout_user
 from flask_security.utils import verify_password, hash_password
-from hashlib import sha3_512
 from flask_login import current_user, login_user
 from flask_mail import Message
 from flask_dance.consumer import oauth_authorized
@@ -44,17 +43,14 @@ from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint
-from sqlalchemy import and_
-from sqlalchemy.orm.exc import NoResultFound
-
-# Translation
-# Try switching between babelex and babel if you are getting errors
 from flask_babelex import gettext as _
 from flask_babelex import Domain
 
-domain = Domain(domain="messages")
-
+# from sqlalchemy import and_
+from sqlalchemy.orm.exc import NoResultFound
 from main import babel
+
+domain = Domain(domain="messages")
 
 
 @babel.localeselector
@@ -81,12 +77,14 @@ from models.users_model import AuthLinks
 from models.wishlist_model import NoteState
 from models.family_model import Family
 from models.groups_model import Group
-from models.user_group_admin_model import UserGroupAdmin
+from models.users_groups_admins_model import UserGroupAdmin
 
 main_page = Blueprint("main_page", __name__, template_folder="templates")
 
-from main import sentry, app
+from main import app
+# from main import sentry
 from utility import *
+from utility_standalone import *
 
 set_recursionlimit()
 
@@ -137,6 +135,8 @@ def error_500(err):
             sentry_enabled = True
     except Exception:
         sentry_enabled = False
+
+    logger.info(str(err))
     return render_template("error.html",
                            sentry_enabled=sentry_enabled,
                            sentry_ask_feedback=True,
@@ -155,6 +155,8 @@ def error_404(err):
             sentry_enabled = True
     except Exception:
         sentry_enabled = False
+
+    logger.info(str(err))
     return render_template("error.html",
                            sentry_enabled=sentry_enabled,
                            sentry_ask_feedback=True,
@@ -168,9 +170,9 @@ def error_404(err):
 @main_page.route("/test")
 @login_required
 def test():
-    check = check_if_admin()
-    if check is not None:
-        return check
+    # check = check_if_admin()
+    # if check is not None:
+    #    return check
     # remind_about_change(False)
     # remind_to_buy(False)
     # remind_to_add(False)
@@ -186,7 +188,7 @@ def favicon():
 
 
 def index():
-    domain = Domain(domain="messages")  # Uncomment this when using babelex
+    Domain(domain="messages")
 
     try:
         security.datastore.commit()
@@ -498,28 +500,9 @@ def updatenotestatus():
     return redirect("/giftingto?id=" + str(request.args["id"]), code=303)
 
 
-christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
-                     "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
-
-
-def get_christmasy_emoji(user_id):
-    """
-    :type user_id: int
-    """
-    if user_id is not None:
-        emoji = christmasy_emojis[int(user_id) % len(christmasy_emojis)]
-    else:
-        emoji = ""
-    return emoji
-
-
 @main_page.route("/giftingto")
 @login_required
 def giftingto():
-    check = check_if_admin()
-    # if check is not None:
-    #   return check
-
     user_id = session["user_id"]
     username = get_person_name(user_id)
     invalid_notes = False
@@ -532,9 +515,8 @@ def giftingto():
     try:
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
-    except Exception as e:
-        logger.info("Failed decrypting or missing: {}", e)
-        request_id = get_target_id(user_id)
+    except Exception:
+        request_id = get_target_id(int(user_id))
 
     try:  # Yeah, only valid IDs please
         if request_id == -1:
@@ -554,33 +536,31 @@ def giftingto():
                                message=_("Pls no hax ") + username + "!!",
                                title=_("Error"))
 
-    if check is not None:  # Let's not let everyone read everyone's lists
-        if request_id != get_target_id(user_id):
-            family_id = get_family_id(user_id)
-            family_obj = Family.query.get(family_id)
-            family_group = family_obj.group
+    if request_id != get_target_id(user_id):  # Let's not let everyone read everyone's lists
+        family_id = get_family_id(user_id)
+        family_obj = Family.query.get(family_id)
+        family_group = family_obj.group
+        database_all_families_with_members = []
+        database_families = Family.query.filter(Family.group == family_group).all()
 
-            database_all_families_with_members = []
-            database_families = Family.query.filter(Family.group == family_group).all()
-            for db_family in database_families:
-                database_family_members = UserFamilyAdmin.query.filter(
-                    UserFamilyAdmin.family_id == db_family.id).all()
-                database_all_families_with_members.append(database_family_members)
+        for db_family in database_families:
+            database_family_members = UserFamilyAdmin.query.filter(
+                UserFamilyAdmin.family_id == db_family.id).all()
+            database_all_families_with_members.append(database_family_members)
+        found = False
 
-            found = False
-            for family in database_all_families_with_members:
-                for member in family:
-                    if member.user_id == request_id:
-                        found = True
-
-            if not found:
-                return check
+        for family in database_all_families_with_members:
+            for member in family:
+                if member.user_id == request_id:
+                    found = True
+        if not found:
+            return str("Not found")
 
     currentnotes = {}
 
     try:
-        logger.info("{} is opening file: {}", user_id, request_id)
-        db_notes = Wishlist.query.filter(Wishlist.user_id == request_id).all()
+        logger.info("{} is opening file: {}".format(user_id, request_id))
+        db_notes = Wishlist.query.filter(and_(Wishlist.user_id == request_id, Wishlist.received == None)).all()
         if len(db_notes) <= 0:
             raise Exception
 
@@ -627,7 +607,7 @@ def giftingto():
     except Exception as e:
         currentnotes = {_("Right now there isn't anything on the list"): (-1, -1, False, "")}
         invalid_notes = True
-        logger.info("Error displaying notes, there might be none: {}", e)
+        logger.info("Error displaying notes, there might be none: {}".format(e))
 
     return render_template("show_notes.html",
                            notes=currentnotes,
@@ -685,6 +665,7 @@ def graph_json(graph_id, unhide):
         graph_id = int(graph_id)
         belongs_in_group = False
         people = {"nodes": [], "links": []}
+        current_year = datetime.datetime.now().year
         for family in Family.query.filter(Family.group == graph_id).all():
             for user in UserFamilyAdmin.query.filter(UserFamilyAdmin.family_id == family.id).all():
                 if unhide:
@@ -699,7 +680,7 @@ def graph_json(graph_id, unhide):
                         people["nodes"].append({"id": get_christmasy_emoji(user.user_id),
                                                 "group": 1})
 
-                shuffles = Shuffle.query.filter(Shuffle.giver == user.user_id).all()
+                shuffles = Shuffle.query.filter(and_(Shuffle.giver == user.user_id, Shuffle.year == current_year)).all()
                 for shuffle_element in shuffles:
                     if unhide:
                         people["links"].append({"source": get_person_name(shuffle_element.giver),
@@ -747,9 +728,7 @@ def custom_js():
                            user_id=int(session["user_id"]),
                            sentry_event_id=sentry_event_id,
                            sentry_public_dsn=sentry_public_dns,
-                           ), \
-           200, \
-           {"content-type": "application/javascript"}
+                           ), 200, {"content-type": "application/javascript"}
 
 
 @main_page.route("/settings")
@@ -800,7 +779,7 @@ def settings():
         sentry.captureException()
 
     return render_template("settings.html",
-                           user_id=user_id,
+                           user_id=encrypt_id(user_id),
                            user_name=user_obj.username,
                            user_language=user_obj.language,
                            family_admin=is_in_family,
@@ -859,7 +838,7 @@ def success_page():
 @main_page.route("/editfam")
 @login_required
 def editfamily():
-    user_id = session["user_id"]
+    user_id = int(session["user_id"])
 
     try:
         request_id = request.args["id"]
@@ -888,6 +867,11 @@ def editfamily():
         is_person = False
         if member.user_id == user_id:
             is_person = True
+            if member.admin:
+                show_admin_column = True
+
+        if member.admin:
+            is_admin = True
 
         birthday = None
         try:
@@ -901,9 +885,7 @@ def editfamily():
     return render_template("editfam.html",
                            family=family,
                            title=_("Edit family"),
-                           admin=show_admin_column,
-                           back=False,
-                           back_link="/settings")
+                           admin=show_admin_column)
 
 
 @main_page.route("/setlanguage", methods=["POST"])
@@ -960,12 +942,10 @@ def editgroup():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         request_id = 0
 
-    db_groups_user_is_admin = UserGroupAdmin.query.filter(
-        UserGroupAdmin.user_id == user_id).all()
+    db_groups_user_is_admin = UserGroupAdmin.query.filter(UserGroupAdmin.user_id == user_id).all()
 
     db_groups_user_has_conn = Family.query.filter(Family.group == request_id).all()
 
@@ -975,15 +955,10 @@ def editgroup():
 
     families = []
     for family in db_families_in_group:
-        admin = False
-
-        if family in db_groups_user_is_admin:
-            admin = True
-
-        families.append((family.name, encrypt_id(family.id), admin))
+        families.append((family.name, encrypt_id(family.id)))
 
     is_admin = False
-    if len(db_groups_user_is_admin) > 0:
+    if db_group.id in [group.group_id for group in db_groups_user_is_admin]:
         is_admin = True
 
     return render_template("editgroup.html",
@@ -1001,63 +976,60 @@ def editgroup_with_action():
     return None
 
 
-def check_if_admin():
-    user_id = session["user_id"]
-    requester = get_person_name(user_id)
-    requester = requester.lower()
-
-    if requester != "admin" and requester != "taavi":
-        return render_template("error.html",
-                               message=_("Pls no hax ") + requester + "!!",
-                               title=_("Error"))
-    else:
-        return None
-
-
-"""@main_page.route("/family")
+@main_page.route("/editfam", methods=["POST"])
 @login_required
-def family():
-    user_id = session["user_id"]
-    family_id = User.query.get(user_id).family_id
-    family_members = User.query.filter(User.family_id == family_id).all()
-    family_member_names = []
-    for member in family_members:
-        family_member_names.append(member.username)
-    return render_template("show_family.html", names=family_member_names, title="Perekond")
-"""
+def editfam_with_action():
+    # TODO:
+    return None
 
 
-@main_page.route("/recreategraph")
+@main_page.route("/recreategraph", methods=["GET"])
 @login_required
 def regraph():
-    check = check_if_admin()
-    if check is not None:
-        return check
-
     user_id = session["user_id"]
-    family_id = get_family_id(user_id)
+    family_id = int(request.args["group_id"])
+    # family_id = int(decrypt_id(request.form["group_id"]))
     family_obj = Family.query.get(family_id)
-    family_group = family_obj.group
     time_right_now = datetime.datetime.now()
 
-    database_families = Family.query.filter(Family.group == family_group).all()
+    database_families = Family.query.filter(Family.group == family_obj.group).all()
     database_all_families_with_members = []
     for db_family in database_families:
         database_family_members = UserFamilyAdmin.query.filter(
             UserFamilyAdmin.family_id == db_family.id).all()
-        database_all_families_with_members.append(database_family_members)
+        database_all_families_with_members.append((db_family.id, database_family_members))
+
+    user_id_to_user_number = {}
+    user_number_to_user_id = {}
+    start_id = 0
+    for family_id, db_family in database_all_families_with_members:
+        for member in db_family:
+            user_number_to_user_id[start_id] = member.user_id
+            user_id_to_user_number[member.user_id] = start_id
+            start_id += 1
+
+    try:
+        if not UserGroupAdmin.query.filter(
+                UserGroupAdmin.user_id == int(user_id) and UserGroupAdmin.admin == True).one():
+            return render_template("error.html",
+                                   message=_("Access denied"),
+                                   title=_("Error"))
+    except NoResultFound:
+        return render_template("error.html",
+                               message=_("Access denied"),
+                               title=_("Error"))
+    except Exception:
+        sentry.captureException()
 
     families = []
     family_ids_map = {}
-    for family_index, list_family in enumerate(database_all_families_with_members):
+    for family_index, (list_family_id, list_family) in enumerate(database_all_families_with_members):
         families.insert(family_index, {})
         for person_index, person in enumerate(list_family):
-            family_ids_map[family_index] = get_family_id(person.user_id)
-            families[family_index][get_person_name(person.user_id)] = person.user_id
+            family_ids_map[family_index] = list_family_id
+            families[family_index][get_person_name(person.user_id)] = user_id_to_user_number[person.user_id]
 
-    families_shuf_nam = {}
     families_shuf_ids = {}
-
     members_to_families = {}
     for family_id, family_members in enumerate(families):
         for person, person_id in family_members.items():
@@ -1072,38 +1044,46 @@ def regraph():
 
     last_connections = secretsanta.connectiongraph.ConnectionGraph(members_to_families, families_to_members)
 
-    for connection in Shuffle.query.filter(Shuffle.group == family_group).all():
-        last_connections.add(connection.source, connection.target, Shuffle.year.year)
+    for group_shuffle in Shuffle.query.filter(Shuffle.group == family_obj.group).all():  # Get last previous shuffles
+        last_connections.add(user_id_to_user_number[group_shuffle.giver],
+                             user_id_to_user_number[group_shuffle.getter],
+                             group_shuffle.year)
 
-    logger.info("{} is the year of Linux Desktop", time_right_now.year)
+    logger.info("{} is the year of Linux Desktop".format(time_right_now.year))
 
     santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
-    new_connections = santa.generate_connections(time_right_now.year)
 
     shuffled_ids_str = {}
-    for connection in new_connections:
+    for connection in santa.generate_connections(time_right_now.year):
         families_shuf_ids[connection.source] = connection.target
-        families_shuf_nam[get_person_name(connection.source)] = get_person_name(connection.target)
         shuffled_ids_str[str(connection.source)] = str(connection.target)
 
-        #    logger.info( shuffled_names)
-        #    logger.info( shuffled_ids)
+    logger.info(shuffled_ids_str)
 
-    for giver, getter in families_shuf_ids.items():  # TODO: Add date
+    for giver, getter in families_shuf_ids.items():
+        # The assumption is that one group shouldn't have more than one shuffle a year active
+        # at the same time, there can be multiple with different years
         db_entry_shuffle = Shuffle(
-            giver=giver,
-            getter=getter,
-            year=time_right_now,
-            group=family_group
+            giver=user_number_to_user_id[giver],
+            getter=user_number_to_user_id[getter],
+            year=time_right_now.year,
+            group=family_obj.group
         )
         try:
             db.session.add(db_entry_shuffle)
             db.session.commit()
         except Exception:
             db.session.rollback()
-            row = Shuffle.query.get(giver)
-            row.getter = getter
-            db.session.commit()
+            try:
+                row = Shuffle.query.filter(and_(Shuffle.giver == user_number_to_user_id[giver],
+                                                Shuffle.year == time_right_now.year)).one()
+                if row.getter != user_number_to_user_id[getter]:
+                    row.getter = user_number_to_user_id[getter]
+                    db.session.commit()
+            except Exception:
+                db.session.rollback()
+
+            sentry.captureException()
 
     return render_template("success.html",
                            action=_("Generated"),
@@ -1398,7 +1378,7 @@ def oauth_handler(blueprint, token):
             try:
                 db.session.add(user)  # Populate User ID first
                 db.session.commit()
-            except Exception as e:
+            except Exception:
                 db.session.rollback()
                 sentry.captureException()
                 logger.error("Could not store user and oauth link")
@@ -1424,10 +1404,6 @@ def oauth_handler(blueprint, token):
             logger.debug("User does not wish to sign up")
             flash(_("You do not have an account"))
             return False
-
-    flash(_("Error logging in"))
-    logger.critical("Impossible case!")
-    return False
 
 
 @main_page.route("/clientcert")
