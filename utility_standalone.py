@@ -22,7 +22,7 @@ def decrypt_id(encrypted_user_id: str) -> str:
 
     try:
         cipher.verify(tag)
-        info("The message is authentic: {}", plaintext)
+        info("The message is authentic: {}".format(plaintext))
     except ValueError:
         info("Key incorrect or message corrupted!")
 
