@@ -531,8 +531,13 @@ def giftingto():
         database_families = Family.query.filter(
             Family.id.in_(
                 set([familygroup.family_id for familygroup in
-                     FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id
-                                              ).all()]))
+                     FamilyGroup.query.filter(FamilyGroup.group_id ==
+                                              FamilyGroup.query.filter(
+                                                  FamilyGroup.family_id == family_obj.id
+                                              ).one().group_id
+                                              ).all()
+                     ])
+            )
         ).all()
 
         for db_family in database_families:
