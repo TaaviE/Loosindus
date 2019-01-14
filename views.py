@@ -621,7 +621,7 @@ def graph():
     try:
         family_id = get_family_id(user_id)
         family_obj = Family.query.get(family_id)
-        family_group = family_obj.group
+        family_group = FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id
         if "unhide" in request.args.keys():  # Make prettier
             if request.args["unhide"] in "True":
                 unhide = "True"
@@ -1354,7 +1354,8 @@ def regraph():
 
     last_connections = secretsanta.connectiongraph.ConnectionGraph(members_to_families, families_to_members)
 
-    for group_shuffle in Shuffle.query.filter(Shuffle.group == family_obj.group).all():  # Get last previous shuffles
+    family_group = FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id
+    for group_shuffle in Shuffle.query.filter(Shuffle.group == family_group).all():  # Get last previous shuffles
         last_connections.add(user_id_to_user_number[group_shuffle.giver],
                              user_id_to_user_number[group_shuffle.getter],
                              group_shuffle.year)
@@ -1377,7 +1378,7 @@ def regraph():
             giver=user_number_to_user_id[giver],
             getter=user_number_to_user_id[getter],
             year=time_right_now.year,
-            group=family_obj.group
+            group=family_group
         )
         try:
             db.session.add(db_entry_shuffle)
