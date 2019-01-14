@@ -661,7 +661,13 @@ def graph_json(graph_id, unhide):
         belongs_in_group = False
         people = {"nodes": [], "links": []}
         current_year = datetime.datetime.now().year
-        for family in Family.query.filter(Family.group == graph_id).all():
+        database_families = Family.query.filter(
+            Family.id.in_(
+                set([familygroup.family_id for familygroup in
+                     FamilyGroup.query.filter(FamilyGroup.group_id == graph_id
+                                              ).all()]))
+        ).all()
+        for family in database_families:
             for user in UserFamilyAdmin.query.filter(UserFamilyAdmin.family_id == family.id).all():
                 if unhide:
                     people["nodes"].append({"id": get_person_name(user.user_id),
