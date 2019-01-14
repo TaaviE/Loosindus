@@ -1,4 +1,7 @@
-{% if no_ads != true %}
+{%
+    if no_ads != true and;
+    config.GOOGLE_ADS %
+}
 try {
     (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "{{ config.DATA_AD_CLIENT }}",
@@ -42,9 +45,6 @@ try {
     gtag("js", new Date());
     gtag("set", "anonymizeIp", true);
     gtag("config", "{{ config.GAUA}}");
-    gtag("set",
-        {"user_id": "{{ user_id }}"}
-    );
 } catch (e) {
     console.log(e);
 }

@@ -8,6 +8,27 @@
     </div>
 {% endblock %}
 
+{% if group_admin %}
+    {% block buttons %}
+        <div class="mdl-card mdl-shadow--2dp mdl-cell">
+            <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="custom-white-text mdl-card__title-text">{{ _("Create new...") }}</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <p>{{ _("Use these buttons to start creating new families and groups") }}</p>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   href="./createfam">{{ _("Create family") }}</a>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   href="./creategroup">{{ _("Create group") }}</a>
+            </div>
+        </div>
+    {% endblock %}
+{% endif %}
+
 {% block content %}
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
@@ -18,21 +39,25 @@
             </div>
             </p>
             <p>{{ _("Your name:") }} {{ user_name }}</p>
-            <p>{% if id_connected %}{{ _("Estonian ID card is linked") }}{% else %}
-                {{ _("Connect Estonian ID card:") }}{% endif %} <a
-                    {% if id_connected %}disabled{% endif %}
-                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                    {% if not id_connected %}
-                    href="{{ url_for("main_page.log_user_in_with_cert") }}"
+
+            {% if config.ESTEID_AUTH %}
+                <p>{% if id_connected %}{{ _("Estonian ID card is linked") }}{% else %}
+                    {{ _("Connect Estonian ID card:") }}{% endif %} <a
+                        {% if id_connected %}disabled{% endif %}
+                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        {% if not id_connected %}
+                        href="{{ url_for("main_page.log_user_in_with_cert") }}"
+                        {% else %}
+                        href="#"
+                        {% endif %}>
+                    {% if id_connected %}
+                        {{ _("Linked") }}
                     {% else %}
-                    href="#"
-                    {% endif %}>
-                {% if id_connected %}
-                    {{ _("Linked") }}
-                {% else %}
-                    {{ _("Link") }}
-                {% endif %}
-            </a></p>
+                        {{ _("Link") }}
+                    {% endif %}
+                </a>
+                </p>
+            {% endif %}
 
             {% if config.GOOGLE_OAUTH %}
                 <p>{% if google_connected %}{{ _("Google account is linked") }}{% else %}
@@ -90,7 +115,7 @@
             {% endif %}
 
             <p>{{ _("Your language:") }}</p>
-            <form method="post" action="setlanguage">
+            <form method="post" action="./setlanguage">
                 <select class="mdl-textfield__input" id="language" name="language">
                     <option value="{{ user_language }}">{{ user_language }}</option>
                     <option value="ee">{{ _("Estonian") }}</option>
@@ -100,14 +125,20 @@
                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                        value={{ _("Send") }}>
             </form>
-            </p>
 
+            {% if in_family %}
             <p>{{ _("Your families:") }}</p>
             <table class="mdl-data-table">
                 <thead>
                 <tr>
                     <th>{{ _("Family") }}</th>
+                    {% if group_admin %}
+                        <th>{{ _("ID") }}</th>
+                    {% endif %}
                     <th>{{ _("Options") }}</th>
+                    {% if family_admin %}
+                        <th></th>
+                    {% endif %}
                 </tr>
                 </thead>
 
@@ -117,26 +148,48 @@
                         <td>{{ name }}</td>
                         {% if family[1] %}
                             <td>
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input class="mdl-textfield__input" type="text" id="user_id" value="{{ family[0] }}"
+                                           disabled>
+                                </div>
+                            </td>
+                            <td>
                                 <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                                   href="./editfam?id={{ family[0] }}">{{ _("Change / Display") }}</a>
+                            </td>
+                            <td>
+                                <form method="post" action="./editfam">
+                                    <input name="action" type="hidden" value="DELETEFAM">
+                                    <input name="extra_data" type="hidden" value="{{ family[0] }}">
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                            name="id" type="submit" value="{{ family[0] }}">{{ _("Delete") }}</button>
+                                </form>
                             </td>
                         {% else %}
                             <td>
                                 <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editfam?id={{ family[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                                   href="./editfam?id={{ family[0] }}">{{ _("Display") }}</a>
                             </td>
                         {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
 
+            {% if in_group %}
             <p>{{ _("Your groups:") }}</p>
             <table class="mdl-data-table">
                 <thead>
                 <tr>
                     <th>{{ _("Group") }}</th>
+                    {% if group_admin %}
+                        <th>{{ _("ID") }}</th>
+                    {% endif %}
                     <th>{{ _("Options") }}</th>
+                    {% if group_admin %}
+                        <th></th>
+                    {% endif %}
                 </tr>
                 </thead>
 
@@ -146,19 +199,34 @@
                         <td>{{ name }}</td>
                         {% if group[1] %}
                             <td>
+                                <div class="mdl-textfield mdl-js-textfield">
+                                    <input class="mdl-textfield__input" type="text" id="user_id" value="{{ group[0] }}"
+                                           disabled>
+                                </div>
+                            </td>
+                            <td>
                                 <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Change / Display") }}</a>
+                                   href="./editgroup?id={{ group[0] }}">{{ _("Change / Display") }}</a>
+                            </td>
+                            <td>
+                                <form method="post" action="./editgroup">
+                                    <input name="action" type="hidden" value="DELETEGROUP">
+                                    <input name="extra_data" type="hidden" value="{{ group[0] }}">
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                            name="id" type="submit" value="{{ group[0] }}">{{ _("Delete") }}</button>
+                                </form>
                             </td>
                         {% else %}
                             <td>
                                 <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                   href="./editgroup?id={{ group[0] }}{{ back_link }}">{{ _("Display") }}</a>
+                                   href="./editgroup?id={{ group[0] }}">{{ _("Display") }}</a>
                             </td>
                         {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

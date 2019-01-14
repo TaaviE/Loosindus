@@ -18,6 +18,11 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
+# Cython
+import pyximport
+
+pyximport.install()
+
 # Utilities
 import copy
 from hashlib import sha3_512
@@ -26,6 +31,7 @@ from secrets import token_bytes
 
 # Graphing
 import secretsanta
+
 # App specific config
 from config import Config
 
@@ -75,7 +81,7 @@ def get_locale():
 from main import db
 from models.users_model import AuthLinks
 from models.wishlist_model import NoteState
-from models.family_model import Family
+from models.family_model import Family, FamilyGroup
 from models.groups_model import Group
 from models.users_groups_admins_model import UserGroupAdmin
 
@@ -126,7 +132,10 @@ def delay_security_email(msg):
 
 
 # Show a friendlier error page
-@main_page.errorhandler(500)
+@app.errorhandler(500)
+@app.errorhandler(404)
+@app.errorhandler(405)
+@main_page.route("/testerror/<err>", defaults={"err": "Testing error"})
 def error_500(err):
     try:
         if not current_user.is_authenticated:
@@ -142,27 +151,7 @@ def error_500(err):
                            sentry_ask_feedback=True,
                            sentry_event_id=g.sentry_event_id,
                            sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                           message=_("There was an error"),
-                           title=_("Error"))
-
-
-@main_page.errorhandler(404)
-def error_404(err):
-    try:
-        if not current_user.is_authenticated:
-            sentry_enabled = False
-        else:
-            sentry_enabled = True
-    except Exception:
-        sentry_enabled = False
-
-    logger.info(str(err))
-    return render_template("error.html",
-                           sentry_enabled=sentry_enabled,
-                           sentry_ask_feedback=True,
-                           sentry_event_id=g.sentry_event_id,
-                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
-                           message=_("Page not found!"),
+                           message=_("An error occured"),
                            title=_("Error"))
 
 
@@ -170,12 +159,6 @@ def error_404(err):
 @main_page.route("/test")
 @login_required
 def test():
-    # check = check_if_admin()
-    # if check is not None:
-    #    return check
-    # remind_about_change(False)
-    # remind_to_buy(False)
-    # remind_to_add(False)
     return render_template("error.html",
                            message=_("Here you go!"),
                            title=_("Error"))
@@ -185,6 +168,15 @@ def test():
 def favicon():
     return send_from_directory("./static",
                                "favicon-16x16.png")
+
+
+@main_page.route("/feedback")
+@login_required
+def feedback():
+    return render_template("feedback.html",
+                           sentry_feedback=True,
+                           sentry_event_id=g.sentry_event_id,
+                           sentry_public_dsn=sentry.client.get_public_dsn("https"))
 
 
 def index():
@@ -270,8 +262,7 @@ def notes():
         for note in db_notes:
             notes_from_file[note.item] = encrypt_id(note.id)
     except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         raise e
 
     if len(notes_from_file) <= 0:
@@ -287,8 +278,13 @@ def notes():
 @main_page.route("/createnote", methods=["GET"])
 @login_required
 def createnote():
-    return render_template("createnote.html",
-                           title=_("Add new"))
+    return render_template("creatething.html",
+                           action="ADD",
+                           confirm=False,
+                           endpoint="createnote",
+                           row_count=3,
+                           label=_("Your wish"),
+                           placeholder="")
 
 
 @main_page.route("/createnote", methods=["POST"])
@@ -297,31 +293,30 @@ def createnote_add():
     logger.info("Got a post request to add a note")
     user_id = session["user_id"]
     username = get_person_name(user_id)
-    logger.info("Found user: {}", username)
-    logger.info("Found user id: {}", user_id)
+    logger.info("Found user: {}".format(username))
+    logger.info("Found user id: {}".format(user_id))
     currentnotes = {}
-    addednote = request.form["note"]
+    addednote = request.form["textfield"]
 
-    if len(addednote) > 1000:
+    if len(addednote) > 1024:
         return render_template("error.html",
-                               message=_("Pls no hax ") + username + "!!",
+                               message=_("You're wishing for too much"),
                                title=_("Error"))
     elif len(addednote) <= 0:
         return render_template("error.html",
                                message=_("Santa can't bring you nothin', ") + username + "!",
                                title=_("Error"))
 
-    logger.info("Trying to add a note: {}", addednote)
+    logger.info("Trying to add a note: {}".format(addednote))
     try:
-        logger.info("Opening file: {}", user_id)
+        logger.info("Opening file: {}".format(user_id))
         #    with open("./notes/" + useridno, "r") as file:
         #        currentnotes = json.load(file)
         db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
         for note in db_notes:
             currentnotes[note.item] = note.id
     except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         raise e
 
     if len(currentnotes) >= 200:
@@ -338,8 +333,7 @@ def createnote_add():
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         raise e
 
     return render_template("success.html",
@@ -356,28 +350,30 @@ def editnote():
 
     try:
         request_id = request.args["id"]
-        request_id = decrypt_id(request_id)
-        request_id = int(request_id)
-
+        request_id = int(decrypt_id(request_id))
         logger.info("{} is trying to remove a note {}", user_id, request_id)
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Pls no hax ") + username + "!!",
                                title=_("Error"))
 
     try:
-        logger.info("{} is editing notes of {}", user_id, request_id)
+        logger.info("{} is editing notes of {}".format(user_id, request_id))
         db_note = Wishlist.query.get(request_id)
-    except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
-        raise e
+    except Exception:
+        sentry.captureException()
+        return render_template("error.html",
+                               message=_("An error occured"),
+                               title=_("Error"))
 
-    return render_template("createnote.html",
-                           action=_("Edit"),
-                           title=_("Edit"),
+    return render_template("creatething.html",
+                           action="ADD",
+                           confirm=False,
+                           endpoint="editnote",
+                           row_count=3,
+                           extra_data=request.args["id"],
+                           label=_("Your wish"),
                            placeholder=db_note.item)
 
 
@@ -386,19 +382,17 @@ def editnote():
 def editnote_edit():
     logger.info("Got a post request to edit a note by")
     user_id = session["user_id"]
-    # username = get_person_name(user_id)
-    logger.info(" user id: {}", user_id)
+    logger.info(" user id: {}".format(user_id))
 
-    addednote = request.form["note"]
+    addednote = request.form["textfield"]
     try:
-        request_id = request.args["id"]
+        request_id = request.form["extra_data"]
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
-                               message=_("Broken link"),
+                               message=_("An error occured"),
                                title=_("Error"))
 
     db_note = Wishlist.query.get(request_id)
@@ -407,11 +401,12 @@ def editnote_edit():
         db_note.item = addednote
         db_note.status = NoteState.MODIFIED.value["id"]
         db.session.commit()
-    except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
+    except Exception:
+        sentry.captureException()
         db.session.rollback()
-        raise e
+        return render_template("error.html",
+                               message=_("An error occured"),
+                               title=_("Error"))
 
     return render_template("success.html",
                            action=_("Changed"),
@@ -419,38 +414,40 @@ def editnote_edit():
                            title=_("Changed"))
 
 
-@main_page.route("/removenote")
+@main_page.route("/removenote", methods=["POST"])
 @login_required
 def deletenote():
     user_id = session["user_id"]
     username = get_person_name(user_id)
 
+    if "confirm" not in request.form.keys():
+        return render_template("creatething.html",
+                               action="DELETE",
+                               endpoint="removenote",
+                               extra_data=request.form["extra_data"],
+                               confirm=True)
+
     try:
-        request_id = request.args["id"]
+        request_id = request.form["extra_data"]
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
-        logger.info("{} is trying to remove a note {}", user_id, request_id)
+        logger.info("{} is trying to remove a note {}".format(user_id, request_id))
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Broken link"),
                                title=_("Error"))
 
-    try:
+    try:  # Let's try to delete it now
         Wishlist.query.filter_by(id=request_id).delete()
         db.session.commit()
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Can't find what you wanted to delete"),
                                title=_("Error"))
 
-    #    with open("./notes/" + useridno, "w") as file:
-    #        file.write(json.dumps(currentnotes))
-
-    logger.info("Removed {} note with ID {}", username, request_id)
+    logger.info("Removed {} note with ID {}".format(username, request_id))
     return render_template("success.html",
                            action=_("Removed"),
                            link="./notes",
@@ -472,9 +469,6 @@ def updatenotestatus():
             note.status = status
             note.purchased_by = user_id
             db.session.commit()
-        #        elif status == "off":
-        #            note.status = NoteState.DEFAULT.value["id"]
-        #            note.purchased_by = None
         elif status == -1:
             if int(note.status) == NoteState.PURCHASED.value["id"] or status == \
                     NoteState.MODIFIED.value["id"]:
@@ -485,17 +479,12 @@ def updatenotestatus():
         else:
             raise Exception("Invalid status code")
     except Exception as e:
-        if not Config.DEBUG:
-            sentry.captureException()
-        else:
-            logger.info("Failed toggling: {}", e)
+        sentry.captureException()
+        logger.info("Failed toggling: {}".format(e))
         return render_template("error.html",
                                message=_("Could not edit"),
                                title=_("Error"),
                                back=True)
-
-    #    with open("./notes/" + useridno, "w") as file:
-    #        file.write(json.dumps(currentnotes))
 
     return redirect("/giftingto?id=" + str(request.args["id"]), code=303)
 
@@ -530,8 +519,7 @@ def giftingto():
                                    message=_("Access to this list is forbidden"),
                                    title=_("Forbidden"))
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Pls no hax ") + username + "!!",
                                title=_("Error"))
@@ -539,27 +527,35 @@ def giftingto():
     if request_id != get_target_id(user_id):  # Let's not let everyone read everyone's lists
         family_id = get_family_id(user_id)
         family_obj = Family.query.get(family_id)
-        family_group = family_obj.group
         database_all_families_with_members = []
-        database_families = Family.query.filter(Family.group == family_group).all()
+        database_families = Family.query.filter(
+            Family.id.in_(
+                set([familygroup.family_id for familygroup in
+                     FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id
+                                              ).all()]))
+        ).all()
 
         for db_family in database_families:
             database_family_members = UserFamilyAdmin.query.filter(
                 UserFamilyAdmin.family_id == db_family.id).all()
             database_all_families_with_members.append(database_family_members)
-        found = False
 
+        found = False
         for family in database_all_families_with_members:
             for member in family:
                 if member.user_id == request_id:
                     found = True
+
         if not found:
-            return str("Not found")
+            return render_template("error.html",
+                                   message=_("Access denied"),
+                                   title=_("Error"))
 
     currentnotes = {}
 
     try:
         logger.info("{} is opening file: {}".format(user_id, request_id))
+        # noinspection PyComparisonWithNone
         db_notes = Wishlist.query.filter(and_(Wishlist.user_id == request_id, Wishlist.received == None)).all()
         if len(db_notes) <= 0:
             raise Exception
@@ -602,8 +598,7 @@ def giftingto():
 
             currentnotes[note.item] = (encrypt_id(note.id), copy.deepcopy(selections), modifyable, name)
     except ValueError:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
     except Exception as e:
         currentnotes = {_("Right now there isn't anything on the list"): (-1, -1, False, "")}
         invalid_notes = True
@@ -695,10 +690,10 @@ def graph_json(graph_id, unhide):
         if belongs_in_group or unhide:
             return dumps(people), 200, {"content-type": "application/json"}
         else:
-            return "{}"
+            return "{}", 200, {"content-type": "application/json"}
     except Exception:
         sentry.captureException()
-        return "{}"
+        return "{}", 200, {"content-type": "application/json"}
 
 
 @main_page.route("/grapher/<graph_id>/<unhide>")
@@ -707,8 +702,7 @@ def graph_json(graph_id, unhide):
 @login_required
 def graph_js(graph_id, unhide):
     return render_template("grapher.js", graph_id=graph_id, unhide=unhide), \
-           200, \
-           {"content-type": "application/javascript"}
+           200, {"content-type": "application/javascript"}
 
 
 @main_page.route("/custom.js")
@@ -718,10 +712,10 @@ def custom_js():
     sentry_event_id = ""
     sentry_public_dns = ""
 
-    if "sentry_event_id" in request.args.keys():
+    if "event_id" in request.args.keys():
         sentry_feedback = True
-        sentry_event_id = request.args["sentry_event_id"]
-        sentry_public_dns = request.args["sentry_public_dsn"]
+        sentry_event_id = request.args["event_id"]
+        sentry_public_dns = request.args["dsn"]
 
     return render_template("custom.js",
                            sentry_feedback=sentry_feedback,
@@ -736,21 +730,28 @@ def custom_js():
 def settings():
     user_id = session["user_id"]
     user_obj = User.query.get(user_id)
-    is_in_group = False
-    is_in_family = False
 
-    db_families_user_has_conn = UserFamilyAdmin.query.filter(
-        UserFamilyAdmin.user_id == user_id).all()
+    db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == user_id).all()
 
     user_families = {}
     db_groups_user_has_conn = []
+    is_in_family = False
+    family_admin = False
     for family_relationship in db_families_user_has_conn:
         family = Family.query.get(family_relationship.family_id)
-        user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
+        if not family_relationship.admin:
+            user_families[family.name] = (encrypt_id(family.id), False)
+        else:
+            family_admin = True
+            user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
         is_in_family = True
-        db_groups_user_has_conn += (Group.query.filter(Family.group == family.group).all())
+        familygroup_ids = [familygroup.group_id for familygroup in
+                           FamilyGroup.query.filter(FamilyGroup.family_id == family.id).all()]
+        db_groups_user_has_conn += (Group.query.filter(Group.id.in_(familygroup_ids)).all())
 
     user_groups = {}
+    is_in_group = False
+    group_admin = False
     for group_relationship in db_groups_user_has_conn:
         group_admin = UserGroupAdmin.query.filter(
             UserGroupAdmin.user_id == user_id
@@ -761,6 +762,8 @@ def settings():
             user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), False)
         else:
             user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), group_admin.admin)
+            group_admin = True
+
         is_in_group = True
 
     id_link_exists = False
@@ -782,14 +785,16 @@ def settings():
                            user_id=encrypt_id(user_id),
                            user_name=user_obj.username,
                            user_language=user_obj.language,
-                           family_admin=is_in_family,
-                           group_admin=is_in_group,
+                           in_family=is_in_family,
+                           in_group=is_in_group,
                            families=user_families,
                            groups=user_groups,
                            title=_("Settings"),
                            id_connected=id_link_exists,
                            google_connected=google_link_exists,
                            github_connected=github_link_exists,
+                           group_admin=group_admin,
+                           family_admin=family_admin,
                            back_link="/")
 
 
@@ -835,7 +840,7 @@ def success_page():
                            title=title)
 
 
-@main_page.route("/editfam")
+@main_page.route("/editfam", methods=["GET"])
 @login_required
 def editfamily():
     user_id = int(session["user_id"])
@@ -844,15 +849,7 @@ def editfamily():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     except Exception:
-        if not Config.DEBUG:
-            sentry.captureException()
-        return render_template("error.html",
-                               message=_("Broken link"),
-                               title=_("Error"))
-
-    if request_id < 0:
-        if not Config.DEBUG:
-            sentry.captureException()
+        sentry.captureException()
         return render_template("error.html",
                                message=_("Broken link"),
                                title=_("Error"))
@@ -885,7 +882,8 @@ def editfamily():
     return render_template("editfam.html",
                            family=family,
                            title=_("Edit family"),
-                           admin=show_admin_column)
+                           admin=show_admin_column,
+                           family_id=encrypt_id(request_id))
 
 
 @main_page.route("/setlanguage", methods=["POST"])
@@ -916,23 +914,7 @@ def set_language():
                                title=_("Error"))
 
 
-@main_page.route("/editfam", methods=["POST"])
-@login_required
-def editfamily_with_action():
-    # TODO:
-    # user_id = session["user_id"]
-
-    # try:
-    # action = request.args["action"]
-    # request_id = request.args["id"]
-    # request_id = int(decrypt_id(request_id))
-    # except Exception:
-    # return render_template("error.html", message="Tekkis viga, kontrolli linki", title="Error")
-
-    return None
-
-
-@main_page.route("/editgroup")
+@main_page.route("/editgroup", methods=["GET"])
 @login_required
 def editgroup():
     user_id = session["user_id"]
@@ -945,54 +927,382 @@ def editgroup():
         sentry.captureException()
         request_id = 0
 
-    db_groups_user_is_admin = UserGroupAdmin.query.filter(UserGroupAdmin.user_id == user_id).all()
+    db_group = Group.query.filter(Group.id == request_id).one()
 
-    db_groups_user_has_conn = Family.query.filter(Family.group == request_id).all()
-
-    db_group = db_groups_user_has_conn[request_id]
-
-    db_families_in_group = Family.query.filter(Family.group == db_group.group).all()
+    db_families_in_group = Family.query.filter(
+        Family.id.in_(
+            set([familygroup.family_id for familygroup in FamilyGroup.query.filter(
+                FamilyGroup.group_id == db_group.id
+            ).all()])
+        )
+    ).all()
 
     families = []
     for family in db_families_in_group:
         families.append((family.name, encrypt_id(family.id)))
 
     is_admin = False
-    if db_group.id in [group.group_id for group in db_groups_user_is_admin]:
+    if UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == request_id,
+                                        UserGroupAdmin.user_id == int(user_id)
+                                        )).one().admin:
         is_admin = True
 
     return render_template("editgroup.html",
                            title=_("Edit group"),
                            families=families,
+                           group_id=request.args["id"],
                            admin=is_admin)
 
 
-@main_page.route("/editgroup", methods=["POST"])
+@main_page.route("/editgroup", methods=["POST"])  # TODO: Maybe merge with editgroup
 @login_required
 def editgroup_with_action():
-    # TODO:
-    # user_id = session["user_id"]
-    # user_obj = User.query.get(user_id)
-    return None
+    user_id = int(session["user_id"])
+    endpoint = "editgroup"
+    if "action" not in request.form.keys():
+        return render_template("error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
+    else:
+        if request.form["action"] == "REMOVEFAM" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="REMOVEFAM",
+                                   endpoint=endpoint,
+                                   extra_data=extra_data,
+                                   id=id,
+                                   confirm=True)
+        elif request.form["action"] == "REMOVEFAM" and request.form["confirm"] == "True":
+            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
+            group_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+
+            admin_relationship = UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
+                                                                  UserGroupAdmin.user_id == user_id)).one()
+
+            if not admin_relationship.admin:
+                logger.warning("User {} is trying to forge requests".format(user_id))
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            target_relationship = FamilyGroup.query.filter(and_(FamilyGroup.group_id == group_id,
+                                                                FamilyGroup.family_id == family_id)).one()
+
+            if target_relationship.admin:
+                return render_template("error.html",
+                                       message=_("You can not delete an admin from your family"),
+                                       title=_("Error"))
+
+            target_relationship.delete()
+
+            try:
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("success.html",
+                                   action=_("Deleted"),
+                                   link="./",
+                                   title=_("Deleted"))
+        elif request.form["action"] == "ADDFAMILY" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="ADDFAMILY",
+                                   endpoint=endpoint,
+                                   extra_data=extra_data,
+                                   id=id,
+                                   confirm=True)
+        elif request.form["action"] == "ADDFAMILY" and request.form["confirm"] == "True":
+            # TODO: Add user to family
+            return render_template("success.html",
+                                   action=_("Added"),
+                                   link="./",
+                                   title=_("Added"))
+        elif request.form["action"] == "DELETEGROUP" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="DELETEGROUP",
+                                   endpoint=endpoint,
+                                   id=id,
+                                   extra_data=extra_data,
+                                   confirm=True)
+        elif request.form["action"] == "DELETEGROUP" and request.form["confirm"] == "True":
+            # TODO: Delete group
+            return render_template("success.html",
+                                   action=_("Deleted"),
+                                   link="./",
+                                   title=_("Deleted"))
+        else:
+            return render_template("error.html",
+                                   message=_("An error has occured"),
+                                   title=_("Error"))
 
 
 @main_page.route("/editfam", methods=["POST"])
 @login_required
 def editfam_with_action():
-    # TODO:
-    return None
+    user_id = int(session["user_id"])
+    endpoint = "editfam"
+    if "action" not in request.form.keys():
+        return render_template("error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
+    else:
+        if request.form["action"] == "REMOVEMEMBER" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="REMOVEMEMBER",
+                                   endpoint=endpoint,
+                                   id=id,
+                                   extra_data=extra_data,
+                                   confirm=True)
+        elif request.form["action"] == "REMOVEMEMBER" and request.form["confirm"] == "True":
+            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
+            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+
+            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
+                                                                   UserFamilyAdmin.family_id == family_id)).one()
+
+            if not admin_relationship.admin:
+                logger.warning("User {} is trying to forge requests".format(user_id))
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            target_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == target_id,
+                                                                    UserFamilyAdmin.family_id == family_id))
+
+            if target_relationship.admin:
+                return render_template("error.html",
+                                       message=_("You can not delete an admin from your family"),
+                                       title=_("Error"))
+
+            target_relationship.delete()
+
+            try:
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("success.html",
+                                   action=_("Deleted"),
+                                   link="./",
+                                   title=_("Deleted"))
+        elif request.form["action"] == "ADDMEMBER" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="ADDMEMBER",
+                                   endpoint=endpoint,
+                                   id=id,
+                                   extra_data=extra_data,
+                                   confirm=True)
+        elif request.form["action"] == "ADDMEMBER" and request.form["confirm"] == "True":
+            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
+            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+
+            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
+                                                                   UserFamilyAdmin.family_id == family_id)).one()
+
+            if not admin_relationship.admin:
+                logger.warning("User {} is trying to forge requests".format(user_id))
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            target_relationship = UserFamilyAdmin(user_id=target_id,
+                                                  admin=False,
+                                                  family_id=family_id)
+
+            try:
+                db.session.add(target_relationship)
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+            return render_template("success.html",
+                                   action=_("Added"),
+                                   link="./",
+                                   title=_("Added"))
+        elif request.form["action"] == "DELETEFAM" and "confirm" not in request.form.keys():
+            if "extra_data" in request.form.keys():
+                extra_data = request.form["extra_data"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            if "id" in request.form.keys():
+                id = request.form["id"]
+            else:
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            return render_template("creatething.html",
+                                   action="DELETEFAM",
+                                   endpoint=endpoint,
+                                   id=id,
+                                   extra_data=extra_data,
+                                   confirm=True)
+        elif request.form["action"] == "DELETEFAM" and request.form["confirm"] == "True":
+            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+
+            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
+                                                                   UserFamilyAdmin.family_id == target_id)).one()
+
+            if not admin_relationship.admin:
+                logger.warning("User {} is trying to forge requests".format(user_id))
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+
+            Family.query.filter(and_(Family.id == target_id)).one().delete()
+
+            try:
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                return render_template("error.html",
+                                       message=_("An error has occured"),
+                                       title=_("Error"))
+            return render_template("success.html",
+                                   action=_("Deleted"),
+                                   link="./",
+                                   title=_("Deleted"))
+        else:
+            return render_template("error.html",
+                                   message=_("An error has occured"),
+                                   title=_("Error"))
+
+
+@main_page.route("/addfam", methods=["GET"])
+@login_required
+def addfam():
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint="editfam",
+                           label=_("Group ID"))
+
+
+@main_page.route("/addgroup", methods=["GET"])
+@login_required
+def addgroup():
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint="editgroup",
+                           label=_("Group ID"))
 
 
 @main_page.route("/recreategraph", methods=["GET"])
 @login_required
+def ask_regraph():
+    if "extra_data" in request.form.keys():
+        extra_data = request.form["extra_data"]
+        return render_template("creatething.html",
+                               action="ADD",
+                               endpoint="recreategraph",
+                               extra_data=extra_data,
+                               confirm=True)
+    else:
+        return render_template("error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
+
+
+@main_page.route("/recreategraph", methods=["POST"])
+@login_required
 def regraph():
     user_id = session["user_id"]
-    family_id = int(request.args["group_id"])
-    # family_id = int(decrypt_id(request.form["group_id"]))
+    try:
+        family_id = int(decrypt_id(request.form["extra_data"]))
+    except Exception:
+        sentry.captureException()
+        return render_template("error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
     family_obj = Family.query.get(family_id)
     time_right_now = datetime.datetime.now()
 
-    database_families = Family.query.filter(Family.group == family_obj.group).all()
+    database_families = Family.query.filter(
+        Family.id.in_(
+            set([familygroup.family_id for familygroup in FamilyGroup.query.filter(
+                FamilyGroup.family_id == family_obj.id
+            ).all()])
+        )
+    ).all()
     database_all_families_with_members = []
     for db_family in database_families:
         database_family_members = UserFamilyAdmin.query.filter(
@@ -1096,7 +1406,7 @@ def regraph():
 def test_mail():
     from main import mail
     with mail.connect() as conn:
-        logger.info("Mail verify: {}", conn.configure_host().vrfy)
+        logger.info("Mail verify: {}".format(conn.configure_host().vrfy))
         msg = Message(recipients=["root@localhost"],
                       body="test",
                       subject="test2")
@@ -1116,33 +1426,36 @@ def api_login():
         password = request.form["password"]
         apikey = request.form["apikey"]
         if apikey != Config.PRIVATE_API_KEY:
-            return "{\"error\": \"error\"}"
+            return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
         user = User.query.filter(User.email == email).first()
 
         if verify_password(password, user.password):
             login_user(user)
         else:
-            return "{\"error\": \"error\"}"
+            return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
         return redirect("/")
     except Exception:
         sentry.captureException()
-        info("Api login failed for user {}", username)
-        return "{\"error\": \"error\"}"
+        info("Api login failed for user {}".format(username))
+        return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
 
 @main_page.route("/ads.txt", methods=["GET"])
+@lru_cache(maxsize=2)
 def ads_txt():
     return render_template("ads.txt"), {"content-type": "text/plain"}
 
 
 @main_page.route("/sitemap.xml", methods=["GET"])
+@lru_cache(maxsize=2)
 def sitemap():
-    return render_template("sitemap.xml")
+    return render_template("sitemap.xml"), {"content-type": "text/xml"}
 
 
 @main_page.route("/robots.txt", methods=["GET"])
+@lru_cache(maxsize=2)
 def robots():
     return render_template("robots.txt"), {"content-type": "text/plain"}
 

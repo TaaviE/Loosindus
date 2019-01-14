@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄{{ title }}{% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
@@ -42,11 +42,17 @@
                 <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
                 {% if not empty %}
                     <td class="mdl-data-table__cell--non-numeric">
-                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./removenote?id={{ id }}">{{ _("Delete") }}</a></td>
+                        <form method="post" action="./removenote">
+                            <input name="action" type="hidden" value="DELETENOTE">
+                            <input name="extra_data" type="hidden" value="{{ id }}">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                    type="submit">{{ _("Delete") }}</button>
+                        </form>
+                    </td>
                     <td class="mdl-data-table__cell--non-numeric">
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editnote?id={{ id }}">{{ _("Edit") }}</a></td>
+                           href="./editnote?id={{ id }}">{{ _("Edit") }}</a>
+                    </td>
                 {% else %}
                     <td class="mdl-data-table__cell--non-numeric"></td>
                     <td class="mdl-data-table__cell--non-numeric"></td>

@@ -1,16 +1,23 @@
 # coding=utf-8
 # author=Taavi Eomäe
+# Cython
+import pyximport
+
+pyximport.install()
+
+from functools import lru_cache
 import datetime
 import sys
 from base64 import urlsafe_b64decode, urlsafe_b64encode, b64decode, b64encode
 from json import dumps, loads
 from logging import info
-
+import binascii
 from Cryptodome.Cipher.AES import new, MODE_GCM
 
 from config import Config
 
 
+@lru_cache(maxsize=64)
 def decrypt_id(encrypted_user_id: str) -> str:
     base64_raw_data = urlsafe_b64decode(encrypted_user_id).decode()
     data = loads(base64_raw_data)
@@ -44,12 +51,23 @@ christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "
                      "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
 
 
+@lru_cache(maxsize=128)
 def get_christmasy_emoji(user_id: int) -> str:
     if user_id is not None:
         emoji = christmasy_emojis[int(user_id) % len(christmasy_emojis)]
     else:
         emoji = ""
     return emoji
+
+
+def auto_pad_urlsafe_b64(input_base64: str) -> str:
+    for i in range(5):  # Let's hope that's all the padding needed
+        try:
+            urlsafe_b64decode(input_base64 + "=" * i)
+            return input_base64 + "=" * i
+        except binascii.Error:
+            pass  # This padding didn't work
+    raise Exception("Beyond messed up, maybe it's a not base64?")
 
 
 def get_timestamp() -> str:

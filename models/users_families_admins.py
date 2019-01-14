@@ -14,8 +14,8 @@ class UserFamilyAdmin(db.Model):
     """
 
     __tablename__ = "users_families_admins"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
-    family_id = db.Column(db.Integer, db.ForeignKey("families.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, nullable=False)
+    family_id = db.Column(db.Integer, db.ForeignKey("families.id"), primary_key=True, nullable=False)
     admin = db.Column(db.Boolean, nullable=False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
 

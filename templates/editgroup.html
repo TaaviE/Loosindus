@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄{{ title }}{% endblock %}
 
 
 {% block updates %}
@@ -8,7 +8,9 @@
         <p>{{ _("This page lists all the families that the group contains") }}</p>
         {% if admin %}
             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               href="./addfam">{{ _("Add new") }}</a>
+               href="./editgroup?extra_data={{ group_id }}">{{ _("Add new family") }}</a>
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               href="./recreategraph?extra_data={{ group_id }}">{{ _("Shuffle") }}</a>
         {% endif %}
     </div>
 {% endblock %}
@@ -19,6 +21,9 @@
         <tbody>
         <tr>
             <th>{{ _("Family") }}</th>
+            {% if admin %}
+                <th>{{ _("ID") }}</th>
+            {% endif %}
             <th>{{ _("Action") }}</th>
             {% if admin %}
                 <th></th>
@@ -27,6 +32,13 @@
         {% for family in families %}
             <tr>
                 <td>{{ family[0] }}</td>
+                {% if admin %}
+                    <td>
+                        <div class="mdl-textfield mdl-js-textfield">
+                            <input class="mdl-textfield__input" disabled value="{{ family[1] }}" type="text">
+                        </div>
+                    </td>
+                {% endif %}
                 <td>
                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                        href="./editfam?id={{ family[1] }}">{{ _("Display") }}</a>
@@ -34,6 +46,8 @@
                 {% if admin %}
                     <td>
                         <form method="post" action="./editgroup">
+                            <input name="action" type="hidden" value="REMOVEFAM">
+                            <input name="extra_data" type="hidden" value="{{ group_id }}">
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                                     name="id" type="submit" value="{{ family[1] }}">{{ _("Remove") }}</button>
                         </form>

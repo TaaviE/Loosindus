@@ -51,11 +51,8 @@
     </main>
 </div>
 {% include "footer.html" %}
-{% if footer %}
-{% block footer %}{% endblock %}
-{% else %}
-    <script src="/custom.js"></script>
-{% endif %}
+{% block footer %}
+    <script src="/custom.js"></script>{% endblock %}
 {% if config.GOOGLE_ADS %}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 {% endif %}

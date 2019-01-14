@@ -18,3 +18,4 @@ celery[redis]
 gunicorn
 sqlalchemy-utils
 passlib
+cython

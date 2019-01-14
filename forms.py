@@ -1,10 +1,11 @@
+from flask_babelex import gettext as _
 from flask_security.forms import StringField, Required, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
     ForgotPasswordForm
 from flask_wtf import RecaptchaField
 
 
 class ExtendedRegisterForm(RegisterForm):
-    username = StringField("Eesnimi", [Required()])  # TODO: Translate I think
+    username = StringField(_("Eesnimi"), [Required()])
     recaptcha = RecaptchaField("Captcha")
 
 

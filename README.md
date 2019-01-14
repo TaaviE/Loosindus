@@ -15,6 +15,7 @@ Features and requirements:
   * The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break
   * The app is intended to be used with multiple families, but it is okay if there's only one family in the group or one-person families in the group
   * The amount of groups an user can be in is technically not limited (multiple secret santa events at the same time) but the UI can't handle displaying it for that user, this limitation will be fixed in future versions
+  * Implements Estonian ID card authentication that integrates with Flask-Security
 
 ## Eesti keeles
 
