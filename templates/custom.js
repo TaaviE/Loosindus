@@ -1,4 +1,4 @@
-{% if no_ads != true and; config.GOOGLE_ADS %}
+{% if no_ads != true and config.GOOGLE_ADS %}
 try {
     (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "{{ config.DATA_AD_CLIENT }}",
