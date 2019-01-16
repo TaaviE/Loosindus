@@ -225,7 +225,7 @@ def contact():
 
 @main_page.route("/worker.js")
 def worker_js():
-    return render_template("worker.js"), 200, {"content-type": "application/json"}
+    return render_template("worker.js"), 200, {"content-type": "application/javascript"}
 
 
 @main_page.route("/logout")
