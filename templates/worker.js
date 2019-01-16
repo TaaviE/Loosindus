@@ -4,9 +4,10 @@ self.addEventListener("install", function(event) {
       return cache.addAll(
         [
           "/static/roboto.min.css",
-          "/static/material.min.css",
+            "/static/material/lite/material.min.css",
+            "/static/material/lite/material.min.js",
           "/static/normalize.min.css",
-          "/static/normalize.min.js",
+            "/static/favicon/favicon-no-bg-196x196.png",
           "/static/custom.css",
         ]
       );
