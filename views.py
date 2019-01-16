@@ -726,6 +726,7 @@ def graph_js(graph_id, unhide):
 
 @main_page.route("/custom.js")
 @login_required
+@lru_cache(maxsize=10)
 def custom_js():
     sentry_feedback = False
     sentry_event_id = ""
