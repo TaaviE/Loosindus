@@ -13,6 +13,7 @@ from json import dumps, loads
 from logging import info
 import binascii
 from Cryptodome.Cipher.AES import new, MODE_GCM
+from hashlib import sha3_512
 
 from config import Config
 
@@ -58,6 +59,11 @@ def get_christmasy_emoji(user_id: int) -> str:
     else:
         emoji = ""
     return emoji
+
+
+@lru_cache(maxsize=1)
+def get_sha3_512_hash(input_dn: str) -> str:
+    return sha3_512(input_dn.encode("utf-8")).hexdigest()
 
 
 def auto_pad_urlsafe_b64(input_base64: str) -> str:

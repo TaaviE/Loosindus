@@ -25,7 +25,6 @@ pyximport.install()
 
 # Utilities
 import copy
-from hashlib import sha3_512
 from logging import getLogger
 from secrets import token_bytes
 
@@ -81,9 +80,6 @@ def get_locale():
 from main import db
 from models.users_model import AuthLinks
 from models.wishlist_model import NoteState
-from models.family_model import Family, FamilyGroup
-from models.groups_model import Group
-from models.users_groups_admins_model import UserGroupAdmin
 
 main_page = Blueprint("main_page", __name__, template_folder="templates")
 
@@ -189,6 +185,7 @@ def index():
 
     user_id = session["user_id"]
     username = get_person_name(user_id)
+
     no_shuffle = False
     if get_target_id(user_id) == -1:
         no_shuffle = True
@@ -210,8 +207,7 @@ def index():
 
 @main_page.route("/about")
 def about():
-    return render_template("home.html",
-                           no_sidebar=True)
+    return render_template("home.html", no_sidebar=True)
 
 
 @main_page.route("/")
@@ -227,6 +223,11 @@ def contact():
     return render_template("contact.html", no_sidebar=True)
 
 
+@main_page.route("/worker.js")
+def worker_js():
+    return render_template("worker.js"), 200, {"content-type": "application/json"}
+
+
 @main_page.route("/logout")
 @login_required
 def logout():
@@ -240,7 +241,13 @@ def shuffle():
     user_id = session["user_id"]
     username = get_person_name(user_id)
     gifter = get_person_id(username)
-    giftee = get_target_id(gifter)
+
+    if "group_id" in request.args.keys():
+        group_id = int(request.args["group_id"])
+        giftee = get_target_id_with_group(user_id, group_id)
+    else:
+        giftee = get_target_id(gifter)
+
     logger.info("Username: {}, From: {}, To: {}", username, gifter, giftee)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
@@ -321,7 +328,7 @@ def createnote_add():
 
     if len(currentnotes) >= 200:
         return render_template("error.html",
-                               message=_("You're wishing for too much, ") + username + "",
+                               message=_("You're wishing for too much, ") + username + ".",
                                title=_("Error"))
 
     db_entry_notes = Wishlist(
@@ -496,16 +503,16 @@ def giftingto():
     username = get_person_name(user_id)
     invalid_notes = False
 
-    try:
-        back_count = request.args["back"]
-    except Exception:
-        back_count = -1
-
-    try:
+    if "id" in request.args.keys():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
-    except Exception:
+    else:
         request_id = get_target_id(int(user_id))
+
+    if "group_id" in request.args.keys():
+        group_id = int(request.args["group_id"])
+    else:
+        group_id = None
 
     try:  # Yeah, only valid IDs please
         if request_id == -1:
@@ -524,21 +531,16 @@ def giftingto():
                                message=_("Pls no hax ") + username + "!!",
                                title=_("Error"))
 
-    if request_id != get_target_id(user_id):  # Let's not let everyone read everyone's lists
-        family_id = get_family_id(user_id)
-        family_obj = Family.query.get(family_id)
+    if group_id is not None:
+        target_id = get_target_id_with_group(user_id, group_id)
+    else:
+        target_id = get_target_id(user_id)
+
+    if request_id != target_id:  # Let's not let everyone read everyone's lists
+        family_obj = get_default_family(user_id)
         database_all_families_with_members = []
-        database_families = Family.query.filter(
-            Family.id.in_(
-                set([familygroup.family_id for familygroup in
-                     FamilyGroup.query.filter(FamilyGroup.group_id ==
-                                              FamilyGroup.query.filter(
-                                                  FamilyGroup.family_id == family_obj.id
-                                              ).one().group_id
-                                              ).all()
-                     ])
-            )
-        ).all()
+        database_families = get_families_in_group(
+            FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id)
 
         for db_family in database_families:
             database_family_members = UserFamilyAdmin.query.filter(
@@ -615,8 +617,7 @@ def giftingto():
                            id=encrypt_id(request_id),
                            title=_("Wishlist"),
                            invalid=invalid_notes,
-                           back=True,
-                           back_count=back_count)
+                           back=True)
 
 
 @main_page.route("/graph")
@@ -624,10 +625,15 @@ def giftingto():
 def graph():
     user_id = session["user_id"]
     try:
-        family_id = get_family_id(user_id)
-        family_obj = Family.query.get(family_id)
-        family_group = FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id
-        if "unhide" in request.args.keys():  # Make prettier
+        if "group_id" in request.args.keys():
+            family_group = decrypt_id(request.args["group_id"])
+        else:
+            family = get_default_family(user_id)
+            family_group = FamilyGroup.query.filter(and_(FamilyGroup.family_id == family.id,
+                                                         FamilyGroup.confirmed == True)
+                                                    ).one().group_id
+
+        if "unhide" in request.args.keys():  # TODO: Make prettier
             if request.args["unhide"] in "True":
                 unhide = "True"
                 user_number = _("or with your own name")
@@ -649,31 +655,33 @@ def graph():
                                title=_("Error"))
 
 
-@main_page.route("/graph/<graph_id>/<unhide>")
-@main_page.route("/graph/<graph_id>", defaults={"unhide": False})
-@main_page.route("/graph/<graph_id>/", defaults={"unhide": False})
+@main_page.route("/graph/<group_id>/<unhide>")
+@main_page.route("/graph/<group_id>", defaults={"unhide": False})
+@main_page.route("/graph/<group_id>/", defaults={"unhide": False})
 @login_required
-def graph_json(graph_id, unhide):
+def graph_json(group_id, unhide):
     user_id = int(session["user_id"])
-    if unhide is "True":
-        if UserGroupAdmin.query.filter(UserGroupAdmin.user_id == user_id).first() is not None:
-            unhide = True
-        else:
-            unhide = False
 
     try:
-        graph_id = int(graph_id)
+        group_id = int(group_id)
+        if unhide is "True":
+            user_group_admin = UserGroupAdmin.query.filter(and_(UserGroupAdmin.user_id == user_id,
+                                                                UserGroupAdmin.group_id == int(group_id),
+                                                                UserGroupAdmin.confirmed == True)
+                                                           ).one()
+            if user_group_admin is not None and user_group_admin.admin:
+                unhide = True
+            else:
+                unhide = False
+
         belongs_in_group = False
         people = {"nodes": [], "links": []}
         current_year = datetime.datetime.now().year
-        database_families = Family.query.filter(
-            Family.id.in_(
-                set([familygroup.family_id for familygroup in
-                     FamilyGroup.query.filter(FamilyGroup.group_id == graph_id
-                                              ).all()]))
-        ).all()
+        database_families = get_families_in_group(group_id)
+
         for family in database_families:
-            for user in UserFamilyAdmin.query.filter(UserFamilyAdmin.family_id == family.id).all():
+            for user in UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.family_id == family.id,
+                                                          UserFamilyAdmin.confirmed == True)).all():
                 if unhide:
                     people["nodes"].append({"id": get_person_name(user.user_id),
                                             "group": family.id})
@@ -756,18 +764,16 @@ def settings():
             family_admin = True
             user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
         is_in_family = True
-        familygroup_ids = [familygroup.group_id for familygroup in
-                           FamilyGroup.query.filter(FamilyGroup.family_id == family.id).all()]
-        db_groups_user_has_conn += (Group.query.filter(Group.id.in_(familygroup_ids)).all())
+
+        db_groups_user_has_conn += (get_groups_family_is_in(family_relationship.family_id))
 
     user_groups = {}
     is_in_group = False
     group_admin = False
     for group_relationship in db_groups_user_has_conn:
-        group_admin = UserGroupAdmin.query.filter(
-            UserGroupAdmin.user_id == user_id
-            and
-            UserGroupAdmin.group_id == group_relationship.id).first()
+        group_admin = UserGroupAdmin.query.filter(and_(
+            UserGroupAdmin.user_id == user_id,
+            UserGroupAdmin.group_id == group_relationship.id)).first()
 
         if not group_admin:
             user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), False)
@@ -805,8 +811,7 @@ def settings():
                            google_connected=google_link_exists,
                            github_connected=github_link_exists,
                            group_admin=group_admin,
-                           family_admin=family_admin,
-                           back_link="/")
+                           family_admin=family_admin)
 
 
 @main_page.route("/error")
@@ -932,30 +937,22 @@ def editgroup():
     # user_obj = User.query.get(user_id)
 
     try:
-        request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
+        group_id = request.args["id"]
+        group_id = int(decrypt_id(group_id))
     except Exception:
         sentry.captureException()
-        request_id = 0
+        return render_template("error.html",
+                               message=_("Faulty input"),
+                               title=_("Error"))
 
-    db_group = Group.query.filter(Group.id == request_id).one()
-
-    db_families_in_group = Family.query.filter(
-        Family.id.in_(
-            set([familygroup.family_id for familygroup in FamilyGroup.query.filter(
-                FamilyGroup.group_id == db_group.id
-            ).all()])
-        )
-    ).all()
+    db_families_in_group = get_families_in_group(group_id)
 
     families = []
     for family in db_families_in_group:
         families.append((family.name, encrypt_id(family.id)))
 
     is_admin = False
-    if UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == request_id,
-                                        UserGroupAdmin.user_id == int(user_id)
-                                        )).one().admin:
+    if if_user_is_group_admin(group_id, user_id):
         is_admin = True
 
     return render_template("editgroup.html",
@@ -984,7 +981,7 @@ def editgroup_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -994,7 +991,7 @@ def editgroup_with_action():
                                    action="REMOVEFAM",
                                    endpoint=endpoint,
                                    extra_data=extra_data,
-                                   id=id,
+                                   id=form_id,
                                    confirm=True)
         elif request.form["action"] == "REMOVEFAM" and request.form["confirm"] == "True":
             family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
@@ -1040,7 +1037,7 @@ def editgroup_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -1050,7 +1047,7 @@ def editgroup_with_action():
                                    action="ADDFAMILY",
                                    endpoint=endpoint,
                                    extra_data=extra_data,
-                                   id=id,
+                                   id=form_id,
                                    confirm=True)
         elif request.form["action"] == "ADDFAMILY" and request.form["confirm"] == "True":
             # TODO: Add user to family
@@ -1067,7 +1064,7 @@ def editgroup_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -1076,7 +1073,7 @@ def editgroup_with_action():
             return render_template("creatething.html",
                                    action="DELETEGROUP",
                                    endpoint=endpoint,
-                                   id=id,
+                                   id=form_id,
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "DELETEGROUP" and request.form["confirm"] == "True":
@@ -1110,7 +1107,7 @@ def editfam_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -1119,7 +1116,7 @@ def editfam_with_action():
             return render_template("creatething.html",
                                    action="REMOVEMEMBER",
                                    endpoint=endpoint,
-                                   id=id,
+                                   id=form_id,
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "REMOVEMEMBER" and request.form["confirm"] == "True":
@@ -1166,7 +1163,7 @@ def editfam_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -1175,7 +1172,7 @@ def editfam_with_action():
             return render_template("creatething.html",
                                    action="ADDMEMBER",
                                    endpoint=endpoint,
-                                   id=id,
+                                   id=form_id,
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "ADDMEMBER" and request.form["confirm"] == "True":
@@ -1216,7 +1213,7 @@ def editfam_with_action():
                                        title=_("Error"))
 
             if "id" in request.form.keys():
-                id = request.form["id"]
+                form_id = request.form["id"]
             else:
                 return render_template("error.html",
                                        message=_("An error has occured"),
@@ -1225,7 +1222,7 @@ def editfam_with_action():
             return render_template("creatething.html",
                                    action="DELETEFAM",
                                    endpoint=endpoint,
-                                   id=id,
+                                   id=form_id,
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "DELETEFAM" and request.form["confirm"] == "True":
@@ -1699,9 +1696,10 @@ def oauth_handler(blueprint, token):
                 password=hash_password(token_bytes(100)),
                 active=True
             )
+            flash(_("Password is set randomly, use the \"Forgot password\" to set another password"))
 
             try:
-                db.session.add(user)  # Populate User ID first
+                db.session.add(user)  # Populate User's ID first by committing
                 db.session.commit()
             except Exception:
                 db.session.rollback()
@@ -1736,6 +1734,7 @@ def log_user_in_with_cert():
     """
     This functionality requires another subdomain requiring client cert
 
+    Nginx configuration for TLC client certificate authentication (Estonian ID card authentication)
     proxy_set_header Tls-Client-Secret Config.TLS_PROXY_SECRET;
     proxy_set_header Tls-Client-Verify $ssl_client_verify;
     proxy_set_header Tls-Client-Dn     $ssl_client_s_dn;
@@ -1755,15 +1754,16 @@ def log_user_in_with_cert():
                             logger.debug("Session exists")
                             if "user_id" in session.keys():
                                 logger.debug("User ID exists")
-                                hashed_dn = sha3_512(request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()
-                                user_id = AuthLinks.query.filter(AuthLinks.provider_user_id == hashed_dn).first()
+                                hashed_dn = get_sha3_512_hash(request.headers["Tls-Client-Dn"])
+                                link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,
+                                                                   AuthLinks.provider == "esteid")).first()
 
-                                if user_id is not None:
+                                if link is not None:
                                     return redirect("/")
 
-                                user_id = session["user_id"]
+                                link = session["user_id"]
                                 new_link = AuthLinks(
-                                    user_id=int(user_id),
+                                    user_id=int(link),
                                     provider_user_id=hashed_dn,
                                     provider="esteid"
                                 )
@@ -1779,35 +1779,28 @@ def log_user_in_with_cert():
                                 return redirect("/")
                             else:
                                 logger.debug("User ID doesn't exist")
-                                try:
-                                    hashed_dn = sha3_512(request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()
-                                    user_id = AuthLinks.query.filter(AuthLinks.provider_user_id == hashed_dn).first()
-                                    if user_id is not None:
-                                        user_id = user_id.user_id
-                                    else:
-                                        return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
-                                    login_user(User.query.get(user_id))
-                                    return
-                                except Exception:
-                                    sentry.captureException()
-                                    logger.debug("Error loging user in")
-                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+                                return try_to_log_in_with_dn(request.headers["Tls-Client-Dn"])
                         else:
-                            try:
-                                logger.debug("User ID doesn't exist")
-                                hashed_dn = sha3_512(request.headers["Tls-Client-Dn"].encode("utf-8")).hexdigest()
-                                user_id = AuthLinks.query.filter(AuthLinks.provider_user_id == hashed_dn).first()
-                                if user_id is not None:
-                                    user_id = user_id.user_id
-                                else:
-                                    logger.debug("User with the link doesn't exist")
-                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
-                                login_user(User.query.get(user_id))
-                                return redirect("/success.html?" + "message=" + _("Added!") + "&action=" + _(
-                                    "Added") + "&link=" + "notes" + "&title=" + _("Added"))
-                            except Exception:
-                                logger.debug("Exception when trying to log user in")
-                                sentry.captureException()
-                                return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+                            return try_to_log_in_with_dn(request.headers["Tls-Client-Dn"])
     logger.debug("Check failed")
     return redirect("error?message=" + _("Error!") + "&title=" + _("Error"))
+
+
+def try_to_log_in_with_dn(input_dn: str) -> object:
+    try:
+        hashed_dn = get_sha3_512_hash(input_dn)
+        link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,
+                                           AuthLinks.provider == "esteid")).first()
+        if link is not None:
+            user_id = link.user_id
+        else:
+            logger.debug("User with the link doesn't exist")
+            return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+
+        login_user(User.query.get(user_id))
+        return redirect("/success.html?" + "message=" + _("Added!") + "&action=" +
+                        _("Added") + "&link=" + "notes" + "&title=" + _("Added"))
+    except Exception:
+        logger.debug("Exception when trying to log user in")
+        sentry.captureException()
+        return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
