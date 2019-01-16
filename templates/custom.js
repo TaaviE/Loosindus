@@ -11,8 +11,8 @@ try {
 window.onload = function () {
     try {
         if (!adsbygoogle.loaded) {
-            addiv = document.getElementById("google-ad-div");
-            addiv.style.display = "none";
+            let ad_div = document.getElementById("google-ad-div");
+            ad_div.style.display = "none";
         }
     } catch (e) {
         console.log(e);
@@ -20,7 +20,7 @@ window.onload = function () {
 };
 {% endif %}
 
-{% if sentry_feedback %}
+{%if sentry_feedback %}
 try {
     Raven.showReportDialog({
         eventId: "{{ sentry_event_id }}",
@@ -46,3 +46,15 @@ try {
     console.log(e);
 }
 {% endif %}
+
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/worker.js")
+            .then(function (registration) {
+                console.log("Sucess", registration);
+            }, function (exception) {
+                console.log("An error occured", exception);
+            });
+    });
+}
