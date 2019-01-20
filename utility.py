@@ -82,8 +82,12 @@ def get_target_id(passed_person_id: int) -> int:
     #              DeprecationWarning, 2)
     try:
         passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-        return Shuffle.query.filter(and_(Shuffle.giver == passed_person_id,
-                                         Shuffle.year == datetime.now().year)).first().getter
+        shuffle = Shuffle.query.filter(and_(Shuffle.giver == passed_person_id,
+                                            Shuffle.year == datetime.now().year)).first()
+        if shuffle is not None:
+            return shuffle.getter
+        else:
+            return -1
     except Exception:
         sentry.captureException()
         return -1
