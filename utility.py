@@ -64,7 +64,9 @@ def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
 def get_default_family(passed_person_id: int) -> Family:
     passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
     db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
-    return sorted(db_families_user_has_conn, key=operator.attrgetter("family_id"), reverse=False)[0]
+    return Family.query.filter(Family.id == sorted(db_families_user_has_conn,
+                                                   key=operator.attrgetter("family_id"),
+                                                   reverse=False)[0]).one()
 
 
 def get_families(passed_person_id: int) -> int:
