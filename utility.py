@@ -4,7 +4,6 @@
 
 # Cython
 import operator
-import warnings
 from functools import lru_cache
 
 import pyximport
@@ -65,7 +64,7 @@ def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
 def get_default_family(passed_person_id: int) -> Family:
     passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
     db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
-    return sorted(db_families_user_has_conn, key=operator.attrgetter("id"), reverse=False)[0].family_id
+    return sorted(db_families_user_has_conn, key=operator.attrgetter("family_id"), reverse=False)[0].family_id
 
 
 def get_families(passed_person_id: int) -> int:
@@ -74,7 +73,7 @@ def get_families(passed_person_id: int) -> int:
 
 
 def get_person_name(passed_person_id: int) -> str:
-    passed_person_id = int(passed_person_id)
+    passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
     return User.query.get(passed_person_id).username
 
 
