@@ -77,8 +77,8 @@ def get_person_name(passed_person_id: int) -> str:
     return User.query.get(passed_person_id).username
 
 
-def get_target_id(passed_person_id: int) -> int:
-    # warnings.warn("The 'get_target_id' method is deprecated, use 'get_target_id_with_group' instead",
+def get_default_target_id(passed_person_id: int) -> int:
+    # warnings.warn("The 'get_default_target_id' method is deprecated, use 'get_target_id_with_group' instead",
     #              DeprecationWarning, 2)
     try:
         passed_person_id = int(passed_person_id)  # Recast to avoid mistakes

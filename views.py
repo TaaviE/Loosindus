@@ -187,7 +187,7 @@ def index():
     username = get_person_name(user_id)
 
     no_shuffle = False
-    if get_target_id(user_id) == -1:
+    if get_default_target_id(user_id) == -1:
         no_shuffle = True
 
     try:
@@ -246,7 +246,7 @@ def shuffle():
         group_id = int(request.args["group_id"])
         giftee = get_target_id_with_group(user_id, group_id)
     else:
-        giftee = get_target_id(gifter)
+        giftee = get_default_target_id(gifter)
 
     logger.info("Username: {}, From: {}, To: {}", username, gifter, giftee)
     return render_template("shuffle.html",
@@ -507,7 +507,7 @@ def giftingto():
         request_id = request.args["id"]
         request_id = int(decrypt_id(request_id))
     else:
-        request_id = get_target_id(int(user_id))
+        request_id = get_default_target_id(int(user_id))
 
     if "group_id" in request.args.keys():
         group_id = int(request.args["group_id"])
@@ -534,7 +534,7 @@ def giftingto():
     if group_id is not None:
         target_id = get_target_id_with_group(user_id, group_id)
     else:
-        target_id = get_target_id(user_id)
+        target_id = get_default_target_id(user_id)
 
     if request_id != target_id:  # Let's not let everyone read everyone's lists
         family_obj = get_default_family(user_id)
