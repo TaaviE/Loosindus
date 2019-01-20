@@ -18,6 +18,7 @@
                href="/">{{ _("Back") }}</a>
         </div>
     </div>
+    {% if not no_video %}
     <iframe height="500m;200vmin"
             class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col-tablet mdl-cell--12-col-desktop mdl-cell--6-col-phone mdl-cell--8-col"
             id="ytplayer"
@@ -25,6 +26,7 @@
             src="https://www.youtube.com/embed/t3otBjVZzT0?autoplay=1&rel=0&origin=https://{{ config.SERVER_NAME }}"
             frameborder="0">
     </iframe>
+    {% endif %}
 {% endblock %}
 
 {% block footer %}

@@ -651,8 +651,10 @@ def graph():
     except Exception:
         sentry.captureException()
         return render_template("error.html",
-                               message=_("Shuffling has not yet been done for your group!"),
-                               title=_("Error"))
+                               message=_(
+                                   "Shuffling has not yet been done for your group (or some other error occured)!"),
+                               title=_("Error"),
+                               no_video=True)
 
 
 @main_page.route("/graph/<group_id>/<unhide>")
@@ -832,6 +834,8 @@ def error_page():
                            sentry_event_id=g.sentry_event_id,
                            sentry_public_dsn=sentry.client.get_public_dsn("https"),
                            message=message,
+                           no_video=True,
+                           no_sidebar=True,
                            title=title)
 
 
@@ -854,6 +858,7 @@ def success_page():
                            message=message,
                            action=(action if action != "" else title),
                            link="./" + link,
+                           no_sidebar=True,
                            title=title)
 
 

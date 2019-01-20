@@ -12,20 +12,22 @@
           </div>
         </div> --> #}
 
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="header_button">
             <i class="material-icons">more_vert</i>
         </button>
-        <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-            <li class="mdl-menu__item"><a href="/about">{{ _("About") }}</a></li>
-            <li class="mdl-menu__item"><a href="/contact">{{ _("Contact") }}</a></li>
-            <li class="mdl-menu__item"><a href="/feedback">{{ _("Feedback") }}</a></li>
-        </ul>
+        <label class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="header_button">
+            <ul>
+                <li class="mdl-menu__item"><a href="/about">{{ _("About") }}</a></li>
+                <li class="mdl-menu__item"><a href="/contact">{{ _("Contact") }}</a></li>
+                <li class="mdl-menu__item"><a href="/feedback">{{ _("Feedback") }}</a></li>
+            </ul>
+        </label>
     </div>
 </header>
 
-{% if no_sidebar != True %}
-    <div class="demo-drawer mdl-layout__drawer">
-        <nav class="demo-navigation mdl-navigation">
+{% if not no_sidebar %}
+    <div class="mdl-layout__drawer">
+        <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="/notes">
                 <i class="material-icons" role="presentation">list</i> {{ _("My Wishlist") }}</a>
             <a class="mdl-navigation__link" href="/giftingto">
