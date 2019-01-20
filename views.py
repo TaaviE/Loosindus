@@ -1607,7 +1607,7 @@ def oauth_handler(blueprint, token):
         db.session.commit()
         logger.info("Successfully signed in with {}.".format(blueprint.name))
         return False
-    elif authentication_link is not None and authentication_link.user_id is None and "user_id" in session["user_id"]:
+    elif authentication_link is not None and authentication_link.user_id is None and "user_id" in session.keys():
         try:
             authentication_link.user_id = int(session["user_id"])  # Update link with user id
             db.session.add(authentication_link)
