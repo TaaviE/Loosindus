@@ -66,7 +66,7 @@ def get_default_family(passed_person_id: int) -> Family:
     db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
     return Family.query.filter(Family.id == sorted(db_families_user_has_conn,
                                                    key=operator.attrgetter("family_id"),
-                                                   reverse=False)[0]).one()
+                                                   reverse=False)[0].family_id).one()
 
 
 def get_families(passed_person_id: int) -> int:
