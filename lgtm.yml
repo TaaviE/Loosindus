@@ -2,9 +2,11 @@ extraction:
   javascript:
     index:
       exclude:
-        - static
-        - templates
+        - "templates/*.js"
+        - "templates/*/*.js"
+        - "static/*.js"
+        - "static/*/*.js"
   html:
     index:
       exclude:
-        - templates
+        - "templates/*.html"
