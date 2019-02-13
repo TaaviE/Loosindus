@@ -4,3 +4,7 @@ extraction:
       exclude:
         - static
         - templates
+  html:
+    index:
+      exclude:
+        - templates
