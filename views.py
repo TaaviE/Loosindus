@@ -43,7 +43,7 @@ from flask_security.utils import verify_password, hash_password
 from flask_login import current_user, login_user
 from flask_mail import Message
 from flask_dance.consumer import oauth_authorized
-from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
+from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint
@@ -1452,7 +1452,7 @@ def api_login():
         return redirect("/")
     except Exception:
         sentry.captureException()
-        info("Api login failed for user {}".format(username))
+        logger.info("Api login failed for user {}".format(username))
         return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
 
@@ -1484,7 +1484,7 @@ if Config.GOOGLE_OAUTH:
         client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
         redirect_url="https://" + Config.SERVER_NAME + "/login"
     )
-    google_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    google_blueprint.backend = SQLAlchemyStorage(AuthLinks, db.session, user=current_user)
     app.register_blueprint(google_blueprint, url_prefix="/google")
 
 
@@ -1511,7 +1511,7 @@ if Config.GITHUB_OAUTH:
         client_secret=Config.GITHUB_OAUTH_CLIENT_SECRET,
         redirect_url="https://" + Config.SERVER_NAME + "/login"
     )
-    github_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    github_blueprint.backend = SQLAlchemyStorage(AuthLinks, db.session, user=current_user)
     app.register_blueprint(github_blueprint, url_prefix="/github")
 
 
@@ -1537,7 +1537,7 @@ if Config.FACEBOOK_OAUTH:
         client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
         redirect_url="https://" + Config.SERVER_NAME + "/login"
     )
-    facebook_blueprint.backend = SQLAlchemyBackend(AuthLinks, db.session, user=current_user)
+    facebook_blueprint.backend = SQLAlchemyStorage(AuthLinks, db.session, user=current_user)
     app.register_blueprint(facebook_blueprint, url_prefix="/facebook")
 
 
