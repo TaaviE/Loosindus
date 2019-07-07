@@ -8,22 +8,20 @@ from functools import lru_cache
 
 import pyximport
 
+pyximport.install()
+
 from models.family_model import Family, FamilyGroup
 from models.groups_model import Group
 from models.users_groups_admins_model import UserGroupAdmin
-
-pyximport.install()
-from datetime import datetime
-
-from sqlalchemy import and_
-
-from main import sentry
-
 from models.names_model import Name
 from models.shuffles_model import Shuffle
 from models.users_families_admins import UserFamilyAdmin
 from models.users_model import User
 from models.wishlist_model import Wishlist
+from datetime import datetime
+from sqlalchemy import and_
+
+from main import sentry
 
 
 def get_person_marked(user_id: int) -> list:
@@ -66,7 +64,8 @@ def get_default_family(passed_person_id: int) -> Family:
     db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
     return Family.query.filter(Family.id == sorted(db_families_user_has_conn,
                                                    key=operator.attrgetter("family_id"),
-                                                   reverse=False)[0].family_id).one()
+                                                   reverse=False)[0].family_id
+                               ).one()
 
 
 def get_families(passed_person_id: int) -> int:
@@ -74,6 +73,7 @@ def get_families(passed_person_id: int) -> int:
     return UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
 
 
+@lru_cache(maxsize=64)
 def get_person_name(passed_person_id: int) -> str:
     passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
     return User.query.get(passed_person_id).username

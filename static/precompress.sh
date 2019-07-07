@@ -24,11 +24,11 @@ find . -type f -name "*.js" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 find . -type f -name "*.map" -exec sh -c "touch {} && brotli --quality=11 < {} > {}.br" \;
 find . -type f -name "*.map" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 
-brotli --quality=11 < sitemap.xml > sitemap.xml.br
-gzip -9 < sitemap.xml > sitemap.xml.gz
+find . -type f -name "*.xml" -exec sh -c "touch {} && brotli --quality=11 < {} > {}.br" \;
+find . -type f -name "*.xml" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 
-brotli --quality=11 < robots.txt > sitemap.xml.br
-gzip -9 < robots.txt > sitemap.xml.gz
+find . -type f -name "*.txt" -exec sh -c "touch {} && brotli --quality=11 < {} > {}.br" \;
+find . -type f -name "*.txt" -exec sh -c "touch {} && gzip -9 < {} > {}.gz" \;
 
-brotli --quality=11 < manifest.json > sitemap.xml.br
-gzip -9 < manifest.json> sitemap.xml.gz
+brotli --quality=11 < manifest.json > manifest.json.br
+gzip -9 < manifest.json> manifest.json.gz

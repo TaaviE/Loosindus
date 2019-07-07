@@ -2,7 +2,6 @@
 # author=Taavi Eomäe
 # Cython
 import pyximport
-
 pyximport.install()
 
 from functools import lru_cache
@@ -10,12 +9,15 @@ import datetime
 import sys
 from base64 import urlsafe_b64decode, urlsafe_b64encode, b64decode, b64encode
 from json import dumps, loads
-from logging import info
 import binascii
 from Cryptodome.Cipher.AES import new, MODE_GCM
 from hashlib import sha3_512
 
 from config import Config
+from logging import getLogger
+
+getLogger().setLevel(Config.LOGLEVEL)
+logger = getLogger()
 
 
 @lru_cache(maxsize=64)
@@ -30,13 +32,15 @@ def decrypt_id(encrypted_user_id: str) -> str:
 
     try:
         cipher.verify(tag)
-        info("The message is authentic: {}".format(plaintext))
+        logger.info("The message is authentic: {}".format(plaintext))
     except ValueError:
-        info("Key incorrect or message corrupted!")
+        logger.info("Key incorrect or message corrupted!")
 
     return plaintext
 
 
+# Replayable, but we don't care anything other than just hiding the data
+@lru_cache(maxsize=128)
 def encrypt_id(user_id: int) -> str:
     cipher = new(Config.AES_KEY, MODE_GCM)
     ciphertext, tag = cipher.encrypt_and_digest(bytes(str(user_id), encoding="utf8"))
@@ -61,11 +65,12 @@ def get_christmasy_emoji(user_id: int) -> str:
     return emoji
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=2)  # Keep last hash in memory
 def get_sha3_512_hash(input_dn: str) -> str:
     return sha3_512(input_dn.encode("utf-8")).hexdigest()
 
 
+# Tries to guess if people forgot to copy the entire string
 def auto_pad_urlsafe_b64(input_base64: str) -> str:
     for i in range(5):  # Let's hope that's all the padding needed
         try:

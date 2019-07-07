@@ -1,13 +1,18 @@
-# Background scheduling tasks, TODO: BROKEN FOR NOW
-import datetime
+# Background tasks
+from logging import getLogger
 
+from config import Config
 from main import mail
 from models.wishlist_model import NoteState
 from utility import *
+from utility_standalone import *
+
+getLogger().setLevel(Config.LOGLEVEL)
+logger = getLogger()
 
 
 def remind_to_add(rate_limit=True):
-    info("Started sending adding reminders")
+    logger.info("Started sending adding reminders")
     now = datetime.datetime.now()
     try:
         with open("remind_to_add", "r+") as timer_file:
@@ -15,16 +20,16 @@ def remind_to_add(rate_limit=True):
             lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
 
             if now - lastexec < datetime.timedelta(days=30):
-                info(" Adding reminders were rate-limited")
+                logger.info(" Adding reminders were rate-limited")
                 if rate_limit:
                     return
             else:
                 timer_file.seek(0)
-                timer_file.write(get_timestamp_string(now))
+                timer_file.write(get_timestamp())
     except Exception:
-        info(" Adding reminders rate-limit file was not found")
+        logger.info(" Adding reminders rate-limit file was not found")
         with open("remind_to_add", "w") as timer_file:
-            timer_file.write(get_timestamp_string(now))
+            timer_file.write(get_timestamp())
 
     for user in User.query:
         if user.last_activity_at:
@@ -41,11 +46,11 @@ def remind_to_add(rate_limit=True):
                           body=email_to_send,
                           recipients=[user.email])
 
-    info(" Finished sending adding reminders")
+    logger.info("Finished sending adding reminders")
 
 
 def remind_to_buy(rate_limit=True):
-    info("Started sending purchase reminders")
+    logger.info("Started sending purchase reminders")
     now = datetime.datetime.now()
     try:
         with open("remind_to_buy", "r+") as timer_file:
@@ -53,16 +58,16 @@ def remind_to_buy(rate_limit=True):
             lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
 
             if now - lastexec < datetime.timedelta(days=15):
-                info("Buying reminders were rate-limited")
+                logger.info("Buying reminders were rate-limited")
                 if rate_limit:
                     return
             else:
                 timer_file.seek(0)
-                timer_file.write(get_timestamp_string(now))
+                timer_file.write(get_timestamp())
     except Exception:
-        info(" Reminder to buy timer file was not found")
+        logger.info(" Reminder to buy timer file was not found")
         with open("remind_to_buy", "w") as timer_file:
-            timer_file.write(get_timestamp_string(now))
+            timer_file.write(get_timestamp())
 
     for user in User.query:
         marked_entries = get_person_marked(user.id)
@@ -86,22 +91,18 @@ def remind_to_buy(rate_limit=True):
             email_to_send += item[1]
             email_to_send += "\n"
         email_to_send += "\n"
-        email_to_send += "Palume mitte unustada, ebameeldivad üllatused ei ole need, mida jõuludeks teistele teha soovime\n"
-        email_to_send += "Jõulurakendus 🎄"
+        email_to_send += "Palun mitte unustada\n"
+        email_to_send += "Jõulurakendus🎄"
 
         mail.send_message(subject="Meeldetuletus kinkide kohta",
                           body=email_to_send,
                           recipients=[user.email])
 
-    info(" Finished sending purchase reminders")
-
-
-def get_timestamp_string(now):
-    return str(now.hour) + "/" + str(now.day) + "/" + str(now.month) + "/" + str(now.year)
+    logger.info("Finished sending purchase reminders")
 
 
 def remind_about_change(rate_limit=True):
-    info(" Started sending change reminders")
+    logger.info(" Started sending change reminders")
     now = datetime.datetime.now()
     try:
         with open("remind_about_change", "r+") as timer_file:
@@ -109,16 +110,16 @@ def remind_about_change(rate_limit=True):
             lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
 
             if now - lastexec < datetime.timedelta(hours=6):
-                info(" Changing reminders were rate-limited")
+                logger.info(" Changing reminders were rate-limited")
                 if rate_limit:
                     return
             else:
                 timer_file.seek(0)
-                timer_file.write(get_timestamp_string(now))
+                timer_file.write(get_timestamp())
     except Exception:
-        info(" Change reminder timer file was not found")
+        logger.info(" Change reminder timer file was not found")
         with open("remind_about_change", "w") as timer_file:
-            timer_file.write(get_timestamp_string(now))
+            timer_file.write(get_timestamp())
 
     for user in User.query:
         marked_entries = get_person_marked(user.id)
@@ -148,25 +149,4 @@ def remind_about_change(rate_limit=True):
                           body=email_to_send,
                           recipients=[user.email])
 
-    info(" Finished sending change reminders")
-
-
-scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(remind_to_add,
-                  trigger=IntervalTrigger(days=30),
-                  name="Addition reminder",
-                  id="add_reminder",
-                  replace_existing=True)
-scheduler.add_job(remind_to_buy,
-                  trigger=IntervalTrigger(days=15),
-                  name="Buying reminder",
-                  id="buy_reminder",
-                  replace_existing=True)
-scheduler.add_job(remind_about_change,
-                  trigger=IntervalTrigger(minutes=720),
-                  name="Change reminder",
-                  id="cng_reminder",
-                  replace_existing=True)
-
-atexit.register(lambda: scheduler.shutdown())
-scheduler.start()
+    logger.info("Finished sending change reminders")

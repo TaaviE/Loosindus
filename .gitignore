@@ -100,21 +100,14 @@ ENV/
 # mypy
 .mypy_cache/
 
-
 # Repository config
-genitive.json
-graph*.png
-secret*.png
-config.py
-notes
-__pycache__
-venv
 .venv
-generated_graphs/
+venv/
+config.py
 .directory
-remind_*
-*.swp
 .bash_history
+.zsh_history
+*.swp
 *.br
 *.gz
 

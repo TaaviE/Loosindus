@@ -1,3 +1,6 @@
+"""
+Contains all the models related to families in the system
+"""
 from datetime import datetime
 
 from sqlalchemy import FetchedValue
