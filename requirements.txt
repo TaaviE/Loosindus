@@ -16,6 +16,6 @@ celery[redis]==4.3.0
 gunicorn==19.9.0
 sqlalchemy-utils==0.34.0
 passlib==1.7.1
-cython==0.29.11
+cython==0.29.12
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git
