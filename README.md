@@ -1,6 +1,6 @@
 # SecretSanta
 [![Liberapay Status](https://img.shields.io/liberapay/patrons/Taavi.svg?logo=liberapay)](https://liberapay.com/Taavi)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus?ref=badge_shield)
 
 A really simple to configure and to use system for secret santa but with some important additions like secretly shared
 shopping lists and gifting constraints (avoid matches between family members for ex.).
@@ -42,4 +42,4 @@ In case this above was too complex you can just use the version hosted by me and
   * Check the GitHub Projects tab
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus?ref=badge_large)
