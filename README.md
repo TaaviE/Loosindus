@@ -37,16 +37,9 @@ My aim is to keep this project as simple as possible in every aspect, including 
 
 In case this above was too complex you can just use the version hosted by me and ask if you need any help.
 
-## My future plans with the application
+## Planned development
 
-  * All .css and other content should have a SRI hash included, generated based on files themselves (and cached)
-  * Validate that security measures are enabled, don't allow insecure deployments
-  * Allow multiple groups - currently they're technically possible to create but the UI doesn't display buttons for the groups
-  * Allow multiple families for user - same as previous, technically possible but no UI support
-  * Allow reshuffling with a button from the UI with confirmation - the button doesn't exist because it's really disruptive and could be accidentally clicked D:
-  * Add more configuration options for users - add name changes, email changes, password changes (and profile pictures?)
-  * Add comments for wishes - sometimes one might have to ask for clarifications about a wish or just discuss it with other santas
-  * Reimplement email sending - this feature can be manually triggered for a group but should be scheduled or triggered
+  * Check the GitHub Projects tab
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FSecretSanta?ref=badge_large)
