@@ -1,4 +1,5 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2017-2019
 # SPDX-License-Identifier: AGPL-3.0-only
 """
 A simple Secret Santa website in Python
