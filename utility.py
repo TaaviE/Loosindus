@@ -1,5 +1,5 @@
 # coding=utf-8
-# author=Taavi Eomäe
+# SPDX-License-Identifier: AGPL-3.0-only
 # This file requires database being initialized
 
 # Cython
