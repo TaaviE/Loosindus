@@ -19,7 +19,7 @@ Features and requirements:
 
 ## Eesti keeles
 
-Lihtne veebiliides loosipakkide tegemiseks - lubab igal kasutajal koostada enda soovinimekirja ning seda enda salajase "jõuluvanaga" jagada (nimekirja saavad vaadata ka ülejäänud grupi liikmed). Loosipakid üksteise vahel jagab süsteem soovi korral automaatselt, vältides perekonnaliikmete vahelisi kinke ja eelmisel aastal loodud kombinatsioone. Eesmärk on suurendada üllatusmomenti, samal ajal vältides halbu kingitusi ning duplikaate (iga soovi saab kingi saaja suhtes varjatult broneerituks märkida). Süsteem lubab pärast seadistamist sisse logida ka ID-kaardiga, Google konto jt. Minimaalne soovituslik kasutajate hulk tarkvara kasutamiseks on neli inimest. Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid ma kasutan seda muudatuste aktiivseks testimises seega see võib vahepeal mõne veaga olla.
+Lihtne veebiliides loosipakkide tegemiseks - lubab igal kasutajal koostada enda soovinimekirja ning seda enda salajase "jõuluvanaga" jagada (nimekirja saavad vaadata ka ülejäänud grupi liikmed). Loosipakid üksteise vahel jagab süsteem soovi korral automaatselt, vältides perekonnaliikmete vahelisi kinke ja eelmisel aastal loodud kombinatsioone. Eesmärk on suurendada üllatusmomenti, samal ajal vältides halbu kingitusi ning duplikaate (iga soovi saab kingi saaja suhtes varjatult broneerituks märkida). Süsteem lubab pärast seadistamist sisse logida ka ID-kaardiga, Google konto jt. Minimaalne soovituslik kasutajate hulk tarkvara kasutamiseks on neli inimest. Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid ma kasutan seda muudatuste aktiivseks testimiseks seega see võib vahepeal mõne veaga olla.
 
 ## Setup (if you wish to self-host)
 
