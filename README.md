@@ -41,5 +41,12 @@ In case this above was too complex you can just use the version hosted by me and
 
   * Check the GitHub Projects tab
 
+### Keywords
+
+  * Kingituste tegemise rakendus
+  * Secret santa web application
+  * Loosipakkide tegemise rakendus
+  * Loosipakirakendus
+
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus?ref=badge_large)
