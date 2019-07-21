@@ -9,7 +9,7 @@ class SubscriptionType(db.Model):
     """
     __tablename__ = "subscription_types"
 
-    id = db.Column(db.Integer(255), db.Sequence("subscription_types_id_seq", start=1, increment=1),
+    id = db.Column(db.Integer(), db.Sequence("subscription_types_id_seq", start=1, increment=1),
                    server_default=FetchedValue(), primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.VARCHAR(255), nullable=False)
 

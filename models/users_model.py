@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
+from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_security import UserMixin, RoleMixin
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Boolean, FetchedValue
 from sqlalchemy.orm import backref, relationship
