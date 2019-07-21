@@ -1,7 +1,7 @@
 import logging
 from logging import getLogger, basicConfig
 
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from config import Config
 from main import app

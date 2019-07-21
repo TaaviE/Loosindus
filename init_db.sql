@@ -28,18 +28,19 @@ create unique index families_id_uindex
 create unique index groups_id_uindex
 	on groups (id);
 
-create table names_genitive
+create table names_cases
 (
 	name varchar(255) not null
-		constraint names_genitive_pkey
+        constraint names_cases_pkey
 			primary key,
 	genitive varchar(255) not null
 );
 
-alter table names_genitive owner to jolod;
+alter table names_cases
+    owner to jolod;
 
-create unique index names_genitive_name_uindex
-	on names_genitive (name);
+create unique index names_cases_name_uindex
+    on names_cases (name);
 
 create table role
 (
@@ -270,7 +271,6 @@ create table subscriptions
 			references subscription_types,
 	until timestamp not null
 );
-
 
 
 create unique index subscriptions_user_id_type_uindex
