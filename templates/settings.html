@@ -97,7 +97,7 @@
 
 
             {% if config.FACEBOOK_OAUTH %}
-                <p>{% if github_connected %}{{ _("Facebook account is linked") }}{% else %}
+                <p>{% if facebook_connected %}{{ _("Facebook account is linked") }}{% else %}
                     {{ _("Connect Facebook account:") }}{% endif %} <a
                         {% if facebook_connected %}disabled{% endif %}
                         class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
