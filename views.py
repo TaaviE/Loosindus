@@ -1532,6 +1532,7 @@ if Config.GITHUB_OAUTH:
 
 if Config.FACEBOOK_OAUTH:
     facebook_blueprint = make_facebook_blueprint(
+        scope=["email"],
         client_id=Config.FACEBOOK_OAUTH_CLIENT_ID,
         client_secret=Config.FACEBOOK_OAUTH_CLIENT_SECRET,
         redirect_url="https://" + Config.SERVER_NAME + "/login"
@@ -1569,7 +1570,7 @@ def oauth_handler(blueprint, token):
         elif blueprint.name == "google":
             response = blueprint.session.get("/plus/v1/people/me")
         elif blueprint.name == "facebook":
-            # response = blueprint.session.get("/plus/v1/people/me")
+            # response = blueprint.session.get("/")
             raise Exception("Unknown blueprint: {}".format(blueprint.session))
         else:
             logger.critical("Missing blueprint handler for {}".format(blueprint.name))
