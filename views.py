@@ -1570,8 +1570,7 @@ def oauth_handler(blueprint, token):
         elif blueprint.name == "google":
             response = blueprint.session.get("/plus/v1/people/me")
         elif blueprint.name == "facebook":
-            # response = blueprint.session.get("/")
-            raise Exception("Unknown blueprint: {}".format(blueprint.session))
+            response = blueprint.session.get("/me?fields=email")
         else:
             logger.critical("Missing blueprint handler for {}".format(blueprint.name))
             flash(_("Error logging in"))
