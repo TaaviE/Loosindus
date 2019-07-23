@@ -1476,8 +1476,8 @@ def robots():
 if Config.GOOGLE_OAUTH:
     google_blueprint = make_google_blueprint(
         scope=[
-            "https://www.googleapis.com/auth/plus.me",
             "https://www.googleapis.com/auth/userinfo.email",
+            "openid"
         ],
         client_id=Config.GOOGLE_OAUTH_CLIENT_ID,
         client_secret=Config.GOOGLE_OAUTH_CLIENT_SECRET,
@@ -1568,8 +1568,11 @@ def oauth_handler(blueprint, token):
             response = blueprint.session.get("/user")
         elif blueprint.name == "google":
             response = blueprint.session.get("/plus/v1/people/me")
+        elif blueprint.name == "facebook":
+            # response = blueprint.session.get("/plus/v1/people/me")
+            raise Exception("Unknown blueprint: {}".format(blueprint.session))
         else:
-            logger.critical("Missing blueprint handler")
+            logger.critical("Missing blueprint handler for {}".format(blueprint.name))
             flash(_("Error logging in"))
             return False
     except ValueError:
@@ -1601,7 +1604,7 @@ def oauth_handler(blueprint, token):
     except Exception:  # Failure in query!
         sentry.captureException()
         logger.error("Failed querying authentication links")
-        flash(_("Error logging in"))
+        flash(_("That account is not linked to any system account, check if you already have an account."))
         return False
 
     # Link exists and it is associated with an user
@@ -1620,7 +1623,7 @@ def oauth_handler(blueprint, token):
             db.session.rollback()
             sentry.captureException()
             logger.error("Could not store user and oauth link")
-            flash(_("Error signing up"))
+            flash(_("Error signing up, please try again"))
             return False
     else:  # Link does not exist or not associated
         if "oauth_sign_up" in session.keys() and session["oauth_sign_up"]:  # If registration
@@ -1676,7 +1679,7 @@ def oauth_handler(blueprint, token):
                             pass  # New email is fine
                     else:
                         logger.info("No email addresses associated with the account")
-                        flash(_("You have no associated email addresses with your account"))
+                        flash(_("You have no associated email addresses with that account"))
                         return False
                 except Exception:
                     logger.info("Error asking for another emails")
@@ -1700,7 +1703,7 @@ def oauth_handler(blueprint, token):
                 password=hash_password(token_bytes(100)),
                 active=True
             )
-            flash(_("Password is set randomly, use the \"Forgot password\" to set another password"))
+            flash(_("Password is set randomly, use \"Forgot password\" to set another password"))
 
             try:
                 db.session.add(user)  # Populate User's ID first by committing
