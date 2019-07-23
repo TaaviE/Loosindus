@@ -143,6 +143,7 @@ def error_500(err):
     return render_template("error.html",
                            sentry_enabled=sentry_enabled,
                            sentry_ask_feedback=True,
+                           no_video=True,
                            sentry_event_id=g.sentry_event_id,
                            sentry_public_dsn=sentry.client.get_public_dsn("https"),
                            message=_("An error occured"),
