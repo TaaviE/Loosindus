@@ -788,6 +788,7 @@ def settings():
     id_link_exists = False
     google_link_exists = False
     github_link_exists = False  # TODO: Store them all in a dictionary and render based on that
+    facebook_link_exists = False
     try:
         user_links = AuthLinks.query.filter(AuthLinks.user_id == int(user_id)).all()
         for link in user_links:
@@ -797,6 +798,8 @@ def settings():
                 google_link_exists = True
             elif "github" == link.provider:
                 github_link_exists = True
+            elif "facebook" == link.provider:
+                facebook_link_exists = True
     except Exception:
         sentry.captureException()
 
@@ -812,6 +815,7 @@ def settings():
                            id_connected=id_link_exists,
                            google_connected=google_link_exists,
                            github_connected=github_link_exists,
+                           facebook_connected=facebook_link_exists,
                            group_admin=group_admin,
                            family_admin=family_admin)
 
