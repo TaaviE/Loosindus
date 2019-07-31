@@ -18,6 +18,6 @@ gunicorn==19.9.0
 sqlalchemy-utils==0.34.1
 raven==6.10.0
 passlib==1.7.1
-cython==0.29.12
+cython==0.29.13
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git
