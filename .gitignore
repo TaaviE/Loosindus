@@ -113,3 +113,6 @@ config.py
 
 # IntelliJ and PyCharm
 .idea
+
+# Syncthing
+**/*.sync-conflict-*-*-*.*
