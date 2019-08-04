@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Contains all the models related to families in the system
 """
