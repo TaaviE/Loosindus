@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Cython
 import pyximport
+
 pyximport.install()
 
 # Utilities
@@ -58,7 +59,11 @@ domain = Domain(domain="messages")
 
 @babel.localeselector
 def get_locale():
-    if "user_id" in session.keys():  # If logged in
+    """
+    Deals with displaying the correct localization with possible override
+    :return: user locale
+    """
+    if current_user.is_authenticated:
         user_id = session["user_id"]
     else:
         return request.accept_languages.best_match(["et", "en"])
@@ -98,6 +103,9 @@ from main import celery, security, mail
 # Send asynchronous email
 @celery.task()
 def send_security_email(message):
+    """
+    Sends asynchronous email
+    """
     with app.app_context():
         try:
             msg = Message(message["subject"],
@@ -113,6 +121,9 @@ def send_security_email(message):
 # Override security email sender
 @security.send_mail_task
 def delay_security_email(msg):
+    """
+    Allows sending e-mail non-blockingly
+    """
     try:
         send_security_email.delay(
             {"subject": msg.subject,
@@ -131,6 +142,9 @@ def delay_security_email(msg):
 @app.errorhandler(405)
 @main_page.route("/testerror/<err>", defaults={"err": "Testing error"})
 def error_500(err):
+    """
+    Displays the nice error handling page
+    """
     try:
         if not current_user.is_authenticated:
             sentry_enabled = False
@@ -154,6 +168,9 @@ def error_500(err):
 @main_page.route("/test")
 @login_required
 def test():
+    """
+    Displays a the error page for testing
+    """
     return render_template("error.html",
                            message=_("Here you go!"),
                            title=_("Error"))
@@ -161,6 +178,9 @@ def test():
 
 @main_page.route("/favicon.ico")
 def favicon():
+    """
+    Returns the site's favicon
+    """
     return send_from_directory("./static",
                                "favicon-16x16.png")
 
@@ -168,6 +188,9 @@ def favicon():
 @main_page.route("/feedback")
 @login_required
 def feedback():
+    """
+    Allows submitting feedback about the application
+    """
     return render_template("feedback.html",
                            sentry_feedback=True,
                            sentry_event_id=g.sentry_event_id,
@@ -175,6 +198,9 @@ def feedback():
 
 
 def index():
+    """
+    Displays the main overview page
+    """
     Domain(domain="messages")
 
     try:
@@ -211,6 +237,9 @@ def about():
 
 @main_page.route("/")
 def home():
+    """
+    Displays a home page based on user logon status
+    """
     if current_user.is_authenticated:
         return index()
     else:
@@ -219,17 +248,26 @@ def home():
 
 @main_page.route("/contact")
 def contact():
+    """
+    Displays a contact details page
+    """
     return render_template("contact.html", no_sidebar=True)
 
 
 @main_page.route("/worker.js")
 def worker_js():
+    """
+    Returns serviceworker JS
+    """
     return render_template("worker.js"), 200, {"content-type": "application/javascript"}
 
 
 @main_page.route("/logout")
 @login_required
 def logout():
+    """
+    Logs the user out
+    """
     logout_user()
     return redirect("/")
 
@@ -256,6 +294,9 @@ def shuffle():
 @main_page.route("/notes")
 @login_required
 def notes():
+    """
+    Displays all the notes in one's wishlist
+    """
     user_id = session["user_id"]
     # username = get_person_name(user_id)
     notes_from_file = {}
@@ -284,6 +325,9 @@ def notes():
 @main_page.route("/createnote", methods=["GET"])
 @login_required
 def createnote():
+    """
+    Displays the form required to add a note
+    """
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
@@ -296,6 +340,9 @@ def createnote():
 @main_page.route("/createnote", methods=["POST"])
 @login_required
 def createnote_add():
+    """
+    Allows submitting new notes to a wishlist
+    """
     logger.info("Got a post request to add a note")
     user_id = session["user_id"]
     username = get_person_name(user_id)
@@ -351,6 +398,9 @@ def createnote_add():
 @main_page.route("/editnote", methods=["GET"])
 @login_required
 def editnote():
+    """
+    Displays a page where a person can edit a note
+    """
     user_id = session["user_id"]
     username = get_person_name(user_id)
 
@@ -386,9 +436,11 @@ def editnote():
 @main_page.route("/editnote", methods=["POST"])
 @login_required
 def editnote_edit():
-    logger.info("Got a post request to edit a note by")
+    """
+    Allows submitting textual edits to notes
+    """
     user_id = session["user_id"]
-    logger.info(" user id: {}".format(user_id))
+    logger.debug("Got a post request to edit a note by user id: {}".format(user_id))
 
     addednote = request.form["textfield"]
     try:
@@ -396,6 +448,7 @@ def editnote_edit():
         request_id = decrypt_id(request_id)
         request_id = int(request_id)
     except Exception:
+        logger.error("Error when decrypting note edit submission")
         sentry.captureException()
         return render_template("error.html",
                                message=_("An error occured"),
@@ -408,6 +461,7 @@ def editnote_edit():
         db_note.status = NoteState.MODIFIED.value["id"]
         db.session.commit()
     except Exception:
+        logger.error("Error when committing note edit change into database")
         sentry.captureException()
         db.session.rollback()
         return render_template("error.html",
@@ -423,6 +477,9 @@ def editnote_edit():
 @main_page.route("/removenote", methods=["POST"])
 @login_required
 def deletenote():
+    """
+    Allows deleting a specific note
+    """
     user_id = session["user_id"]
     username = get_person_name(user_id)
 
@@ -462,7 +519,10 @@ def deletenote():
 
 @main_page.route("/giftingto", methods=["POST"])
 @login_required
-def updatenotestatus():
+def update_note_status():
+    """
+    Allows setting specific wishlist note's status
+    """
     user_id = session["user_id"]
     try:
         status = int(request.form["status"])
@@ -498,6 +558,9 @@ def updatenotestatus():
 @main_page.route("/giftingto")
 @login_required
 def giftingto():
+    """
+    Display default group's active event's wishlist
+    """
     user_id = session["user_id"]
     username = get_person_name(user_id)
     invalid_notes = False
@@ -622,6 +685,9 @@ def giftingto():
 @main_page.route("/graph")
 @login_required
 def graph():
+    """
+    Display default group's graph
+    """
     user_id = session["user_id"]
     try:
         if "group_id" in request.args.keys():
@@ -661,6 +727,9 @@ def graph():
 @main_page.route("/graph/<group_id>/", defaults={"unhide": False})
 @login_required
 def graph_json(group_id, unhide):
+    """
+    Displays an interactive graph
+    """
     user_id = int(session["user_id"])
 
     try:
@@ -721,6 +790,9 @@ def graph_json(group_id, unhide):
 @main_page.route("/grapher/<graph_id>/", defaults={"unhide": ""})
 @login_required
 def graph_js(graph_id, unhide):
+    """
+    Returns the JS required to graph one specific graph
+    """
     return render_template("grapher.js", graph_id=graph_id, unhide=unhide), \
            200, {"content-type": "application/javascript"}
 
@@ -729,6 +801,9 @@ def graph_js(graph_id, unhide):
 @login_required
 @lru_cache(maxsize=10)
 def custom_js():
+    """
+    User-specific JS for custom functionality
+    """
     sentry_feedback = False
     sentry_event_id = ""
     sentry_public_dns = ""
@@ -749,6 +824,9 @@ def custom_js():
 @main_page.route("/settings")
 @login_required
 def settings():
+    """
+    Displays a settings page
+    """
     user_id = session["user_id"]
     user_obj = User.query.get(user_id)
 
@@ -822,6 +900,9 @@ def settings():
 
 @main_page.route("/error")
 def error_page():
+    """
+    Displays an error page
+    """
     message = _("Broken link")
     title = _("Error")
 
@@ -844,6 +925,9 @@ def error_page():
 
 @main_page.route("/success")
 def success_page():
+    """
+    Displays a success page based on given parameters
+    """
     message = _("Broken link")
     title = _("Error")
     action = ""
@@ -1747,10 +1831,12 @@ def log_user_in_with_cert():
     This functionality requires another subdomain requiring client cert
 
     Nginx configuration for TLC client certificate authentication (Estonian ID card authentication)
+    ```
     proxy_set_header Tls-Client-Secret Config.TLS_PROXY_SECRET;
     proxy_set_header Tls-Client-Verify $ssl_client_verify;
     proxy_set_header Tls-Client-Dn     $ssl_client_s_dn;
     proxy_set_header Tls-Client-Cert   $ssl_client_cert;
+    ```
     """
     if "Tls-Client-Secret" in request.headers.keys():
         logger.debug("Tls-Client-Secret exists")
@@ -1799,6 +1885,14 @@ def log_user_in_with_cert():
 
 
 def try_to_log_in_with_dn(input_dn: str) -> object:
+    """
+    This function allows people to log in based on the hash of the DN of their certificate
+    Assumes certificate validity has been checked and the DN is authentic
+    Most likely a new ID-card requires new link to be made to log in
+
+    :param input_dn: The DN field of the client certificate
+    :return: Returns a redirect depending on success
+    """
     try:
         hashed_dn = get_sha3_512_hash(input_dn)
         link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,

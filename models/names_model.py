@@ -1,3 +1,9 @@
+# coding=utf-8
+"""
+Specifies how Estonian names are stored in the DB with cases
+"""
+from sqlalchemy import VARCHAR, Column
+
 from main import db
 
 

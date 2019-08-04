@@ -1,4 +1,10 @@
+# coding=utf-8
+"""
+Contains all the models related to shuffles made between people
+"""
 from datetime import datetime
+
+from sqlalchemy import FetchedValue, BigInteger, Column, Integer, ForeignKey
 
 from main import db
 from models.groups_model import Group
