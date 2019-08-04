@@ -1,7 +1,8 @@
+# coding=utf-8
 from enum import Enum
 
 from flask_babelex import gettext as _
-from sqlalchemy import FetchedValue
+from sqlalchemy import VARCHAR, Integer, Column, TIMESTAMP, BigInteger
 
 from main import db
 
@@ -42,13 +43,12 @@ class Wishlist(db.Model):
     """
     __tablename__ = "wishlists"
 
-    user_id = db.Column(db.Integer)
-    item = db.Column(db.VARCHAR(255))
-    status = db.Column(db.Integer, default=NoteState.DEFAULT.value["id"], nullable=False)
-    purchased_by = db.Column(db.Integer, nullable=True)
-    received = db.Column(db.TIMESTAMP, nullable=True)
-    id = db.Column(db.BIGINT, db.Sequence("wishlists_note_id_seq", start=1, increment=1), server_default=FetchedValue(),
-                   primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer)
+    item = Column(VARCHAR(255))
+    status = Column(Integer, default=NoteState.DEFAULT.value["id"], nullable=False)
+    purchased_by = Column(Integer, nullable=True)
+    received = Column(TIMESTAMP, nullable=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True, nullable=False)
 
     def __init__(self, user_id, item, status=NoteState.DEFAULT.value["id"], purchased_by=None):
         self.user_id = user_id
