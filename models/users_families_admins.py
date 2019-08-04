@@ -1,4 +1,12 @@
+# coding=utf-8
+"""
+Contains the model how users are related to families
+"""
+from sqlalchemy import Integer, ForeignKey, Boolean, Column
+
 from main import db
+from models.family_model import Family
+from models.users_model import User
 
 
 class UserFamilyAdmin(db.Model):
