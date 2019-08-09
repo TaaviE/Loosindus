@@ -1,3 +1,6 @@
+# coding=utf-8
+from sqlalchemy import Boolean, Integer, ForeignKey, Column
+
 from main import db
 
 
@@ -14,10 +17,10 @@ class UserGroupAdmin(db.Model):
     """
 
     __tablename__ = "users_groups_admins"
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), primary_key=True, nullable=False)
-    admin = db.Column(db.Boolean, nullable=False)
-    confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    user_id = Column(Integer, ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.id"), primary_key=True, nullable=False)
+    admin = Column(Boolean, nullable=False)
+    confirmed = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, user_id, group_id, admin):
         self.user_id = user_id

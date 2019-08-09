@@ -1,4 +1,9 @@
-from sqlalchemy import FetchedValue
+# coding=utf-8
+"""
+Specifies how groups of people are stored in a database
+
+"""
+from sqlalchemy import FetchedValue, VARCHAR, BigInteger, Column
 
 from main import db
 
@@ -14,10 +19,9 @@ class Group(db.Model):
     """
     __tablename__ = "groups"
 
-    id = db.Column(db.Integer, db.Sequence("groups_id_seq", start=1, increment=1), server_default=FetchedValue(),
-                   autoincrement=True, nullable=False, primary_key=True)
-    name = db.Column(db.VARCHAR(255), nullable=True)
-    description = db.Column(db.VARCHAR(255), nullable=True)
+    id = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name = Column(VARCHAR(255), nullable=True)
+    description = Column(VARCHAR(255), nullable=True)
 
     def __init__(self, group_id, group_name):
         self.id = group_id
