@@ -18,8 +18,8 @@ class Name(db.Model):
     """
     __tablename__ = "names_cases"
 
-    name = db.Column(db.VARCHAR(255), primary_key=True, nullable=False)
-    genitive = db.Column(db.VARCHAR(255), nullable=False)
+    name = Column(VARCHAR(255), primary_key=True, nullable=False)
+    genitive = Column(VARCHAR(255), nullable=False)
 
     def __init__(self, name, genitive):
         self.name = name

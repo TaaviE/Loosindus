@@ -1,11 +1,17 @@
-from sqlalchemy.sql.schema import ForeignKey, Column
-from sqlalchemy.sql.sqltypes import Integer, TIMESTAMP
+# coding=utf-8
+"""
+Contains all models related to subscription subsystem
+"""
+from sqlalchemy import ForeignKey, TIMESTAMP, Integer, FetchedValue, VARCHAR, BigInteger, Column, Boolean
 
 from main import db
 from models.users_model import User
 
 
 class Subscription(db.Model):
+    """
+    Specifies which users have subscriptions and if they're valid
+    """
     __tablename__ = "subscriptions"
 
     user_id = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False)

@@ -47,8 +47,7 @@ from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint
-from flask_babelex import gettext as _
-from flask_babelex import Domain
+from flask_babelex import Domain, gettext as _
 
 # from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
@@ -998,6 +997,9 @@ def editfamily():
 @main_page.route("/setlanguage", methods=["POST"])
 @login_required
 def set_language():
+    """
+    Allows the user to set their language
+    """
     user_id = session["user_id"]
     try:
         if request.form["language"] in ["en", "ee"]:
@@ -1184,6 +1186,9 @@ def editgroup_with_action():
 @main_page.route("/editfam", methods=["POST"])
 @login_required
 def editfam_with_action():
+    """
+    Deals with all the possible modifications to a family
+    """
     user_id = int(session["user_id"])
     endpoint = "editfam"
     if "action" not in request.form.keys():
@@ -1351,7 +1356,7 @@ def editfam_with_action():
 
 @main_page.route("/addfam", methods=["GET"])
 @login_required
-def addfam():
+def add_family():
     return render_template("creatething.html",
                            row_count=1,
                            endpoint="editfam",
@@ -1360,7 +1365,7 @@ def addfam():
 
 @main_page.route("/addgroup", methods=["GET"])
 @login_required
-def addgroup():
+def add_group():
     return render_template("creatething.html",
                            row_count=1,
                            endpoint="editgroup",
@@ -1370,6 +1375,9 @@ def addgroup():
 @main_page.route("/recreategraph", methods=["GET"])
 @login_required
 def ask_regraph():
+    """
+    Displays a confirmation page before reshuffling
+    """
     if "extra_data" in request.form.keys():
         extra_data = request.form["extra_data"]
         return render_template("creatething.html",
@@ -1522,11 +1530,14 @@ def test_mail():
 
 @main_page.route("/api/login", methods=["POST"])
 def api_login():
+    """
+    Allows login without CSRF protection if one knows the API key
+    """
     username = ""
     try:
         email = request.form["email"]
         password = request.form["password"]
-        apikey = request.form["apikey"]
+        apikey = request.headers["X-API-Key"]
         if apikey != Config.PRIVATE_API_KEY:
             return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
@@ -1540,25 +1551,34 @@ def api_login():
         return redirect("/")
     except Exception:
         sentry.captureException()
-        logger.info("Api login failed for user {}".format(username))
+        logger.info("API login failed for user {}".format(username))
         return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
 
 @main_page.route("/ads.txt", methods=["GET"])
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=1)
 def ads_txt():
+    """
+    Displays ads.txt
+    """
     return render_template("ads.txt"), {"content-type": "text/plain"}
 
 
 @main_page.route("/sitemap.xml", methods=["GET"])
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=1)
 def sitemap():
+    """
+    Displays the software's sitemap
+    """
     return render_template("sitemap.xml"), {"content-type": "text/xml"}
 
 
 @main_page.route("/robots.txt", methods=["GET"])
-@lru_cache(maxsize=2)
+@lru_cache(maxsize=1)
 def robots():
+    """
+    Displays the standard robots.txt
+    """
     return render_template("robots.txt"), {"content-type": "text/plain"}
 
 
@@ -1577,18 +1597,27 @@ if Config.GOOGLE_OAUTH:
 
 
     @oauth_authorized.connect_via(google_blueprint)
-    def google_oauth(blueprint, token):
+    def google_oauth_handler(blueprint, token):
+        """
+        Passes the oauth event to the oauth handler
+        """
         return oauth_handler(blueprint, token)
 
 
     @main_page.route("/googleregister")
-    def googlesignup():
+    def google_signup():
+        """
+        Sets the required session variable to enable signup when logging in
+        """
         session["oauth_sign_up"] = True
         return redirect(url_for("google.login"))
 
 
     @main_page.route("/googlelogin")
-    def googlelogin():
+    def google_login():
+        """
+        Allows someone to just log in with the OAuth provider
+        """
         session["oauth_sign_up"] = False
         return redirect(url_for("google.login"))
 
@@ -1604,18 +1633,27 @@ if Config.GITHUB_OAUTH:
 
 
     @oauth_authorized.connect_via(github_blueprint)
-    def google_oauth(blueprint, token):
+    def github_oauth_handler(blueprint, token):
+        """
+        Passes the oauth event to the oauth handler
+        """
         return oauth_handler(blueprint, token)
 
 
     @main_page.route("/githublogin")
-    def githublogin():
+    def github_login():
+        """
+        Allows someone to just log in with the OAuth provider
+        """
         session["oauth_sign_up"] = False
         return redirect(url_for("github.login"))
 
 
     @main_page.route("/githubregister")
-    def githubsignup():
+    def github_signup():
+        """
+        Sets the required session variable to enable signup when logging in
+        """
         session["oauth_sign_up"] = True
         return redirect(url_for("github.login"))
 
@@ -1631,23 +1669,39 @@ if Config.FACEBOOK_OAUTH:
 
 
     @oauth_authorized.connect_via(facebook_blueprint)
-    def google_oauth(blueprint, token):
+    def facebook_oauth_handler(blueprint, token):
+        """
+        Passes the oauth event to the oauth handler
+        """
         return oauth_handler(blueprint, token)
 
 
     @main_page.route("/facebookregister")
-    def facebooksignup():
+    def facebook_signup():
+        """
+        Sets the required session variable to enable signup when logging in
+        """
         session["oauth_sign_up"] = True
         return redirect(url_for("facebook.login"))
 
 
     @main_page.route("/facebooklogin")
-    def facebooklogin():
+    def facebook_login():
+        """
+        Allows someone to just log in with the OAuth provider
+        """
         session["oauth_sign_up"] = False
         return redirect(url_for("facebook.login"))
 
 
 def oauth_handler(blueprint, token):
+    """
+    Handles incoming OAuth events, login, signup
+
+    :param blueprint:
+    :param token:
+    :return:
+    """
     if token is None:  # Failed
         logger.info("Failed to log in with {}.".format(blueprint.name))
         flash(_("Error logging in"))
@@ -1702,7 +1756,9 @@ def oauth_handler(blueprint, token):
         db.session.commit()
         logger.info("Successfully signed in with {}.".format(blueprint.name))
         return False
-    elif authentication_link is not None and authentication_link.user_id is None and "user_id" in session.keys():
+    elif authentication_link is not None and \
+            authentication_link.user_id is None and \
+            "user_id" in session.keys():
         try:
             authentication_link.user_id = int(session["user_id"])  # Update link with user id
             db.session.add(authentication_link)
@@ -1715,7 +1771,9 @@ def oauth_handler(blueprint, token):
             flash(_("Error signing up, please try again"))
             return False
     else:  # Link does not exist or not associated
-        if "oauth_sign_up" in session.keys() and session["oauth_sign_up"]:  # If registration
+        if "oauth_sign_up" in session.keys() and \
+                session["oauth_sign_up"]:  # If registration
+
             session["oauth_sign_up"] = False
             if "email" in response.keys():
                 user_email = response["email"]
@@ -1740,7 +1798,8 @@ def oauth_handler(blueprint, token):
                 flash(_("Error signing up"))
                 return False
 
-            if user_email is None or len(user_email) < len("a@b.cc") or \
+            if user_email is None or \
+                    len(user_email) < len("a@b.cc") or \
                     "@" not in user_email:  # I'll assume noone with their own TLD will use this
                 logger.info("User email is wrong or missing, trying other API endpoint")
                 try:
@@ -1887,11 +1946,12 @@ def log_user_in_with_cert():
 def try_to_log_in_with_dn(input_dn: str) -> object:
     """
     This function allows people to log in based on the hash of the DN of their certificate
-    Assumes certificate validity has been checked and the DN is authentic
+    Assumes certificate validity, which also means that the issuing CA has been checked and whitelisted
     Most likely a new ID-card requires new link to be made to log in
+    This is a tradeoff unless someone wants to start to store Personal Identification Numbers and parse DNs
 
     :param input_dn: The DN field of the client certificate
-    :return: Returns a redirect depending on success
+    :return: Returns a redirect depending on result
     """
     try:
         hashed_dn = get_sha3_512_hash(input_dn)

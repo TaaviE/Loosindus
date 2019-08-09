@@ -4,9 +4,10 @@ Contains all the models related to families in the system
 """
 from datetime import datetime
 
-from sqlalchemy import FetchedValue
+from sqlalchemy import FetchedValue, String, BigInteger, DateTime, Column, Boolean, Integer, ForeignKey
 
 from main import db
+from models.groups_model import Group
 
 
 class Family(db.Model):
@@ -22,10 +23,9 @@ class Family(db.Model):
     """
 
     __tablename__ = "families"
-    id = db.Column(db.Integer, db.Sequence("families_id_seq", start=1, increment=1), server_default=FetchedValue(),
-                   autoincrement=True, primary_key=True, unique=True, nullable=False)
-    name = db.Column(db.String(255), nullable=False)
-    creation = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    id = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name = Column(String(255), nullable=False)
+    creation = Column(DateTime, nullable=False, default=datetime.now())
 
     def __init__(self, family_id, family_group, family_name):
         self.id = family_id
@@ -47,9 +47,9 @@ class FamilyGroup(db.Model):
     """
 
     __tablename__ = "families_groups"
-    family_id = db.Column(db.Integer, db.ForeignKey("family.id"), primary_key=True, unique=False, nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey("group.id"), unique=False, nullable=False)
-    confirmed = db.Column(db.Boolean, default=False, unique=False, nullable=False)
+    family_id = Column(Integer, ForeignKey(Family.id), primary_key=True, unique=False, nullable=False)
+    group_id = Column(Integer, ForeignKey(Group.id), unique=False, nullable=False)
+    confirmed = Column(Boolean, default=False, unique=False, nullable=False)
 
     def __init__(self, family_id, group_id, confirmed=False):
         self.family_id = family_id
