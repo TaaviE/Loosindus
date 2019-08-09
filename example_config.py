@@ -57,7 +57,7 @@ class Config(object):
 
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
 
-    TLS_PROXY_SECRET = ""  # TODO: Make sure TLS-Client-Secret header value matches,
+    TLS_PROXY_SECRET = "__"  # TODO: Make sure TLS-Client-Secret header value matches,
     # this is a countermeasure to forgetting to proxy
 
     LOGLEVEL = logging.DEBUG
@@ -89,3 +89,7 @@ class Config(object):
     DATA_AD_SLOT = "1234567890"  # TODO: Update AD slot field value
 
     GAUA = "UA-1234314234-2"  # TODO: Google Analytics User ID
+
+    SQLALCHEMY_ENGINE_OPTIONS = {  # This is to make sure the service stays alive even if connections time out
+        "pool_pre_ping": True,
+    }
