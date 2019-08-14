@@ -41,7 +41,7 @@ try {
 
     gtag("js", new Date());
     gtag("set", "anonymizeIp", true);
-    gtag("config", "{{ config.GAUA}}");
+    gtag("config", "{{ config.GAUA }}");
 } catch (e) {
     console.log(e);
 }
@@ -52,7 +52,7 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
         navigator.serviceWorker.register("/worker.js")
             .then(function (registration) {
-                console.log("Sucess", registration);
+                console.log("Success", registration);
             }, function (exception) {
                 console.log("An error occured", exception);
             });
