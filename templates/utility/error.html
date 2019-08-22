@@ -18,7 +18,7 @@
                href="/">{{ _("Back") }}</a>
         </div>
     </div>
-    {% if not no_video %}
+    {% if not no_video and show_joke_error_video %}
     <iframe height="500m;200vmin"
             class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--8-col-tablet mdl-cell--12-col-desktop mdl-cell--6-col-phone mdl-cell--8-col"
             id="ytplayer"

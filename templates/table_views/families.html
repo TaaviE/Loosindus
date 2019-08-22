@@ -18,7 +18,9 @@
             {% if admin %}
                 <th>{{ _("ID") }}</th>
             {% endif %}
-            <th>{{ _("Birthday") }}</th>
+            {% if birthday %}
+                <th>{{ _("Birthday") }}</th>
+            {% endif %}
             <th>{{ _("Actions") }}</th>
             {% if admin %}
                 <th></th>
@@ -26,26 +28,28 @@
         </tr>
         {% for member in family %}
             <tr>
-                <td>{{ member[0] }}</td>
+                <td>{{ member["name"] }}</td>
                 {% if admin %}
                     <td>
                         <div class="mdl-textfield mdl-js-textfield">
-                            <input class="mdl-textfield__input" type="text" id="user_id" value="{{ member[1] }}"
+                            <input class="mdl-textfield__input" type="text" id="user_id" value="{{ member["id"] }}"
                                    disabled>
                         </div>
                     </td>
                 {% endif %}
 
-                {% if member[4] is not none %}
-                    <td>{{ member[4] }}</td>
-                {% else %}
-                    <td>{{ _("Unknown") }}</td>
+                {% if birthday %}
+                    {% if member["birthday"] is not none %}
+                        <td>{{ member[4] }}</td>
+                    {% else %}
+                        <td>{{ _("Unknown") }}</td>
+                    {% endif %}
                 {% endif %}
 
-                {% if not member[3] %}
+                {% if not member["self"] %}
                     <td>
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./giftingto?id={{ member[1] }}">{{ _("Display") }}</a>
+                           href="./giftingto?id={{ member["id"] }}">{{ _("Display") }}</a>
                     </td>
                 {% else %}
                     <td></td>
@@ -57,7 +61,7 @@
                             <input name="action" type="hidden" value="REMOVEMEMBER">
                             <input name="extra_data" type="hidden" value="{{ family_id }}">
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                    name="id" type="submit" value="{{ member[1] }}">{{ _("Remove") }}</button>
+                                    name="id" type="submit" value="{{ member["id"] }}">{{ _("Remove") }}</button>
                         </form>
                     </td>
                 {% endif %}
