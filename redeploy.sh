@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 git branch -D new-branch-to-save-current-commits
 git checkout master
 git branch new-branch-to-save-current-commits
