@@ -274,6 +274,9 @@ def logout():
 @main_page.route("/shuffle")
 @login_required
 def shuffle():
+    """
+    Returns a page that displays a specific event's shuffle
+    """
     user_id = session["user_id"]
     username = get_person_name(user_id)
     gifter = get_person_id(username)
