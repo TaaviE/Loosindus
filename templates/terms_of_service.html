@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <h3>{{ _("Terms and conditions") }}</h3>
+        </div>
+    </div>
+{% endblock %}
+
+{% block buttons %}
+{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("By using Loosindus you agree to adhere to these terms and conditions.") }}</p>
+        <p>{{ _("Any violations of these terms are at minimum subject to termination of the account at fault.") }}</p>
+        <p>{{ _("You are definetly not allowed to:") }}</p>
+        <p>{{ _("* Use any components of Loosindus without complying with the licenses of respective components") }}</p>
+        <p>{{ _("* Cause excessive load on the system, regular use of the service does not fall under this") }}</p>
+        <p>{{ _("* Use the system for other reasons than listed as the features of the service") }}</p>
+        <p>{{ _("* Anything in violation of the law in the country of the host of the service") }}</p>
+        <p>{{ _("But this list is not comprehensive, ask the host of this service if you have any doubts.") }}</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("This page lists all emails related to your account") }}</p>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <tbody>
+        <tr>
+            <th>{{ _("E-mail") }}</th>
+            <th>{{ _("Verified") }}</th>
+            <th>{{ _("Primary") }}</th>
+            <th>{{ _("Added") }}</th>
+        </tr>
+        {% for event in events %}
+            <tr>
+                <td>{{ event["email"] }}</td>
+                <td>{{ event["verified"] }}</td>
+                <td>{{ event["primary"] }}</td>
+                <td>{{ event["added"] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

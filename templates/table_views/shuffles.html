@@ -15,6 +15,20 @@
 {% endblock %}
 
 {% block content %}
+    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+        <tbody>
+        <tr>
+            <th>{{ _("Group") }}</th>
+            <th>{{ _("Action") }}</th>
+        </tr>
+        {% for shuffle in shuffles %}
+            <tr>
+                <td>{{ role["id"] }}</td>
+                <td>{{ role["link"] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
     <svg id="viz"
          class="custom-height-500 mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone"></svg>
     <script src="./grapher/{{ graph_id }}/{{ unhide }}"></script>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}🎄{{ title }}{% endblock %}
+
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("This page lists all your system roles") }}</p>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+        <tbody>
+        <tr>
+            <th>{{ _("Role") }}</th>
+            <th>{{ _("Description") }}</th>
+        </tr>
+        {% for role in roles %}
+            <tr>
+                <td>{{ role["role"] }}</td>
+                <td>{{ role["description"] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
