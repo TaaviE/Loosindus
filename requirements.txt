@@ -1,6 +1,5 @@
 Flask==1.1.1
 Flask-SqlAlchemy==2.4.0
-Flask-Security==3.0.0
 Flask-Script==2.0.6
 Flask-Mail==0.9.1
 Flask-WTF==0.14.2
@@ -21,3 +20,4 @@ passlib==1.7.1
 cython==0.29.13
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git
+Flask-Security-Too==3.3.0rc1
