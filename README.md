@@ -1,25 +1,33 @@
-# SecretSanta
-[![Liberapay Status](https://img.shields.io/liberapay/patrons/Taavi.svg?logo=liberapay)](https://liberapay.com/Taavi)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus?ref=badge_shield)
+# Loosindus
 
 A really simple to configure and to use system for secret santa but with some important additions like secretly shared
 shopping lists and gifting constraints (avoid matches between family members for ex.).
 
-Features and requirements:
-  * Mobile- and Kindle-friendly - no massive dependencies, minimal or no Javascript on pages. All critical pages also work without JS and there's a nice script for precompressing everything for fast loading everything even when clients have a slow connection or your server is just a Raspberry Pi
-  * It's relatively fast (for Python) - the code hasn't been heavily optimized but common pages load sub-second served by mediocre hardware
-  * The UI is as simple as possible to make it usable for everyone
-  * No Python 2
-  * Works fairly well with Content Security Policy - no need for 'inline'-anything
-  * Minimum of 4 users are required for any functionality - there's simply nothing secret when you have less than four people
-  * The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break
+Features:
+  * Keeps the secret in "Secret Santa", a lot of effort has gone into hiding both the santas and possible gifts
+  * Very simple to use
+  * Possibility to share gift wishlists with people to avoid duplicate gifts and other hassle coordinating gifts
+  * Best possible gift target and receiver generation to avoid combinations that would ruin the surprise
+  * Mobile, Chromebook and Kindle-friendly - no massive JS dependencies, minimal or no Javascript on pages. All critical pages also work without JS.
+  * Supports multiple events at the same time, with optional advanced features
+  * Supports Estonian ID card authentication
+
+
+For self-hosters:
+  * Works very well with Content Security Policy - no need for 'inline'-anything
   * The app is intended to be used with multiple families, but it is okay if there's only one family in the group or one-person families in the group
-  * The amount of groups an user can be in is technically not limited (multiple secret santa events at the same time) but the UI can't handle displaying it for that user, this limitation will be fixed in future versions
-  * Implements Estonian ID card authentication that integrates with Flask-Security
+  * The amount of groups an user can be in is not limited (multiple secret santa events at the same time)
+  * The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break
+  * Estonian (and other client TLS cert) authentication with Flask-Security requires extra configuration
 
 ## Eesti keeles
 
-Lihtne veebiliides loosipakkide tegemiseks - lubab igal kasutajal koostada enda soovinimekirja ning seda enda salajase "jõuluvanaga" jagada (nimekirja saavad vaadata ka ülejäänud grupi liikmed). Loosipakid üksteise vahel jagab süsteem soovi korral automaatselt, vältides perekonnaliikmete vahelisi kinke ja eelmisel aastal loodud kombinatsioone. Eesmärk on suurendada üllatusmomenti, samal ajal vältides halbu kingitusi ning duplikaate (iga soovi saab kingi saaja suhtes varjatult broneerituks märkida). Süsteem lubab pärast seadistamist sisse logida ka ID-kaardiga, Google konto jt. Minimaalne soovituslik kasutajate hulk tarkvara kasutamiseks on neli inimest. Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid ma kasutan seda muudatuste aktiivseks testimiseks seega see võib vahepeal mõne veaga olla.
+Lihtne veebiliides loosipakkide tegemiseks - lubab igal kasutajal koostada enda soovinimekirja ning seda enda salajase "jõuluvanaga" jagada (nimekirja saavad vaadata ka ülejäänud grupi liikmed).
+Loosipakid üksteise vahel jagab süsteem soovi korral automaatselt, vältides perekonnaliikmete vahelisi kinke ja eelmisel aastal loodud kombinatsioone.
+Eesmärk on suurendada üllatusmomenti, samal ajal vältides halbu kingitusi ning duplikaate (iga soovi saab kingi saaja suhtes varjatult broneerituks märkida).
+Süsteem lubab pärast seadistamist sisse logida ka ID-kaardiga, Google konto jt.
+Minimaalne kasutajate hulk tarkvara kasutamiseks on loogiliselt neli inimest.
+Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid ma kasutan seda muudatuste aktiivseks testimiseks seega see võib vahepeal mõne veaga olla.
 
 ## Setup (if you wish to self-host)
 
@@ -41,12 +49,13 @@ In case this above was too complex you can just use the version hosted by me and
 
   * Check the GitHub Projects tab
 
+## Donations
+
+  * [![Liberapay Status](https://img.shields.io/liberapay/patrons/Taavi.svg?logo=liberapay)](https://liberapay.com/Taavi)
+
 ### Keywords
 
   * Kingituste tegemise rakendus
   * Secret santa web application
   * Loosipakkide tegemise rakendus
   * Loosipakirakendus
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FTaaviE%2FLoosindus?ref=badge_large)
