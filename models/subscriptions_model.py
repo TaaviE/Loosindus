@@ -2,8 +2,6 @@
 """
 Contains all models related to subscription subsystem
 """
-from datetime import datetime
-
 from sqlalchemy import ForeignKey, TIMESTAMP, Integer, FetchedValue, VARCHAR, BigInteger, Column, Boolean
 
 from main import db
