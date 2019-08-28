@@ -12,16 +12,14 @@ class Name(db.Model):
     Specifies how names are stored in the database for Estonian localization
 
     @param name: the name as a string
-    @type  name: str
     @param genitive: the name in genitive case
-    @type genitive: str
     """
     __tablename__ = "names_cases"
 
-    name = Column(VARCHAR(255), primary_key=True, nullable=False)
-    genitive = Column(VARCHAR(255), nullable=False)
+    name: str = Column(VARCHAR(255), primary_key=True, nullable=False)
+    genitive: str = Column(VARCHAR(255), nullable=False)
 
-    def __init__(self, name, genitive):
+    def __init__(self, name: str, genitive: str):
         self.name = name
         self.genitive = genitive
 
