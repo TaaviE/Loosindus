@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block content %}
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <h3>{{ _("Privacy Policy") }}</h3>
+        </div>
+    </div>
+{% endblock %}
+
+{% block buttons %}
+{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("The service uses Google Analytics for analytics and Sentry for crash reporting, so by using this website you agree to them processing your data.") }}</p>
+        <p>{{ _("Crash reporting data may consist of but is not limited to usernames, IP addresses, feedback given and e-mails. This is simply because otherwise problems occuring with the service would be too hard for me to debug, special arrangements can in theory be made.") }}</p>
+        <p>{{ _("Analytics data consists of browser metadata, visited pages and IP addresses.") }}</p>
+        <p>{{ _("In addition to those, using this service means that you agree that the host of this site processes your data for the functionality of the site. Wishlist data, shuffling data and connections between people are shared with no third party unless with your explicit consent.") }}</p>
+    </div>
+{% endblock %}

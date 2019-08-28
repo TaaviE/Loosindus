@@ -99,7 +99,6 @@ chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 from main import celery, security, mail
 
 
-# Send asynchronous email
 @celery.task()
 def send_security_email(message):
     """
@@ -231,7 +230,10 @@ def index():
 
 @main_page.route("/about")
 def about():
-    return render_template("home.html", no_sidebar=True)
+    """
+    Displays a nice introductory page
+    """
+    return render_template("pretty_index.html", no_sidebar=True)
 
 
 @main_page.route("/")
@@ -318,7 +320,7 @@ def notes():
         notes_from_file = {_("Right now there's nothing in the Wishlist"): ("", "")}
         empty = True
 
-    return render_template("notes.html",
+    return render_template("wishlists.html",
                            list=notes_from_file,
                            empty=empty,
                            title=_("My Wishlist"))
@@ -925,6 +927,24 @@ def error_page():
                            title=title)
 
 
+@main_page.route("/tos")
+def terms_of_service():
+    """
+    Displays terms of service
+    """
+    return render_template("terms_of_service.html",
+                           title=_("Terms of Service"))
+
+
+@main_page.route("/pp")
+def privacy_policy():
+    """
+    Displays the service's privacy policy
+    """
+    return render_template("privacy_policy.html",
+                           title=_("Privacy Policy"))
+
+
 @main_page.route("/success")
 def success_page():
     """
@@ -939,7 +959,7 @@ def success_page():
         title = request.args["title"]
         message = request.args["message"]
         action = request.args["action"]
-        link = request.args["link"]
+        link = request.args["link"]  # TODO: Check if for this domain only
     except Exception:
         pass
 
@@ -1815,8 +1835,8 @@ def oauth_handler(blueprint, token):
                             return False
                         else:
                             response = response.json()
-                            user_email = response[0]["email"] if len(response) > 0 and "email" in response[
-                                0].keys() else None
+                            user_email = response[0]["email"] if len(response) > 0 and \
+                                                                 "email" in response[0].keys() else None
                             # Take the first email
                             if not response[0]["verified"] or \
                                     user_email is None or \
@@ -1852,7 +1872,7 @@ def oauth_handler(blueprint, token):
                 email=user_email,
                 username=user_name,
                 password=hash_password(token_bytes(100)),
-                active=True
+                enabled=True
             )
             flash(_("Password is set randomly, use \"Forgot password\" to set another password"))
 
@@ -1925,6 +1945,7 @@ def log_user_in_with_cert():
                                 new_link = AuthLinks(
                                     user_id=int(link),
                                     provider_user_id=hashed_dn,
+                                    token=None,
                                     provider="esteid"
                                 )
                                 try:

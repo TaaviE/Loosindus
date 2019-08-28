@@ -18,11 +18,11 @@ class Shuffle(db.Model):
 
     __tablename__ = "shuffles"
 
-    id = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    giver = Column(Integer(), ForeignKey(User.id), nullable=False)
-    getter = Column(Integer(), ForeignKey(User.id), nullable=False)
-    year = Column(Integer(), default=datetime.now().year, nullable=False)
-    group = Column(Integer(), ForeignKey(Group.id))
+    id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    giver: int = Column(Integer(), ForeignKey(User.id), nullable=False)
+    getter: int = Column(Integer(), ForeignKey(User.id), nullable=False)
+    year: int = Column(Integer(), default=datetime.now().year, nullable=False)
+    group: int = Column(Integer(), ForeignKey(Group.id))
 
     def __str__(self):
         return "{\"id\": {id}, \"giver\": {giver}, \"getter\": {getter}, \"year\": {year}, \"group\": {group}}".format(
