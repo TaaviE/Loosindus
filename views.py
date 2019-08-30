@@ -233,7 +233,7 @@ def about():
     """
     Displays a nice introductory page
     """
-    return render_template("pretty_index.html", no_sidebar=True)
+    return render_template("generic/pretty_index.html", no_sidebar=True)
 
 
 @main_page.route("/")

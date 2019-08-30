@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>{% block title %}{% endblock title %}</title>
-    {% include "head.html" %}
-    {% include "style.html" %}
+    {% include "subtemplates/head.html" %}
+    {% include "subtemplates/style.html" %}
     {% block additional_head %}{% endblock %}
     <meta name="description" content="{% block description %}{% endblock %}">
     <meta property="og:title" content="{{ self.title() }}"/>
@@ -11,10 +11,10 @@
 
 
 <body>
-<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+<div class="mdl-layout mdl-js-layout {% if not no_sidebar %}mdl-layout--fixed-drawer{% endif %} mdl-layout--fixed-header">
     {% block title_bar %}
         {% with title=self.title() %}
-            {% include "title_bar.html" %}
+            {% include "subtemplates/title_bar.html" %}
         {% endwith %}
     {% endblock %}
 
@@ -50,7 +50,7 @@
         </div>
     </main>
 </div>
-{% include "footer.html" %}
+{% include "subtemplates/footer.html" %}
 {% block footer %}
     <script src="/custom.js"></script>{% endblock %}
 {% if config.GOOGLE_ADS %}
