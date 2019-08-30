@@ -1,3 +1,7 @@
+# coding=utf-8
+"""
+This file contains all the changes to forms required for this application
+"""
 from flask_babelex import gettext as _
 from flask_security.forms import StringField, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
     ForgotPasswordForm
