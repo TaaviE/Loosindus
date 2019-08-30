@@ -1,14 +1,15 @@
 from flask_babelex import gettext as _
-from flask_security.forms import StringField, Required, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
+from flask_security.forms import StringField, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
     ForgotPasswordForm
 from flask_wtf import RecaptchaField
+from wtforms.validators import DataRequired
 
 
 class ExtendedRegisterForm(RegisterForm):
     """
     Adds first name and captcha to the registration form
     """
-    first_name = StringField(_("Eesnimi"), [Required()])
+    first_name = StringField(_("First name"), [DataRequired()])
     recaptcha = RecaptchaField("Captcha")
 
 
