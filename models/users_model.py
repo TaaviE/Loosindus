@@ -1,12 +1,17 @@
 # coding=utf-8
+"""
+Contains everything very directly related to users
+"""
 from datetime import datetime
 
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_security import UserMixin, RoleMixin
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, Boolean, FetchedValue, VARCHAR
+from sqlalchemy import DateTime, FetchedValue, VARCHAR
+from sqlalchemy import Integer, ForeignKey, Boolean, Column
 from sqlalchemy.orm import backref, relationship
 
 from main import db
+from models.family_model import Family
 
 
 class Role(db.Model, RoleMixin):
@@ -23,9 +28,12 @@ class Role(db.Model, RoleMixin):
 
 
 class RolesUsers(db.Model):
+    """
+    Specifies what role an User has
+    """
     __tablename__ = "roles_users"
     id = Column("id", Integer(), ForeignKey("user.id"), primary_key=True)
-    role_id = Column("role_id", Integer(), ForeignKey("role.id"))
+    role_id = Column("role_id", Integer(), ForeignKey(Role.id))
 
 
 class User(db.Model, UserMixin):
@@ -40,22 +48,10 @@ class User(db.Model, UserMixin):
     language = Column(VARCHAR(5), default="en", nullable=False)
 
     roles = relationship(
-        "Role",
+        Role,
         secondary=RolesUsers.__tablename__,
         backref=backref("User", lazy="dynamic")
     )
-
-    @property
-    def confirmed_at(self):
-        if not self.confirmed:
-            return None
-
-        return confirmed_at
-
-    @confirmed_at.setter
-    def confirmed_at(self, value):
-        raise NotImplementedError
-        self.confirmed_at = value
 
     @property
     def last_login_ip(self):
@@ -97,6 +93,9 @@ class User(db.Model, UserMixin):
 
 
 class AuthLinks(db.Model, OAuthConsumerMixin):
+    """
+    Specifies how 3rd party identity providers are linked to users
+    """
     __tablename__ = "user_connections"
     id = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     provider_user_id = Column(VARCHAR(255), nullable=False)
@@ -113,28 +112,30 @@ class AuthLinks(db.Model, OAuthConsumerMixin):
 
 
 class Email(db.Model):
+    """
+    Specifies how emails are stored for history and management purposes
+    Users table is updated based on this table by a stored procedure
+    """
     __tablename__ = "emails"
 
-    email = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
-    verified = Column(Boolean, nullable=False, default=False, server_default=False)
-    primary = Column(Boolean, nullable=False, default=False, server_default=False)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    email: str = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
+    verified: bool = Column(Boolean, default=False, nullable=False)
+    primary: bool = Column(Boolean, default=False, nullable=False)
+    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
+    added: datetime = Column(DateTime, server_default=FetchedValue(), nullable=False)
 
 
 class Password(db.Model):
+    """
+    Specifies how passwords are stored in the database,
+    Users table is updated based on this table by a stored procedure
+    """
     __tablename__ = "passwords"
 
-    password = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
-    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
-    active = Column(Boolean, default=False, nullable=False)
-    created = Column(DateTime, default=datetime.now(), nullable=False)
-
-
-from sqlalchemy import Integer, ForeignKey, Boolean, Column
-
-from main import db
-from models.family_model import Family
-from models.users_model import User
+    password: str = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
+    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
+    active: bool = Column(Boolean, default=False, nullable=False)
+    created: datetime = Column(DateTime, default=datetime.now(), nullable=False)
 
 
 class UserFamilyAdmin(db.Model):

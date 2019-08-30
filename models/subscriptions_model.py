@@ -2,10 +2,31 @@
 """
 Contains all models related to subscription subsystem
 """
+from datetime import datetime
+
 from sqlalchemy import ForeignKey, TIMESTAMP, Integer, FetchedValue, VARCHAR, BigInteger, Column, Boolean
 
 from main import db
 from models.users_model import User
+
+
+class SubscriptionType(db.Model):
+    """
+    Specifies different types of subscriptions
+    """
+    __tablename__ = "subscription_types"
+
+    id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name: str = Column(VARCHAR(255), nullable=False)
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def __repr__(self):
+        return "<id {}>".format(self.user_id)
+
+    def __str__(self):
+        return "{\"id\": {id}, \"name\": \"{name}\"}".format(id=self.id, name=self.name)
 
 
 class Subscription(db.Model):
@@ -35,22 +56,3 @@ class Subscription(db.Model):
             until=self.until,
             active=str(self.active).lower()
         )
-
-
-class SubscriptionType(db.Model):
-    """
-    Specifies different types of subscriptions
-    """
-    __tablename__ = "subscription_types"
-
-    id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name: str = Column(VARCHAR(255), nullable=False)
-
-    def __init__(self, name: str):
-        self.name = name
-
-    def __repr__(self):
-        return "<id {}>".format(self.user_id)
-
-    def __str__(self):
-        return "{\"id\": {id}, \"name\": \"{name}\"}".format(id=self.id, name=self.name)

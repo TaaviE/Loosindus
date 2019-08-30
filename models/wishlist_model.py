@@ -3,8 +3,7 @@ from datetime import datetime
 from enum import Enum
 
 from flask_babelex import gettext as _
-from sqlalchemy import ForeignKey
-from sqlalchemy import VARCHAR, Integer, Column, TIMESTAMP, BigInteger
+from sqlalchemy import VARCHAR, Integer, Column, TIMESTAMP, BigInteger, ForeignKey
 
 from main import db
 # To make sure these strings get translated
@@ -44,7 +43,7 @@ class Wishlist(db.Model):
     __tablename__ = "wishlists"
 
     user_id: int = Column(Integer)
-    item: str = Column(VARCHAR(255))
+    item: str = Column(VARCHAR(1024))
     status: int = Column(Integer, default=NoteState.DEFAULT.value["id"], nullable=False)
     purchased_by: int = Column(Integer, nullable=True)
     received: datetime = Column(TIMESTAMP, nullable=True)

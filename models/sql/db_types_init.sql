@@ -1,0 +1,1 @@
+-- Run this script to initialize the tables that are used to look up ID values for different events (audit, shuffle and etc.)

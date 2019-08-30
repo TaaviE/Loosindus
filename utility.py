@@ -12,12 +12,10 @@ import pyximport
 pyximport.install()
 
 from models.family_model import Family, FamilyGroup
-from models.groups_model import Group
-from models.users_groups_admins_model import UserGroupAdmin
+from models.groups_model import Group, UserGroupAdmin
 from models.names_model import Name
 from models.shuffles_model import Shuffle
-from models.users_families_admins import UserFamilyAdmin
-from models.users_model import User
+from models.users_model import User, UserFamilyAdmin
 from models.wishlist_model import Wishlist
 from datetime import datetime
 from sqlalchemy import and_
@@ -26,13 +24,14 @@ from main import sentry
 
 
 def get_person_marked(user_id: int) -> list:
-    passed_person_id = int(user_id)  # Recast to avoid mistakes
+    """
+    Get all notes that have been somehow marked by an user
+    :param user_id:
+    :return:
+    """
+    passed_person_id = int(user_id)
     wishlist_marked = Wishlist.query.filter(Wishlist.purchased_by == passed_person_id).all()
     return wishlist_marked
-
-
-def get_person_id(name: str) -> int:
-    return User.query.filter(User.username == name).first().id
 
 
 def get_families_in_group(group_id: int) -> list:
@@ -76,24 +75,13 @@ def get_families(passed_person_id: int) -> int:
 
 @lru_cache(maxsize=64)
 def get_person_name(passed_person_id: int) -> str:
+    """
+    Returns person's first name based on ID
+    :param passed_person_id: Person's ID
+    :return: Person's username
+    """
     passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-    return User.query.get(passed_person_id).username
-
-
-def get_default_target_id(passed_person_id: int) -> int:
-    # warnings.warn("The 'get_default_target_id' method is deprecated, use 'get_target_id_with_group' instead",
-    #              DeprecationWarning, 2)
-    try:
-        passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-        shuffle = Shuffle.query.filter(and_(Shuffle.giver == passed_person_id,
-                                            Shuffle.year == datetime.now().year)).first()
-        if shuffle is not None:
-            return shuffle.getter
-        else:
-            return -1
-    except Exception:
-        sentry.captureException()
-        return -1
+    return User.query.get(passed_person_id).first_name
 
 
 def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int:
@@ -110,6 +98,11 @@ def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int
 
 @lru_cache(maxsize=64)
 def get_name_in_genitive(name: str) -> str:
+    """
+    Get the person's name in Estonian genitive case
+    :param name: Name
+    :return: Name in Estonian genitive case
+    """
     try:
         return Name.query.get(name).genitive
     except Exception:
@@ -117,6 +110,12 @@ def get_name_in_genitive(name: str) -> str:
 
 
 def get_person_language_code(user_id: int) -> str:
+    """
+    Fetches person's language preference from DB
+
+    :param user_id: Person's ID
+    :return: Two-letter language code
+    """
     user_id = int(user_id)  # Recast to avoid mistakes
     user = User.query.filter(User.id == user_id).first()
     if user.language is None:

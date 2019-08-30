@@ -21,7 +21,6 @@ class ShufflingEventType(db.Model):
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(), nullable=True)
 
-
 class ShufflingEvent(db.Model):
     """
     Specifies how events are stored in the database

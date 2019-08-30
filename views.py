@@ -283,9 +283,9 @@ def shuffle():
     username = get_person_name(user_id)
     gifter = get_person_id(username)
 
-    if "group_id" in request.args.keys():
-        group_id = int(request.args["group_id"])
-        giftee = get_target_id_with_group(user_id, group_id)
+    if "event_id" in request.args.keys():
+        event_id = int(request.args["event_id"])
+        giftee = "1"
     else:
         giftee = get_default_target_id(gifter)
 

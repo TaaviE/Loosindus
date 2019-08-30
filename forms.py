@@ -8,7 +8,7 @@ class ExtendedRegisterForm(RegisterForm):
     """
     Adds first name and captcha to the registration form
     """
-    username = StringField(_("Eesnimi"), [Required()])
+    first_name = StringField(_("Eesnimi"), [Required()])
     recaptcha = RecaptchaField("Captcha")
 
 
