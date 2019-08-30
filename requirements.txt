@@ -20,4 +20,4 @@ passlib==1.7.1
 cython==0.29.13
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git
-Flask-Security-Too==3.3.0rc1
+Flask-Security-Too==3.3.0rc2
