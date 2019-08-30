@@ -5,7 +5,7 @@ Contains all the models related to events organized in one specific group
 
 from datetime import datetime
 
-from sqlalchemy import FetchedValue, BigInteger, Column, Integer, ForeignKey, TIMESTAMP, VARCHAR
+from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
 from models.groups_model import Group
@@ -20,6 +20,7 @@ class ShufflingEventType(db.Model):
 
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(), nullable=True)
+
 
 class ShufflingEvent(db.Model):
     """

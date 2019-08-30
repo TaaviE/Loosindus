@@ -5,9 +5,8 @@ Contains everything very directly related to users
 from datetime import datetime
 
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
-from flask_security import UserMixin, RoleMixin
-from sqlalchemy import DateTime, FetchedValue, VARCHAR
-from sqlalchemy import Integer, ForeignKey, Boolean, Column
+from flask_security import RoleMixin, UserMixin
+from sqlalchemy import Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, VARCHAR
 from sqlalchemy.orm import backref, relationship
 
 from main import db

@@ -3,8 +3,7 @@
 This file contains all the changes to forms required for this application
 """
 from flask_babelex import gettext as _
-from flask_security.forms import StringField, RegisterForm, ResetPasswordForm, SendConfirmationForm, \
-    ForgotPasswordForm
+from flask_security.forms import ForgotPasswordForm, RegisterForm, ResetPasswordForm, SendConfirmationForm, StringField
 from flask_wtf import RecaptchaField
 from wtforms.validators import DataRequired
 

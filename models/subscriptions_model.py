@@ -4,7 +4,7 @@ Contains all models related to subscription subsystem
 """
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, TIMESTAMP, Integer, FetchedValue, VARCHAR, BigInteger, Column, Boolean
+from sqlalchemy import BigInteger, Boolean, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
 from models.users_model import User

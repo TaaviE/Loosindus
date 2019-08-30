@@ -5,7 +5,7 @@ Contains all the models related to logging user actions
 
 from datetime import datetime
 
-from sqlalchemy import FetchedValue, BigInteger, Column, Integer, ForeignKey, TIMESTAMP, VARCHAR
+from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
 from models.groups_model import Group

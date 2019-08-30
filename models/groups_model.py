@@ -3,7 +3,7 @@
 Specifies how groups of people are stored in a database
 
 """
-from sqlalchemy import FetchedValue, VARCHAR, BigInteger, Boolean, Integer, ForeignKey, Column
+from sqlalchemy import BigInteger, Boolean, Column, FetchedValue, ForeignKey, Integer, VARCHAR
 
 from main import db
 

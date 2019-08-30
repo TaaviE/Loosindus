@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 # Background tasks
-from logging import getLogger
 
-from config import Config
 from main import mail
 from models.wishlist_model import NoteState
 from utility import *

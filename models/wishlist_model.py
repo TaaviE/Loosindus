@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 
 from flask_babelex import gettext as _
-from sqlalchemy import VARCHAR, Integer, Column, TIMESTAMP, BigInteger, ForeignKey
+from sqlalchemy import BigInteger, Column, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
 # To make sure these strings get translated

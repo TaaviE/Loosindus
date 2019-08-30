@@ -4,7 +4,7 @@ Contains all the models related to shuffles made between people
 """
 from datetime import datetime
 
-from sqlalchemy import FetchedValue, BigInteger, Column, Integer, ForeignKey
+from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer
 
 from main import db
 from models.groups_model import Group

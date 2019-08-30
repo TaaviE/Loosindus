@@ -4,7 +4,7 @@ Contains all the models related to families in the system
 """
 from datetime import datetime
 
-from sqlalchemy import FetchedValue, String, BigInteger, DateTime, Column, Boolean, Integer, ForeignKey
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, String
 
 from main import db
 from models.groups_model import Group

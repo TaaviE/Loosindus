@@ -1,6 +1,6 @@
 # coding=utf-8
 import logging
-from logging import getLogger, basicConfig
+from logging import basicConfig, getLogger
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 

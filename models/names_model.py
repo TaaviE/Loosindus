@@ -2,7 +2,7 @@
 """
 Specifies how Estonian names are stored in the DB with cases
 """
-from sqlalchemy import VARCHAR, Column
+from sqlalchemy import Column, VARCHAR
 
 from main import db
 
