@@ -22,15 +22,15 @@ class Shuffle(db.Model):
     giver: int = Column(Integer(), ForeignKey(User.id), nullable=False)
     getter: int = Column(Integer(), ForeignKey(User.id), nullable=False)
     year: int = Column(Integer(), default=datetime.now().year, nullable=False)
-    group: int = Column(Integer(), ForeignKey(Group.id))
+    event: int = Column(Integer(), ForeignKey(Group.id), nullable=False)
 
     def __str__(self):
-        return "{\"id\": {id}, \"giver\": {giver}, \"getter\": {getter}, \"year\": {year}, \"group\": {group}}".format(
+        return "{\"id\": {id}, \"giver\": {giver}, \"getter\": {getter}, \"year\": {year}, \"event\": {event}}".format(
             id=self.id,
             giver=self.giver,
             getter=self.getter,
             year=self.year,
-            group=self.group)
+            event=self.event)
 
     def __hash__(self):
         return hash(str(self))

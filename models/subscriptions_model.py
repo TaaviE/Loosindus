@@ -29,6 +29,11 @@ class SubscriptionType(db.Model):
         return "{\"id\": {id}, \"name\": \"{name}\"}".format(id=self.id, name=self.name)
 
 
+subscription_type_to_id = {}
+for subscription_type in SubscriptionType.query.all():
+    subscription_type_to_id[subscription_type.name.lower().replace(" ", "_")] = subscription_type.id
+
+
 class Subscription(db.Model):
     """
     Specifies which users have subscriptions and if they're valid

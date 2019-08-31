@@ -80,7 +80,7 @@ def get_locale():
 
 # Database models
 from main import db
-from models.users_model import AuthLinks
+from models.users_model import AuthLinks, UserGroupAdmin
 from models.wishlist_model import NoteState
 
 main_page = Blueprint("main_page", __name__, template_folder="templates")
@@ -594,13 +594,15 @@ def giftingto():
     except Exception:
         sentry.captureException()
         return render_template("error.html",
-                               message=_("Pls no hax ") + username + "!!",
+                               message=_("Sorry for the error,") + username + "!!",
                                title=_("Error"))
 
     if group_id is not None:
         target_id = get_target_id_with_group(user_id, group_id)
     else:
-        target_id = get_default_target_id(user_id)
+        return render_template("error.html",
+                               message=_("You have to specify which combinations you want to see,") + username + "!",
+                               title=_("Error"))
 
     if request_id != target_id:  # Let's not let everyone read everyone's lists
         family_obj = get_default_family(user_id)
@@ -1558,7 +1560,7 @@ def api_login():
     """
     username = ""
     try:
-        email = request.form["email"]
+        email = request.form["email"]  # TODO: Use header
         password = request.form["password"]
         apikey = request.headers["X-API-Key"]
         if apikey != Config.PRIVATE_API_KEY:
@@ -1872,7 +1874,7 @@ def oauth_handler(blueprint, token):
                 email=user_email,
                 username=user_name,
                 password=hash_password(token_bytes(100)),
-                enabled=True
+                active=True
             )
             flash(_("Password is set randomly, use \"Forgot password\" to set another password"))
 

@@ -23,6 +23,11 @@ class AuditEventType(db.Model):
     description: str = Column(VARCHAR(1024), nullable=False)
 
 
+audit_event_type_to_id = {}
+for event_type in AuditEventType.query.all():
+    audit_event_type_to_id[event_type.name.lower().replace(" ", "_")] = event_type.id
+
+
 class AuditEvent(db.Model):
     """
     Specifies how audit events are stored in the database
