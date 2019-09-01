@@ -1,0 +1,44 @@
+.section--center {
+    max-width: 860px;
+    position: relative;
+    margin-bottom: 32px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center-icon {
+    display: flex;
+    -webkit-align-items: center;
+    justify-content: center;
+}
+
+.three-dot-menu {
+    position: absolute;
+    z-index: 99;
+    top: 8px;
+    right: 8px;
+}
+
+.circle-next-text {
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+    padding-top: 8px;
+}
+
+.circle-next-text h5 {
+    font-size: inherit;
+    margin: 8px 0 4px;
+}
+
+.circle-container {
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    margin: 8px 0;
+    font-size: 32px;
+    text-align: center;
+    line-height: 64px;
+    color: #ffffff;
+}

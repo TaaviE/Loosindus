@@ -12,10 +12,10 @@ import pyximport
 pyximport.install()
 
 from models.family_model import Family, FamilyGroup
-from models.groups_model import Group, UserGroupAdmin
+from models.groups_model import Group
 from models.names_model import Name
 from models.shuffles_model import Shuffle
-from models.users_model import User, UserFamilyAdmin
+from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
 from models.wishlist_model import Wishlist
 from datetime import datetime
 from sqlalchemy import and_
@@ -53,7 +53,7 @@ def get_groups_family_is_in(family_id: int) -> list:
 def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
     try:
         return UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
-                                                UserGroupAdmin.user_id == int(user_id)
+                                                UserGroupAdmin.user_id == user_id
                                                 )).one().admin
     except Exception:
         return False

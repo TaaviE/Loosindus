@@ -12,16 +12,18 @@
           </div>
         </div> --> #}
 
-        <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="header_button">
-            <i class="material-icons">more_vert</i>
-        </button>
-        <label class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="header_button">
-            <ul>
-                <li class="mdl-menu__item"><a href="/about">{{ _("About") }}</a></li>
-                <li class="mdl-menu__item"><a href="/contact">{{ _("Contact") }}</a></li>
-                <li class="mdl-menu__item"><a href="/feedback">{{ _("Feedback") }}</a></li>
-            </ul>
-        </label>
+        {% if three_dot %}
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="header_button">
+                <i class="material-icons">more_vert</i>
+            </button>
+            <label class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="header_button">
+                <ul>
+                    <li class="mdl-menu__item"><a href="/about">{{ _("About") }}</a></li>
+                    <li class="mdl-menu__item"><a href="/contact">{{ _("Contact") }}</a></li>
+                    <li class="mdl-menu__item"><a href="/feedback">{{ _("Feedback") }}</a></li>
+                </ul>
+            </label>
+        {% endif %}
     </div>
 </header>
 

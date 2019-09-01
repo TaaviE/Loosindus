@@ -1,5 +1,7 @@
 {% extends "subtemplates/base.html" %}
 {% set no_sidebar = True %}
+{% set no_information = True %}
+
 {% from "security/_macros.html" import render_field_with_errors, render_field %}
 
 {% block title %}{{ _("Register") }}{% endblock %}
@@ -8,35 +10,35 @@
     <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-color-text--grey-600 mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <h1>{{ _("Register") }}</h1>
         {% include "security/_messages.html" %}
+        <p>You can sign up using your e-mail, or by using an external provider using links below</p>
 
         <form action="{{ url_for_security("register") }}" method="POST" name="register_user_form">
             <table>
                 {{ register_user_form.hidden_tag() }}
-                {{ render_field_with_errors(register_user_form.username) }}
+                {{ render_field_with_errors(register_user_form.first_name) }}
                 {{ render_field_with_errors(register_user_form.email) }}
                 {{ render_field_with_errors(register_user_form.password) }}
                 {% if register_user_form.password_confirm %}
                     {{ render_field_with_errors(register_user_form.password_confirm) }}
                 {% endif %}
                 {{ render_field_with_errors(register_user_form.recaptcha) }}
-                {{ render_field(register_user_form.submit) }}
             </table>
         </form>
         <p></p>
         {% if config.GITHUB_OAUTH %}
-            <p><a href="{{ url_for("main_page.githubsignup") }}"
+            <p><a href="{{ url_for("main_page.github_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Github") }}</a></p>
         {% endif %}
 
         {% if config.GOOGLE_OAUTH %}
-            <p><a href="{{ url_for("main_page.googlesignup") }}"
+            <p><a href="{{ url_for("main_page.google_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Google") }}</a></p>
         {% endif %}
 
         {% if config.FACEBOOK_OAUTH %}
-            <p><a href="{{ url_for("main_page.facebooksignup") }}"
+            <p><a href="{{ url_for("main_page.facebook_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Facebook") }}</a></p>
         {% endif %}

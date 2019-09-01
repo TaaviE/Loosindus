@@ -21,6 +21,7 @@
     <main class="mdl-layout__content mdl-color--grey-100">
         <div class="mdl-grid">
             {# <div class="mdl-color--white mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-grid"></div> #}
+            {% if not no_information %}
             <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
                 <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
                     <h2 class="mdl-card__title-text">{{ _("Information") }}</h2>
@@ -31,6 +32,7 @@
                     <a href="#" class="mdl-button mdl-js-button mdl-js-ripple-effect">{{ _("Read More") }}</a>
                 </div> #}
             </div>
+            {% endif %}
 
             {% if config.GOOGLE_ADS %}
                 {% if not ad_free or ad_free is none %}
@@ -49,10 +51,10 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+    {% block footer %}
+        <script src="/custom.js"></script>{% endblock %}
 </div>
 {% include "subtemplates/footer.html" %}
-{% block footer %}
-    <script src="/custom.js"></script>{% endblock %}
 {% if config.GOOGLE_ADS %}
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 {% endif %}

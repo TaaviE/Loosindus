@@ -24,6 +24,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SERVER_NAME = "https://example.com"  # TODO: Fill this to make sure sitemap and robots.txt gets filled properly
+    CONTACT_EMAIL = "host@example.com"  # TODO: So that people can e-mail you
 
     MAIL_SERVER = "localhost"
     MAIL_PORT = 25

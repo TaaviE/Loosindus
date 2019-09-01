@@ -15,9 +15,9 @@ from models.family_model import Family
 
 class Role(db.Model, RoleMixin):
     __tablename__ = "role"
-    id = Column(Integer(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name = Column(VARCHAR(80), unique=True)
-    description = Column(VARCHAR(255))
+    id: int = Column(Integer(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name: str = Column(VARCHAR(80), unique=True)
+    description: str = Column(VARCHAR(255))
 
     def __str__(self):
         return self.name
@@ -26,29 +26,21 @@ class Role(db.Model, RoleMixin):
         return hash(self.name)
 
 
-class RolesUsers(db.Model):
-    """
-    Specifies what role an User has
-    """
-    __tablename__ = "roles_users"
-    id = Column("id", Integer(), ForeignKey("user.id"), primary_key=True)
-    role_id = Column("role_id", Integer(), ForeignKey(Role.id))
-
-
 class User(db.Model, UserMixin):
     __tablename__ = "users"
-    id = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    email = Column(VARCHAR(255), unique=True)
-    first_name = Column(VARCHAR(255), nullable=False)
-    password = Column(VARCHAR(255), nullable=False)
-    confirmed = Column(Boolean())
+    id: int = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    email: str = Column(VARCHAR(255), unique=True)
+    first_name: str = Column(VARCHAR(255), nullable=False)
+    password: str = Column(VARCHAR(255), nullable=False)
+    confirmed_at: datetime = Column(DateTime())
+    active: bool = Column(Boolean())
 
-    birthday = Column(DateTime())
-    language = Column(VARCHAR(5), default="en", nullable=False)
+    birthday: datetime = Column(DateTime())
+    language: str = Column(VARCHAR(5), default="en", nullable=False)
 
     roles = relationship(
         Role,
-        secondary=RolesUsers.__tablename__,
+        secondary="roles_users",
         backref=backref("User", lazy="dynamic")
     )
 
@@ -89,6 +81,15 @@ class User(db.Model, UserMixin):
         self.username = username
         self.password = password
         self.active = active
+
+
+class RolesUsers(db.Model):
+    """
+    Specifies what role an User has
+    """
+    __tablename__ = "roles_users"
+    id = Column(Integer(), ForeignKey(User.id), primary_key=True)
+    role_id = Column(Integer(), ForeignKey(Role.id))
 
 
 class AuthLinks(db.Model, OAuthConsumerMixin):

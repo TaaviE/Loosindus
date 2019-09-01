@@ -18,6 +18,10 @@
     font-size: 200%;
 }
 
+.custom-very-large-text {
+    font-size: 1000%;
+}
+
 .adsbygoogle {
     display: block;
     text-align: center;

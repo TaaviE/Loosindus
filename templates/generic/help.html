@@ -1,16 +1,14 @@
 {% extends "subtemplates/base.html" %}
 {% set no_sidebar = True %}
+{% set no_information = True %}
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
 {% block content %}
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <h4>{{ _("You can contact the host via:") }}</h4>
-            {% if config.CONTACT_EMAIL %}
-                <p>E-mail: <a href="mailto:{{ config.CONTACT_EMAIL }}">{{ config.CONTACT_EMAIL }}</a></p>
-            {% endif %}
+            <p class="custom-very-large-text material-icons">build</p>
+            <h4>{{ _("This page is under construction, sorry") }}</h4>
         </div>
     </div>
 {% endblock %}

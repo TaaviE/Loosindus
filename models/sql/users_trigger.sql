@@ -53,8 +53,10 @@ begin
             insert into "passwords" ("user_id", "password", "active") values (old."id", new."password", true);
         end if;
 
-        if (old.active = false and new."active" = true) then
+        if (old.confirmed_at is null and new."confirmed_at" is not null) then
             update "emails" set "verified"= true where "email" = old.email;
+
+            insert into audit_events (event_type_id, user_id) values (2, old.id);
         end if;
 
         return new;
