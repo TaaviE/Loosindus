@@ -34,6 +34,10 @@ def get_person_marked(user_id: int) -> list:
     return wishlist_marked
 
 
+def get_person(user_id: int) -> User:
+    return User.query.get(user_id)
+
+
 def get_families_in_group(group_id: int) -> list:
     return Family.query.filter(
         Family.id.in_(  # TODO: .subquery() instead of .all()

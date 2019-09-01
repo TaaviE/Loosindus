@@ -209,13 +209,12 @@ def index():
     except Exception:
         pass
 
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
+    user_id: int = int(session["user_id"])
+    user: User = get_person(user_id)
 
-    active_events =
+    events = []
 
     try:
-        user = User.query.get(int(user_id))
         user.last_activity_at = datetime.datetime.now()
         user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(" ")[-1]
         db.session.commit()
@@ -223,8 +222,8 @@ def index():
         sentry.captureException()
 
     return render_template("index.html",
-                           auth=username,
-                           no_shuffle=no_shuffle,
+                           auth=user.first_name,
+                           event=events,
                            uid=user_id,
                            title=_("Home"))
 

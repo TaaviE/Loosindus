@@ -5,6 +5,7 @@ Contains all the models related to families in the system
 from datetime import datetime
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, String
+from sqlalchemy.orm import backref, relationship
 
 from main import db
 from models.groups_model import Group
@@ -23,9 +24,15 @@ class Family(db.Model):
     """
 
     __tablename__ = "families"
-    id = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name = Column(String(255), nullable=False)
-    creation = Column(DateTime, nullable=False, default=datetime.now())
+    id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name: str = Column(String(255), nullable=False)
+    creation: datetime = Column(DateTime, nullable=False, default=datetime.now())
+
+    groups = relationship(
+        Group,
+        secondary="families_groups",
+        backref=backref("Family", lazy="dynamic")
+    )
 
     def __init__(self, family_id, family_group, family_name):
         self.id = family_id
