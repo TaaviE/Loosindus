@@ -3,6 +3,7 @@
 Contains everything very directly related to users
 """
 from datetime import datetime
+from typing import List
 
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_security import RoleMixin, UserMixin
@@ -10,8 +11,7 @@ from sqlalchemy import Boolean, Column, DateTime, FetchedValue, ForeignKey, Inte
 from sqlalchemy.orm import backref, relationship
 
 from main import db
-from models.family_model import Family
-from models.groups_model import Group
+from models.family_model import Family, Group
 
 
 class Role(db.Model, RoleMixin):
@@ -39,13 +39,13 @@ class User(db.Model, UserMixin):
     birthday: datetime = Column(DateTime())
     language: str = Column(VARCHAR(5), default="en", nullable=False)
 
-    roles = relationship(
+    roles: List[Role] = relationship(
         Role,
         secondary="roles_users",
         backref=backref("User", lazy="dynamic")
     )
 
-    families = relationship(
+    families: List[Family] = relationship(
         Family,
         secondary="users_families_admins",
         backref=backref("User", lazy="dynamic")

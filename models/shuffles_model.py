@@ -7,7 +7,7 @@ from datetime import datetime
 from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer
 
 from main import db
-from models.groups_model import Group
+from models.family_model import Group
 from models.users_model import User
 
 

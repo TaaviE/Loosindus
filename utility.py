@@ -4,7 +4,6 @@
 # This file requires database being initialized
 
 # Cython
-import operator
 from functools import lru_cache
 
 import pyximport
@@ -12,7 +11,6 @@ import pyximport
 pyximport.install()
 
 from models.family_model import Family, FamilyGroup
-from models.groups_model import Group
 from models.names_model import Name
 from models.shuffles_model import Shuffle
 from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
@@ -47,13 +45,6 @@ def get_families_in_group(group_id: int) -> list:
         )
     ).all()
 
-
-def get_groups_family_is_in(family_id: int) -> list:
-    familygroup_ids = [familygroup.group_id for familygroup in
-                       FamilyGroup.query.filter(FamilyGroup.family_id == family_id).all()]
-    return Group.query.filter(Group.id.in_(familygroup_ids)).all()
-
-
 def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
     try:
         return UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
@@ -61,15 +52,6 @@ def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
                                                 )).one().admin
     except Exception:
         return False
-
-
-def get_default_family(passed_person_id: int) -> Family:
-    passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-    db_families_user_has_conn = UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
-    return Family.query.filter(Family.id == sorted(db_families_user_has_conn,
-                                                   key=operator.attrgetter("family_id"),
-                                                   reverse=False)[0].family_id
-                               ).one()
 
 
 def get_families(passed_person_id: int) -> int:

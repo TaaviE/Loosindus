@@ -18,7 +18,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Cython
+from typing import List
+
 import pyximport
+
+from models.events_model import ShufflingEvent
 
 pyximport.install()
 
@@ -212,7 +216,11 @@ def index():
     user_id: int = int(session["user_id"])
     user: User = get_person(user_id)
 
-    events = []
+    events: List[ShufflingEvent] = []
+    for family in user.families:
+        for group in family.groups:
+            for event in group.events:
+                events.append(event)
 
     try:
         user.last_activity_at = datetime.datetime.now()

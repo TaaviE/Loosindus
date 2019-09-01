@@ -2,13 +2,48 @@
 """
 Contains all the models related to families in the system
 """
-from datetime import datetime
+from __future__ import annotations
 
-from sqlalchemy import BigInteger, Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, String
+from datetime import datetime
+from typing import List
+
+from sqlalchemy import BigInteger, Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, String, VARCHAR
 from sqlalchemy.orm import backref, relationship
 
 from main import db
-from models.groups_model import Group
+
+
+class Group(db.Model):
+    """
+    Specifies how groups are modeled in the database
+
+    @param group_id: group's ID
+    @param group_name: 255 letter name of the group
+    """
+    __tablename__ = "groups"
+
+    id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    name: str = Column(VARCHAR(255), nullable=True)
+    description: str = Column(VARCHAR(255), nullable=True)
+
+    families: List[Family] = relationship(
+        "Family",
+        secondary="families_groups",
+        backref=backref("Group", lazy="dynamic")
+    )
+
+    """events = relationship(
+        "ShufflingEvent",
+        secondary="events",
+        backref=backref("Group", lazy="dynamic")
+    )"""
+
+    def __init__(self, group_id: int, group_name: str):
+        self.id = group_id
+        self.name = group_name
+
+    def __repr__(self):
+        return "<id {}>".format(self.id)
 
 
 class Family(db.Model):
@@ -28,7 +63,7 @@ class Family(db.Model):
     name: str = Column(String(255), nullable=False)
     creation: datetime = Column(DateTime, nullable=False, default=datetime.now())
 
-    groups = relationship(
+    groups: List[Group] = relationship(
         Group,
         secondary="families_groups",
         backref=backref("Family", lazy="dynamic")
@@ -64,3 +99,4 @@ class FamilyGroup(db.Model):
 
     def __repr__(self):
         return "<id {}>".format(self.family_id)
+

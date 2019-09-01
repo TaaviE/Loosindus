@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
-from models.groups_model import Group
+from models.family_model import Group
 
 
 class ShufflingEventType(db.Model):
