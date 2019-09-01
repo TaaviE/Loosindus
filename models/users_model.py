@@ -11,6 +11,7 @@ from sqlalchemy.orm import backref, relationship
 
 from main import db
 from models.family_model import Family
+from models.groups_model import Group
 
 
 class Role(db.Model, RoleMixin):
@@ -41,6 +42,12 @@ class User(db.Model, UserMixin):
     roles = relationship(
         Role,
         secondary="roles_users",
+        backref=backref("User", lazy="dynamic")
+    )
+
+    families = relationship(
+        Family,
+        secondary="users_families_admins",
         backref=backref("User", lazy="dynamic")
     )
 
@@ -118,10 +125,10 @@ class Email(db.Model):
     """
     __tablename__ = "emails"
 
+    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
     email: str = Column(VARCHAR(255), primary_key=True, unique=True, nullable=False)
     verified: bool = Column(Boolean, default=False, nullable=False)
     primary: bool = Column(Boolean, default=False, nullable=False)
-    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
     added: datetime = Column(DateTime, server_default=FetchedValue(), nullable=False)
 
 
@@ -166,17 +173,14 @@ class UserGroupAdmin(db.Model):
     """
     Specifies how user-group-admin relationships are modeled in the database
 
-    @type  user_id: int
     @param user_id: user's ID
-    @type  group_id: int
     @param group_id: family_id where the family belongs ID
-    @type  admin: bool
     @param admin: if the user is the adming of the group
     """
 
     __tablename__ = "users_groups_admins"
-    user_id: int = Column(Integer, ForeignKey("user.id"), primary_key=True, unique=True, nullable=False)
-    group_id: int = Column(Integer, ForeignKey("groups.id"), primary_key=True, nullable=False)
+    user_id: int = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
+    group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
     admin: bool = Column(Boolean, nullable=False)
     confirmed: bool = Column(Boolean, nullable=False, default=False)
 

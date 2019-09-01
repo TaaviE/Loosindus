@@ -35,7 +35,7 @@ class ShufflingEvent(db.Model):
     __tablename__ = "events"
 
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    created_at: object = Column(TIMESTAMP(), server_default=FetchedValue(), nullable=False)
+    created_at: datetime = Column(TIMESTAMP(), server_default=FetchedValue(), nullable=False)
     name: str = Column(VARCHAR(255), nullable=False)
     event_at: datetime = Column(TIMESTAMP(), nullable=True)
     group_id: int = Column(Integer(), ForeignKey(Group.id), nullable=False)

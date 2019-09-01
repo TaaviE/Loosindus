@@ -4,6 +4,7 @@ Specifies how groups of people are stored in a database
 
 """
 from sqlalchemy import BigInteger, Column, FetchedValue, VARCHAR
+from sqlalchemy.orm import backref, relationship
 
 from main import db
 
@@ -20,6 +21,18 @@ class Group(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(255), nullable=True)
     description: str = Column(VARCHAR(255), nullable=True)
+
+    families = relationship(
+        "Family",
+        secondary="families_groups",
+        backref=backref("Group", lazy="dynamic")
+    )
+
+    """events = relationship(
+        "ShufflingEvent",
+        secondary="events",
+        backref=backref("Group", lazy="dynamic")
+    )"""
 
     def __init__(self, group_id: int, group_name: str):
         self.id = group_id
