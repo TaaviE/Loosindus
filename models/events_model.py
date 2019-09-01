@@ -58,5 +58,15 @@ class ShufflingEvent(db.Model):
             event_type=self.event_type
         )
 
+    def as_dict(self):
+        return {
+            "id": self.id,
+            "created_at": self.created_at,
+            "name": self.name,
+            "event_at": self.event_at,
+            "group_id": self.group_id,
+            "event_type": self.event_type,
+        }
+
     def __hash__(self):
         return hash(str(self))

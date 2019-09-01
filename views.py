@@ -22,8 +22,6 @@ from typing import List
 
 import pyximport
 
-from models.events_model import ShufflingEvent
-
 pyximport.install()
 
 # Utilities
@@ -216,11 +214,14 @@ def index():
     user_id: int = int(session["user_id"])
     user: User = get_person(user_id)
 
-    events: List[ShufflingEvent] = []
+    events: List[dict] = []
     for family in user.families:
         for group in family.groups:
             for event in group.events:
-                events.append(event)
+                dict_ev = event.as_dict()
+                dict_ev["group_id"] = group.name
+                events.append(dict_ev)
+
 
     try:
         user.last_activity_at = datetime.datetime.now()
@@ -231,7 +232,7 @@ def index():
 
     return render_template("index.html",
                            auth=user.first_name,
-                           event=events,
+                           events=events,
                            uid=user_id,
                            title=_("Home"))
 
