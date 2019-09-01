@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
-from models.groups_model import Group
+from models.family_model import Group
 
 
 class AuditEventType(db.Model):
@@ -23,7 +23,7 @@ class AuditEventType(db.Model):
     description: str = Column(VARCHAR(1024), nullable=False)
 
 
-audit_event_type_to_id = {}
+audit_event_type_to_id: dict = {}
 for event_type in AuditEventType.query.all():
     audit_event_type_to_id[event_type.name.lower().replace(" ", "_")] = event_type.id
 

@@ -32,12 +32,6 @@ class Group(db.Model):
         backref=backref("Group", lazy="dynamic")
     )
 
-    """events = relationship(
-        "ShufflingEvent",
-        secondary="events",
-        backref=backref("Group", lazy="dynamic")
-    )"""
-
     def __init__(self, group_id: int, group_name: str):
         self.id = group_id
         self.name = group_name
@@ -50,11 +44,8 @@ class Family(db.Model):
     """
     Specifies how families are modeled in the database
 
-    @type  family_id: int
     @param family_id: family's ID
-    @type  family_group: int
     @param family_group: group where the family belongs ID
-    @type  family_name: str
     @param family_name: 255 letter name of the group
     """
 

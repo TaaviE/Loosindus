@@ -29,7 +29,7 @@ class SubscriptionType(db.Model):
         return "{\"id\": {id}, \"name\": \"{name}\"}".format(id=self.id, name=self.name)
 
 
-subscription_type_to_id = {}
+subscription_type_to_id: dict = {}
 for subscription_type in SubscriptionType.query.all():
     subscription_type_to_id[subscription_type.name.lower().replace(" ", "_")] = subscription_type.id
 

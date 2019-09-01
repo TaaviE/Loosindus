@@ -22,7 +22,7 @@ class ShufflingEventType(db.Model):
     name: str = Column(VARCHAR(), nullable=True)
 
 
-event_type_to_id = {}
+event_type_to_id: dict = {}
 for event_type in ShufflingEventType.query.all():
     event_type_to_id[event_type.name.lower().replace(" ", "_")] = event_type.id
 

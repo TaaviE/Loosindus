@@ -24,6 +24,7 @@ from flask_babelex import Babel
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import CreateColumn
 
 from config import Config
@@ -59,7 +60,12 @@ else:
     sentry = Sentry(app, dsn=None, logging=False)
 
 from models.users_model import User, Role
+from models.events_model import ShufflingEvent
+from models.family_model import Group
+
 from flask_security import SQLAlchemyUserDatastore, Security
+
+Group.events = relationship(ShufflingEvent)  # Because Python doesn't have forward decl.
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
