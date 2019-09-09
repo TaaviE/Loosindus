@@ -4,8 +4,10 @@ Contains all of the routes that aren't really super specific to Loosindus
 """
 from functools import lru_cache
 
-from views import _, app, current_user, g, index, logger, login_required, logout_user, main_page, redirect, \
-    render_template, request, send_from_directory, sentry, session
+from flask import g, render_template, request, send_from_directory, session
+from flask_security import login_required, logout_user
+
+from views import _, app, current_user, index, logger, main_page, redirect, sentry
 
 
 # Show a friendlier error page
