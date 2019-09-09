@@ -5,12 +5,47 @@
 # Background tasks
 
 from main import mail
-from models.wishlist_model import NoteState
 from utility import *
 from utility_standalone import *
+from views import Message, app, celery, security
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
+
+
+@celery.task()
+def send_security_email(message):
+    """
+    Sends asynchronous email
+    """
+    with app.app_context():
+        try:
+            msg = Message(message["subject"],
+                          message["recipients"])
+            msg.body = message["body"]
+            msg.html = message["html"]
+            msg.sender = message["sender"]
+            mail.send(msg)
+        except Exception:
+            sentry.captureException()
+
+
+# Override security email sender
+@security.send_mail_task
+def delay_security_email(msg):
+    """
+    Allows sending e-mail non-blockingly
+    """
+    try:
+        send_security_email.delay(
+            {"subject": msg.subject,
+             "recipients": msg.recipients,
+             "body": msg.body,
+             "html": msg.html,
+             "sender": msg.sender}
+        )
+    except Exception:
+        sentry.captureException()
 
 
 def remind_to_add(rate_limit=True):
@@ -75,8 +110,8 @@ def remind_to_buy(rate_limit=True):
         marked_entries = get_person_marked(user.id)
         items_to_purchase = []
         for entry in marked_entries:
-            if entry.status == NoteState.PLANNING_TO_PURCHASE.value["id"] or \
-                    entry.status == NoteState.MODIFIED.value["id"]:
+            if entry.status == "booked" or \
+                    entry.status == "modified":
                 items_to_purchase.append((entry.item, get_person_name(entry.user_id)))
 
         if len(items_to_purchase) == 0:
@@ -127,7 +162,7 @@ def remind_about_change(rate_limit=True):
         marked_entries = get_person_marked(user.id)
         items_to_purchase = []
         for entry in marked_entries:
-            if entry.status == NoteState.MODIFIED.value["id"]:
+            if entry.status == "modified":
                 items_to_purchase.append((entry.item, get_person_name(entry.user_id)))
 
         if len(items_to_purchase) == 0:
