@@ -286,14 +286,15 @@ def logout():
     return redirect("/")
 
 
-@main_page.route("/shuffle")
+@main_page.route("/shuffles")
 @login_required
-def shuffle():
+def shuffles():
     """
     Returns a page that displays a specific event's shuffle
     """
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
+    user_id = int(session["user_id"])
+    user: User = User.query.get(user_id)
+    username = user.first_name
     gifter = get_person_id(username)
 
     if "event_id" in request.args.keys():
@@ -301,6 +302,22 @@ def shuffle():
         giftee = "1"
     else:
         giftee = get_default_target_id(gifter)
+
+    logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
+    return render_template("shuffle.html",
+                           title=_("Shuffle"),
+                           id=giftee)
+
+
+@main_page.route("/shuffle/<event_id>")
+@login_required
+def shuffle(event_id: str):
+    """
+    Returns a page that displays a specific event's shuffle
+    """
+    user_id = int(session["user_id"])
+    user = User.query.get(user_id)
+    username = user.first_name
 
     logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
     return render_template("shuffle.html",
@@ -434,7 +451,7 @@ def notes():
         notes_from_file = {_("Right now there's nothing in the Wishlist"): ("", "")}
         empty = True
 
-    return render_template("wishlists.html",
+    return render_template("table_views/notes_private.html",
                            list=notes_from_file,
                            empty=empty,
                            title=_("My Wishlist"))
@@ -469,11 +486,11 @@ def createnote_add():
     """
     Allows submitting new notes to a wishlist
     """
-    logger.info("Got a post request to add a note")
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
-    logger.info("Found user: {}".format(username))
-    logger.info("Found user id: {}".format(user_id))
+    logger.debug("Got a post request to add a note")
+    user_id = int(session["user_id"])
+    user: User = User.query.get(user_id)
+    username = user.first_name
+    logger.debug("Found user: {username} with id: {id}".format(username=username, id=user_id))
     currentnotes = {}
     addednote = request.form["textfield"]
 
@@ -483,7 +500,7 @@ def createnote_add():
                                title=_("Error"))
     elif len(addednote) <= 0:
         return render_template("utility/error.html",
-                               message=_("Santa can't bring you nothin', ") + username + "!",
+                               message=_("Santa can't bring you nothing, ") + username + "!",
                                title=_("Error"))
 
     logger.info("Trying to add a note: {}".format(addednote))
@@ -527,8 +544,9 @@ def editnote():
     """
     Displays a page where a person can edit a note
     """
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
+    user_id = int(session["user_id"])
+    user: User = User.query.get(user_id)
+    username = user.first_name
 
     try:
         request_id = request.args["id"]
@@ -605,8 +623,9 @@ def deletenote():
     """
     Allows deleting a specific note
     """
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
+    user_id = int(session["user_id"])
+    user = User.query.get(user_id)
+    username = user.first_name
 
     if "confirm" not in request.form.keys():
         return render_template("creatething.html",
