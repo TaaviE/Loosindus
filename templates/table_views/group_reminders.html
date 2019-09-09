@@ -23,8 +23,8 @@
         {% for reminder in reminders %}
             <tr>
                 <td>{{ reminder["group"] }}</td>
-                <td>{{ reminder["last check"] }}</td>
-                <td>{{ reminder["last sent"] }}</td>
+                <td>{{ reminder["last_check"] }}</td>
+                <td>{{ reminder["last_sent"] }}</td>
                 <td>{{ reminder["type"] }}</td>
             </tr>
         {% endfor %}

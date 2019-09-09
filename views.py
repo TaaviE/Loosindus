@@ -22,10 +22,13 @@ from typing import List
 
 import pyximport
 
+from models.events_model import ShufflingEvent
+from models.family_model import Group
+from models.wishlist_model import wishlist_status_to_id
+
 pyximport.install()
 
 # Utilities
-import copy
 from logging import getLogger
 from secrets import token_bytes
 
@@ -218,15 +221,14 @@ def index():
     for family in user.families:
         for group in family.groups:
             for event in group.events:
-                dict_ev = event.as_dict()
-                dict_ev["group_id"] = group.name
-                events.append(dict_ev)
+                events.append(event)
 
 
     try:
-        user.last_activity_at = datetime.datetime.now()
-        user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(" ")[-1]
-        db.session.commit()
+        # user.last_activity_at = datetime.datetime.now()
+        # user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(" ")[-1]
+        # db.session.commit()
+        pass
     except Exception:
         sentry.captureException()
 
@@ -300,10 +302,111 @@ def shuffle():
     else:
         giftee = get_default_target_id(gifter)
 
-    logger.info("Username: {}, From: {}, To: {}", username, gifter, giftee)
+    logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
                            id=giftee)
+
+
+@main_page.route("/event/<id>")
+@login_required
+def event(id: str):
+    """
+    Displays all the families in the event
+    """
+    user_id = int(session["user_id"])
+    event_id = int(id)
+    event = ShufflingEvent.query.get(event_id)
+    if not event:
+        return render_template("utility/error.html")
+
+    group = Group.query.get(event.group_id)
+
+    authorized = False
+    for family in group.families:
+        for member in family.members:
+            if member.id == user_id:
+                authorized = True
+                break
+
+    if not authorized:
+        return render_template("utility/error.html")
+
+    return render_template("table_views/families.html",
+                           families=group.families,
+                           group_id=group.id,
+                           title=_("Event"))
+
+
+@main_page.route("/family/<family_id>/<group_id>")
+@login_required
+def family(family_id: str, group_id: str):
+    """
+    Displays all the people in the family
+    """
+    user_id = int(session["user_id"])
+    family_id = int(family_id)
+    family = Family.query.get(family_id)
+    if not family:
+        return render_template("error.html",
+                               message=_("You do are not authorized to access this family"))
+
+    group_id = int(group_id)
+    group = Group.query.get(group_id)
+    if not group:
+        return render_template("error.html",
+                               message=_("You do are not authorized to access this family"))
+
+    authorized = False
+    for member in family.members:
+        if member.id == user_id:
+            authorized = True
+            break
+
+    if not authorized:
+        for family in group.families:
+            for member in family.members:
+                if member.id == user_id:
+                    authorized = True
+                    break
+
+    if not authorized:
+        for group in family.groups:
+            for family in group.families:
+                for member in family.members:
+                    if member.id == user_id:
+                        authorized = True
+                        break
+
+    if not authorized:
+        return render_template("error.html",
+                               message=_("You do are not authorized to access this family"))
+
+    return render_template("table_views/users.html",
+                           members=family.members,
+                           family_id=family_id,
+                           group_id=group_id,
+                           title=_("Family"))
+
+
+@main_page.route("/events")
+@login_required
+def events():
+    """
+    Displays all the events of a person
+    """
+    # TODO:
+    return render_template("table_views/events.html")
+
+
+@main_page.route("/families")
+@login_required
+def families():
+    """
+    Displays all the events of a person
+    """
+    # TODO:
+    return render_template("table_views/events.html")
 
 
 @main_page.route("/notes")
@@ -320,9 +423,9 @@ def notes():
     try:
         # noinspection PyComparisonWithNone
         # SQLAlchemy doesn't like "is None"
-        db_notes = Wishlist.query.filter(and_(Wishlist.user_id == user_id, Wishlist.received == None)).all()
+        db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
         for note in db_notes:
-            notes_from_file[note.item] = encrypt_id(note.id)
+            notes_from_file[note.item] = note.id
     except Exception as e:
         sentry.captureException()
         raise e
@@ -338,7 +441,7 @@ def notes():
 
 
 @main_page.route("/help", methods=["GET"])
-def help():
+def help_page():
     """
     :return: A help page
     """
@@ -429,7 +532,7 @@ def editnote():
 
     try:
         request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
+        request_id = int(request_id)
         logger.info("{} is trying to remove a note {}", user_id, request_id)
     except Exception:
         sentry.captureException()
@@ -468,7 +571,6 @@ def editnote_edit():
     addednote = request.form["textfield"]
     try:
         request_id = request.form["extra_data"]
-        request_id = decrypt_id(request_id)
         request_id = int(request_id)
     except Exception:
         logger.error("Error when decrypting note edit submission")
@@ -481,7 +583,7 @@ def editnote_edit():
 
     try:
         db_note.item = addednote
-        db_note.status = NoteState.MODIFIED.value["id"]
+        db_note.status = wishlist_status_to_id["modified"]
         db.session.commit()
     except Exception:
         logger.error("Error when committing note edit change into database")
@@ -515,7 +617,6 @@ def deletenote():
 
     try:
         request_id = request.form["extra_data"]
-        request_id = decrypt_id(request_id)
         request_id = int(request_id)
         logger.info("{} is trying to remove a note {}".format(user_id, request_id))
     except Exception:
@@ -540,29 +641,37 @@ def deletenote():
                            title=_("Removed"))
 
 
-@main_page.route("/giftingto", methods=["POST"])
+@main_page.route("/note/<id>", methods=["POST"])
 @login_required
-def update_note_status():
+def update_note_status(id: str):
     """
     Allows setting specific wishlist note's status
     """
-    user_id = session["user_id"]
-    try:
-        status = int(request.form["status"])
-        note = Wishlist.query.get(decrypt_id(request.form["id"]))
+    user_id = int(session["user_id"])
 
-        if status > -1:
-            if int(note.status) == NoteState.PURCHASED.value["id"] or status == \
-                    NoteState.MODIFIED.value["id"]:
+    # TODO: Check if they should be able to change
+    try:
+        requested_status = int(request.form["status"])
+        note = Wishlist.query.get(id)
+
+        if requested_status != wishlist_status_to_id["default"]:
+            # If the requested state is not default
+            # If it's already been purchased or someone tries to set it to modified
+            # then abort (modified only happens after edit of a note)
+            if note.status == wishlist_status_to_id["purchased"] or \
+                    requested_status == wishlist_status_to_id["modified"]:
                 raise Exception("Invalid access")
-            note.status = status
+            note.status = requested_status
             note.purchased_by = user_id
             db.session.commit()
-        elif status == -1:
-            if int(note.status) == NoteState.PURCHASED.value["id"] or status == \
-                    NoteState.MODIFIED.value["id"]:
+        elif requested_status == wishlist_status_to_id["default"]:
+            # If the request is to set it to default
+            # If the note has already been purchased or someone tried to set it to modified
+            # then abort (modified only happens after edit of a note
+            if note.status == wishlist_status_to_id["purchased"] or \
+                    requested_status == wishlist_status_to_id["modified"]:
                 raise Exception("Invalid access")
-            note.status = status
+            note.status = requested_status
             note.purchased_by = None
             db.session.commit()
         else:
@@ -575,133 +684,122 @@ def update_note_status():
                                title=_("Error"),
                                back=True)
 
-    return redirect("/giftingto?id=" + str(request.args["id"]), code=303)
+    return redirect("//" + str(id), code=303)
 
 
-@main_page.route("/giftingto")
+@main_page.route("/wishlist/<group_id>/<person_id>")
 @login_required
-def giftingto():
+def wishlist(group_id: str, person_id: str):
     """
-    Display default group's active event's wishlist
+    Display specific user's wishlist
     """
-    user_id = session["user_id"]
-    username = get_person_name(user_id)
+    user_id = int(session["user_id"])
+    user = User.query.get(user_id)
     invalid_notes = False
 
-    if "id" in request.args.keys():
-        request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
-    else:
-        request_id = get_default_target_id(int(user_id))
-
-    if "group_id" in request.args.keys():
-        group_id = int(request.args["group_id"])
-    else:
-        group_id = None
-
-    try:  # Yeah, only valid IDs please
-        if request_id == -1:
-            return render_template("utility/error.html",
-                                   message=_("Shuffling has not yet been done for your group!"),
-                                   title=_("Error"))
-        elif request_id < 0:
-            raise Exception()
-        elif request_id == int(user_id):
-            return render_template("utility/error.html",
-                                   message=_("Access to this list is forbidden"),
-                                   title=_("Forbidden"))
-    except Exception:
-        sentry.captureException()
+    if not person_id.isnumeric():
         return render_template("utility/error.html",
-                               message=_("Sorry for the error,") + username + "!!",
-                               title=_("Error"))
+                               no_sidebar=False,
+                               message=_("Access denied"),
+                               title=_("Access denied"))
 
-    if group_id is not None:
-        target_id = get_target_id_with_group(user_id, group_id)
-    else:
+    person_id = int(person_id)
+
+    if not group_id.isnumeric():
         return render_template("utility/error.html",
-                               message=_("You have to specify which combinations you want to see,") + username + "!",
-                               title=_("Error"))
+                               no_sidebar=False,
+                               message=_("Access denied"),
+                               title=_("Access denied"))
 
-    if request_id != target_id:  # Let's not let everyone read everyone's lists
-        family_obj = get_default_family(user_id)
-        database_all_families_with_members = []
-        database_families = get_families_in_group(
-            FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id)
+    group_id = int(group_id)
 
-        for db_family in database_families:
-            database_family_members = UserFamilyAdmin.query.filter(
-                UserFamilyAdmin.family_id == db_family.id).all()
-            database_all_families_with_members.append(database_family_members)
+    if person_id == user_id:
+        return render_template("utility/error.html",
+                               no_sidebar=False,
+                               message=_("To view your own list use the sidebar"),
+                               title=_("Access denied"))
 
-        found = False
-        for family in database_all_families_with_members:
-            for member in family:
-                if member.user_id == request_id:
-                    found = True
+    target_user = User.query.get(person_id)
+    first_name = target_user.first_name
 
-        if not found:
-            return render_template("utility/error.html",
-                                   message=_("Access denied"),
-                                   title=_("Error"))
+    authorized = False
+    group = Group.query.get(group_id)
+    if not group:
+        return render_template("utility/error.html",
+                               no_sidebar=False,
+                               message=_("To view your own list use the sidebar"),
+                               title=_("Access denied"))
 
-    currentnotes = {}
+    for family in group.families:
+        for member in family.members:
+            if member.id == user.id:
+                authorized = True
+                break
 
+    if not authorized:
+        return render_template("utility/error.html",
+                               no_sidebar=False,
+                               message=_("Not authorized"),
+                               title=_("Access denied"))
+
+    currentnotes = []
     try:
-        logger.info("{} is opening file: {}".format(user_id, request_id))
+        logger.info("{} is opening wishlist of {}".format(user_id, target_user.id))
         # noinspection PyComparisonWithNone
-        db_notes = Wishlist.query.filter(and_(Wishlist.user_id == request_id, Wishlist.received == None)).all()
+        db_notes: List[Wishlist] = Wishlist.query.filter(Wishlist.user_id == target_user.id).all()
         if len(db_notes) <= 0:
-            raise Exception
+            raise Exception("Not a single wishlist item")
 
         for note in db_notes:
-            all_states = [state.value for state in NoteState]
-            all_states.remove(NoteState.MODIFIED.value)
+            all_states = list(wishlist_status_to_id.items())
+            all_states.remove(("modified", wishlist_status_to_id["modified"]))
             selections = []
             modifyable = False
             name = ""
 
-            if note.received is not None:
-                continue
-
-            if note.status == NoteState.DEFAULT.value["id"]:
+            if note.status == wishlist_status_to_id["default"] or note.status is None:
                 selections = all_states
-                selections.insert(0, selections.pop(selections.index(NoteState.DEFAULT.value)))
+                selections.remove(("default", wishlist_status_to_id["default"]))
+                selections.insert(0, ("default", wishlist_status_to_id["default"]))
                 modifyable = True
-            elif note.status == NoteState.MODIFIED.value["id"]:
-                if note.purchased_by == int(user_id) or note.purchased_by is None:
+            elif note.status == wishlist_status_to_id["modified"]:
+                if note.purchased_by == user_id or note.purchased_by is None:
                     selections = all_states
-                    selections.insert(0, NoteState.MODIFIED.value)
+                    selections.insert(0, ("modified", wishlist_status_to_id["modified"]))
                     modifyable = True
                 else:
-                    selections = [NoteState.MODIFIED.value]
+                    selections = [("modified", wishlist_status_to_id["modified"])]
                     modifyable = False
                 name = get_christmasy_emoji(note.purchased_by)
-            elif note.status == NoteState.PURCHASED.value["id"]:
-                selections = [NoteState.PURCHASED.value]
+            elif note.status == wishlist_status_to_id["purchased"]:
+                selections = [("purchased", wishlist_status_to_id["purchased"])]
                 name = get_christmasy_emoji(note.purchased_by)
                 modifyable = False
-            elif note.status == NoteState.PLANNING_TO_PURCHASE.value["id"]:
-                selections = [NoteState.PLANNING_TO_PURCHASE.value,
-                              NoteState.DEFAULT.value, NoteState.PURCHASED.value]
+            elif note.status == wishlist_status_to_id["booked"]:
+                selections = [("booked", wishlist_status_to_id["booked"]),
+                              ("default", wishlist_status_to_id["default"]),
+                              ("purchased", wishlist_status_to_id["purchased"])]
                 name = get_christmasy_emoji(note.purchased_by)
-                if note.purchased_by == int(user_id):
+                if note.purchased_by == user_id:
                     modifyable = True
                 else:
                     modifyable = False
 
-            currentnotes[note.item] = (encrypt_id(note.id), copy.deepcopy(selections), modifyable, name)
+            note.buyer = name
+            note.statuses = selections
+            note.status_modifyable = modifyable
+            currentnotes.append(note)
     except ValueError:
         sentry.captureException()
     except Exception as e:
-        currentnotes = {_("Right now there isn't anything on the list"): (-1, -1, False, "")}
+        currentnotes = [{}]
         invalid_notes = True
         logger.info("Error displaying notes, there might be none: {}".format(e))
 
-    return render_template("show_notes.html",
+    return render_template("table_views/notes_public.html",
                            notes=currentnotes,
-                           target=get_name_in_genitive(get_person_name(request_id)),
-                           id=encrypt_id(request_id),
+                           target=get_name_in_genitive(first_name),
+                           id=group_id,
                            title=_("Wishlist"),
                            invalid=invalid_notes,
                            back=True)
@@ -747,18 +845,18 @@ def graph():
                                no_video=True)
 
 
-@main_page.route("/graph/<group_id>/<unhide>")
-@main_page.route("/graph/<group_id>", defaults={"unhide": False})
-@main_page.route("/graph/<group_id>/", defaults={"unhide": False})
+@main_page.route("/graph/<event_id>/<unhide>")
+@main_page.route("/graph/<event_id>", defaults={"unhide": False})
+@main_page.route("/graph/<event_id>/", defaults={"unhide": False})
 @login_required
-def graph_json(group_id, unhide):
+def graph_json(event_id, unhide):
     """
     Displays an interactive graph
     """
     user_id = int(session["user_id"])
 
     try:
-        group_id = int(group_id)
+        group_id = int(event_id)
         if unhide is "True":
             user_group_admin = UserGroupAdmin.query.filter(and_(UserGroupAdmin.user_id == user_id,
                                                                 UserGroupAdmin.group_id == int(group_id),
@@ -864,10 +962,10 @@ def settings():
     for family_relationship in db_families_user_has_conn:
         family = Family.query.get(family_relationship.family_id)
         if not family_relationship.admin:
-            user_families[family.name] = (encrypt_id(family.id), False)
+            user_families[family.name] = (family.id, False)
         else:
             family_admin = True
-            user_families[family.name] = (encrypt_id(family.id), family_relationship.admin)
+            user_families[family.name] = (family.id, family_relationship.admin)
         is_in_family = True
 
         db_groups_user_has_conn += (get_groups_family_is_in(family_relationship.family_id))
@@ -881,9 +979,9 @@ def settings():
             UserGroupAdmin.group_id == group_relationship.id)).first()
 
         if not group_admin:
-            user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), False)
+            user_groups[group_relationship.description] = (group_relationship.id, False)
         else:
-            user_groups[group_relationship.description] = (encrypt_id(group_relationship.id), group_admin.admin)
+            user_groups[group_relationship.description] = (group_relationship.id, group_admin.admin)
             group_admin = True
 
         is_in_group = True
@@ -907,7 +1005,7 @@ def settings():
         sentry.captureException()
 
     return render_template("settings.html",
-                           user_id=encrypt_id(user_id),
+                           user_id=user_id,
                            user_name=user_obj.username,
                            user_language=user_obj.language,
                            in_family=is_in_family,
@@ -1033,13 +1131,13 @@ def editfamily():
             pass
 
         family.append(
-            (get_person_name(member.user_id), encrypt_id(member.user_id), is_admin, is_person, birthday))
+            (get_person_name(member.user_id), member.user_id, is_admin, is_person, birthday))
 
     return render_template("editfam.html",
                            family=family,
                            title=_("Edit family"),
                            admin=show_admin_column,
-                           family_id=encrypt_id(request_id))
+                           family_id=request_id)
 
 
 @main_page.route("/setlanguage", methods=["POST"])
@@ -1092,7 +1190,7 @@ def editgroup():
 
     families = []
     for family in db_families_in_group:
-        families.append((family.name, encrypt_id(family.id)))
+        families.append((family.name, family.id))
 
     is_admin = False
     if if_user_is_group_admin(group_id, user_id):

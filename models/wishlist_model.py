@@ -41,15 +41,18 @@ class Wishlist(db.Model):
     """
     __tablename__ = "wishlists"
 
-    user_id: int = Column(Integer)
-    item: str = Column(VARCHAR(1024))
-    status: int = Column(Integer, default=wishlist_status_to_id["default"], nullable=False)
-    purchased_by: int = Column(Integer, nullable=True)
-    received: datetime = Column(TIMESTAMP, nullable=True)
-    event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
+    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
+    item: str = Column(VARCHAR(1024), nullable=False)
+    status: int = Column(Integer, ForeignKey(WishlistStatusType.id), default=wishlist_status_to_id["default"],
+                         nullable=False)
+    purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
+    event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)
 
-    def __init__(self, user_id: int, item: str, status: int = wishlist_status_to_id["default"],
+    def __init__(self,
+                 user_id: int,
+                 item: str,
+                 status: int = wishlist_status_to_id["default"],
                  purchased_by: int = None):
         self.user_id = user_id
         self.item = item
@@ -57,7 +60,7 @@ class Wishlist(db.Model):
         self.purchased_by = purchased_by
 
     def __repr__(self):
-        return "<id {}>".format(self.user_id)
+        return "<Wishlist {}>".format(self.id)
 
 
 class ArchivedWishlist(db.Model):
@@ -72,10 +75,11 @@ class ArchivedWishlist(db.Model):
     __tablename__ = "archived_wishlists"
 
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    item: str = Column(VARCHAR(1024))
-    status: int = Column(Integer, nullable=False)
+    user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
+    item: str = Column(VARCHAR(1024), nullable=False)
+    status: int = Column(Integer, ForeignKey(WishlistStatusType.id), default=wishlist_status_to_id["purchased"],
+                         nullable=False)
     purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
-    user_id: int = Column(Integer, ForeignKey(User.id))
     event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)
     archived: datetime = Column(TIMESTAMP, nullable=False)
 
@@ -87,4 +91,4 @@ class ArchivedWishlist(db.Model):
         self.purchased_by = purchased_by
 
     def __repr__(self):
-        return "<id {}>".format(self.user_id)
+        return "<Wishlist {}>".format(self.id)

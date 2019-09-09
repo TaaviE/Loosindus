@@ -4,7 +4,7 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>{{ _("This page lists all the people in this family") }}</p>
+        <p>{{ _("This page lists all the families participating in this event") }}</p>
     </div>
 {% endblock %}
 
@@ -15,56 +15,15 @@
         <tbody>
         <tr>
             <th>{{ _("Member") }}</th>
-            {% if admin %}
-                <th>{{ _("ID") }}</th>
-            {% endif %}
-            {% if birthday %}
-                <th>{{ _("Birthday") }}</th>
-            {% endif %}
-            <th>{{ _("Actions") }}</th>
-            {% if admin %}
-                <th></th>
-            {% endif %}
+            <th>{{ _("Action") }}</th>
         </tr>
-        {% for member in family %}
+        {% for family in families %}
             <tr>
-                <td>{{ member["name"] }}</td>
-                {% if admin %}
-                    <td>
-                        <div class="mdl-textfield mdl-js-textfield">
-                            <input class="mdl-textfield__input" type="text" id="user_id" value="{{ member["id"] }}"
-                                   disabled>
-                        </div>
-                    </td>
-                {% endif %}
-
-                {% if birthday %}
-                    {% if member["birthday"] is not none %}
-                        <td>{{ member[4] }}</td>
-                    {% else %}
-                        <td>{{ _("Unknown") }}</td>
-                    {% endif %}
-                {% endif %}
-
-                {% if not member["self"] %}
-                    <td>
-                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./giftingto?id={{ member["id"] }}">{{ _("Display") }}</a>
-                    </td>
-                {% else %}
-                    <td></td>
-                {% endif %}
-
-                {% if admin %}
-                    <td>
-                        <form method="post" action="./editfam">
-                            <input name="action" type="hidden" value="REMOVEMEMBER">
-                            <input name="extra_data" type="hidden" value="{{ family_id }}">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                    name="id" type="submit" value="{{ member["id"] }}">{{ _("Remove") }}</button>
-                        </form>
-                    </td>
-                {% endif %}
+                <td>{{ family["name"] }}</td>
+                <td>
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="/family/{{ family["id"] }}/{{ group_id }}">{{ _("Display") }}</a>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

@@ -7,7 +7,7 @@
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
         <p class="center">{{ _("Here is") }}
-            <b>{{ target }}</b>{{ _("'s wishlist, you can change their wishlist items' statuses") }}</p>
+            <b>{{ target }}</b>{{ _("'s wishlist, feel free to mark a gift bought :)") }}</p>
     </div>
 {% endblock %}
 
@@ -23,33 +23,33 @@
             <th class="mdl-data-table__cell--non-numeric">{{ _("Action") }}</th>
         {% endif %}
 
-        {% for item, (id, enums, modifyable, name) in notes.items() %}
+        {% for note in notes %}
             <tr>
-                <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
+                <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ note["item"] }}</td>
 
                 {% if not invalid %}
                     <form action="" method="post">
                         <td class="mdl-data-table__cell--non-numeric">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                {% if modifyable %}
+                                {% if note["status_modifyable"] %}
                                     <select class="mdl-textfield__input" id="status" name="status">
-                                    {% for enum in enums %}
-                                        <option value="{{ enum["id"] }}">{{ _(enum["description"]) }}</option>
+                                    {% for status in note["statuses"] %}
+                                        <option value="{{ status[1] }}">{{ _(status[0].capitalize()) }}</option>
                                     {% endfor %}
                                 {% else %}
                                     <select disabled class="mdl-textfield__input" id="status" name="status">
-                                    <option value="{{ enums[0]["id"] }}">{{ _(enums[0]["description"]) }}</option>
+                                    <option value="{{ note["statuses"][0][1] }}">{{ _(note["statuses"][0][0].capitalize()) }}</option>
                                 {% endif %}
                                 </select>
                                 <label class="mdl-textfield__label" for="status"></label>
                             </div>
                         </td>
 
-                        <td class="mdl-data-table__cell--non-numeric custom_large_text">{{ name }}</td>
+                        <td class="mdl-data-table__cell--non-numeric custom_large_text">{{ note["buyer"] }}</td>
 
-                        {% if modifyable %}
+                        {% if note["status_modifyable"] %}
                             <td class="mdl-data-table__cell--non-numeric">
-                                <input type="hidden" name="id" value="{{ id }}">
+                                <input type="hidden" name="id" value="{{ note["id"] }}">
                                 <input id="submit" type="submit"
                                        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                        value="{{ _("Save") }}"/>

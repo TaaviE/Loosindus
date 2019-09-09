@@ -61,11 +61,14 @@ else:
 
 from models.users_model import User, Role
 from models.events_model import ShufflingEvent
-from models.family_model import Group
+from models.family_model import Group, Family
 
 from flask_security import SQLAlchemyUserDatastore, Security
 
 Group.events = relationship(ShufflingEvent)  # Because Python doesn't have forward decl.
+
+Family.members = relationship(User,
+                              secondary="users_families_admins")
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 

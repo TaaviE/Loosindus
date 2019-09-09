@@ -8,9 +8,9 @@
         <p>{{ _("This page lists all groups you're in") }}</p>
         {% if admin %}
             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               href="./editgroup?extra_data={{ group_id }}">{{ _("Add new family") }}</a>
+               href="./group/{{ group_id }}">{{ _("Add new family") }}</a>
             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-               href="./recreategraph?extra_data={{ group_id }}">{{ _("Shuffle") }}</a>
+               href="./events/{{ group_id }}">{{ _("Manage events") }}</a>
         {% endif %}
     </div>
 {% endblock %}
@@ -20,7 +20,7 @@
     <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
         <tbody>
         <tr>
-            <th>{{ _("Family") }}</th>
+            <th>{{ _("Group") }}</th>
             {% if admin %}
                 <th>{{ _("ID") }}</th>
             {% endif %}
@@ -29,27 +29,26 @@
                 <th></th>
             {% endif %}
         </tr>
-        {% for family in families %}
+        {% for group in groups %}
             <tr>
-                <td>{{ family[0] }}</td>
+                <td>{{ group["name"] }}</td>
                 {% if admin %}
                     <td>
                         <div class="mdl-textfield mdl-js-textfield">
-                            <input class="mdl-textfield__input" disabled value="{{ family[1] }}" type="text">
+                            <input class="mdl-textfield__input" disabled value="{{ group["id"] }}" type="text">
                         </div>
                     </td>
                 {% endif %}
                 <td>
                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="./editfam?id={{ family[1] }}">{{ _("Display") }}</a>
+                       href="/group/{{ group["id"] }}">{{ _("Display") }}</a>
                 </td>
                 {% if admin %}
                     <td>
-                        <form method="post" action="./editgroup">
-                            <input name="action" type="hidden" value="REMOVEFAM">
-                            <input name="extra_data" type="hidden" value="{{ group_id }}">
+                        <form method="post" action="/groups">
+                            <input name="action" type="hidden" value="REMOVEGROUP">
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                    name="id" type="submit" value="{{ family[1] }}">{{ _("Remove") }}</button>
+                                    name="id" type="submit" value="{{ group["id"] }}">{{ _("Remove") }}</button>
                         </form>
                     </td>
                 {% endif %}

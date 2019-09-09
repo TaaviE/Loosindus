@@ -45,6 +45,7 @@ def get_families_in_group(group_id: int) -> list:
         )
     ).all()
 
+
 def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
     try:
         return UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
@@ -57,17 +58,6 @@ def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
 def get_families(passed_person_id: int) -> int:
     passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
     return UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
-
-
-@lru_cache(maxsize=64)
-def get_person_name(passed_person_id: int) -> str:
-    """
-    Returns person's first name based on ID
-    :param passed_person_id: Person's ID
-    :return: Person's username
-    """
-    passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-    return User.query.get(passed_person_id).first_name
 
 
 def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int:

@@ -34,6 +34,8 @@ class Config(object):
     MAIL_DEFAULT_SENDER = ("Pretty mailer name", "place@holder")  # TODO: Update email sender info
     MAIL_SUPPRESS_SEND = True  # TODO: Do not suppress send in production
 
+    SHUFFLE_SEED = 0  # TODO: This is used to shuffle symbols displayed to users, keep secret to keep the surprise
+
     RECAPTCHA_PUBLIC_KEY = ""  # TODO: Add captcha keys
     RECAPTCHA_PRIVATE_KEY = ""
 

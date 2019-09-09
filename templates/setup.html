@@ -1,0 +1,53 @@
+{% extends "subtemplates/base.html" %}
+
+{% block title %}🎄{{ title }}{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        {% if not confirm %}
+            <p>{{ _("Enter what is required into the box") }}</p>
+        {% else %}
+            <p>{{ _("Do you really want to do this? You won't be asked again.") }}</p>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <form method="post" action="./{{ endpoint }}">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <input name="action" type="hidden" value="{{ action }}">
+                    {# <!--suppress HtmlFormInputWithoutLabel --> #}
+                    {% if extra_data %}
+                        <input name="extra_data" type="hidden" value="{{ extra_data }}">
+                    {% endif %}
+
+                    {% if id %}
+                        <input name="id" type="hidden" value="{{ id }}">
+                    {% endif %}
+
+                    {% if not confirm %}
+                        <textarea class="mdl-textfield__input" type="text"
+                                  rows="{{ "3" if not row_count else row_count }}"
+                                  name="textfield">{{ "" if not placeholder else placeholder }}</textarea>
+                    {% else %}
+                        <input name="confirm" type="hidden" value="True">
+                    {% endif %}
+
+                    {% if label %}
+                        <label class="mdl-textfield__label" for="textfield">{{ label }}</label>
+                    {% endif %}
+                </div>
+                <br>
+                <input type="submit"
+                       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       value={% if not confirm %}{{ _("Send") }}{% else %}{{ _("Confirm") }}{% endif %}>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block buttons %}{% endblock %}
+
+{% block description %}{{ _("Page for creating a note") }}{% endblock %}

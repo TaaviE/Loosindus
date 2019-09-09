@@ -10,10 +10,8 @@ pyximport.install()
 from functools import lru_cache
 import datetime
 import sys
-from base64 import urlsafe_b64decode, urlsafe_b64encode, b64decode, b64encode
-from json import dumps, loads
+from base64 import urlsafe_b64decode
 import binascii
-from Cryptodome.Cipher.AES import new, MODE_GCM
 from hashlib import sha3_512
 
 from config import Config
@@ -22,41 +20,12 @@ from logging import getLogger
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
 
+from random import Random
 
-@lru_cache(maxsize=64)
-def decrypt_id(encrypted_user_id: str) -> str:
-    base64_raw_data = urlsafe_b64decode(encrypted_user_id).decode()
-    data = loads(base64_raw_data)
-    ciphertext = b64decode(data[0])
-    nonce = b64decode(data[1])
-    tag = b64decode(data[2])
-    cipher = new(Config.AES_KEY, MODE_GCM, nonce=nonce)
-    plaintext = cipher.decrypt(ciphertext).decode()
-
-    try:
-        cipher.verify(tag)
-        logger.info("The message is authentic: {}".format(plaintext))
-    except ValueError:
-        logger.info("Key incorrect or message corrupted!")
-
-    return plaintext
-
-
-# Replayable, but we don't care anything other than just hiding the data
-@lru_cache(maxsize=128)
-def encrypt_id(user_id: int) -> str:
-    cipher = new(Config.AES_KEY, MODE_GCM)
-    ciphertext, tag = cipher.encrypt_and_digest(bytes(str(user_id), encoding="utf8"))
-    nonce = b64encode(cipher.nonce).decode()
-    ciphertext = b64encode(ciphertext).decode()
-    tag = b64encode(tag).decode()
-    json_package = dumps([ciphertext, nonce, tag])
-    packed = urlsafe_b64encode(bytes(json_package, "utf8")).decode()
-    return packed
-
-
+shuffler = Random(Config.SHUFFLE_SEED)
 christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
                      "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
+shuffler.shuffle(christmasy_emojis)
 
 
 @lru_cache(maxsize=128)
