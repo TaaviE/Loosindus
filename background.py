@@ -4,10 +4,10 @@
 
 # Background tasks
 
-from main import mail
+from main import celery, mail
 from utility import *
 from utility_standalone import *
-from views import Message, app, celery, security
+from views import Message, app, security
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
