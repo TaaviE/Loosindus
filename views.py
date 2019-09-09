@@ -310,7 +310,6 @@ def notes():
                            title=_("My Wishlist"))
 
 
-
 @main_page.route("/createnote", methods=["GET"])
 @login_required
 def createnote():
@@ -679,7 +678,7 @@ def graph():
     user_id = session["user_id"]
     try:
         if "group_id" in request.args.keys():
-            family_group = decrypt_id(request.args["group_id"])
+            family_group = request.args["group_id"]
         else:
             family = get_default_family(user_id)
             family_group = FamilyGroup.query.filter(and_(FamilyGroup.family_id == family.id,
