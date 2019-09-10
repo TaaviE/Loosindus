@@ -5,7 +5,7 @@ Contains all of the routes that aren't really super specific to Loosindus
 from functools import lru_cache
 
 import sentry_sdk
-from flask import g, render_template, request, send_from_directory, session
+from flask import render_template, request, send_from_directory, session
 from flask_security import login_required, logout_user
 
 from config import Config
@@ -35,10 +35,8 @@ def error_500(err):
         message = _("Unfortunately this page was not found")
 
     return render_template("utility/error.html",
-                           sentry_enabled=sentry_enabled,
-                           sentry_ask_feedback=True,
+                           sentry_feedback=sentry_enabled,
                            no_video=True,
-                           sentry_event_id=sentry_sdk.last_event_id(),
                            message=message,
                            title=_("Error"))
 
@@ -71,8 +69,7 @@ def feedback():
     Allows submitting feedback about the application
     """
     return render_template("feedback.html",
-                           sentry_feedback=True,
-                           sentry_event_id=sentry_sdk.last_event_id())
+                           sentry_feedback=True)
 
 
 @main_page.route("/about")
@@ -137,10 +134,6 @@ def custom_js():
     User-specific JS for custom functionality
     """
     sentry_feedback = False
-    sentry_event_id = "0"
-
-    if "event_id" in request.args.keys():
-        sentry_event_id = request.args["event_id"]
 
     if "sentry_feedback" in request.args.keys():
         sentry_feedback = True
@@ -148,7 +141,7 @@ def custom_js():
     return render_template("custom.js",
                            user_id=int(session["user_id"]),
                            sentry_feedback=sentry_feedback,
-                           sentry_event_id=sentry_event_id,
+                           sentry_event_id=sentry_sdk.last_event_id(),
                            ), 200, {"content-type": "application/javascript"}
 
 
@@ -169,7 +162,6 @@ def error_page():
     return render_template("utility/error.html",
                            sentry_enabled=True,
                            sentry_ask_feedback=True,
-                           sentry_event_id=g.sentry_event_id,
                            message=message,
                            no_video=True,
                            no_sidebar=not current_user.is_authenticated,
