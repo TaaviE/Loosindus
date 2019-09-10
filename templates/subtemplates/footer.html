@@ -1,9 +1,10 @@
 <link rel="stylesheet"
       type="text/css"
       href="{{ url_for("static", filename="custom.css") }}"/>
+{% if config.SENTRY_PUBLIC_DSN %}
 <script src="https://browser.sentry-cdn.com/5.6.3/bundle.min.js"
-        integrity="sha384-/Cqa/8kaWn7emdqIBLk3AkFMAHBk0LObErtMhO+hr52CntkaurEnihPmqYj3uJho"
         crossorigin="anonymous"></script>
+{% endif %}
 <script src="/custom.js{% if sentry_event_id or sentry_feedback %}?{% endif %}{% if sentry_event_id %}event_id={{ sentry_event_id }}{% endif %}{% if sentry_event_id and sentry_feedback %}&{% endif %}{% if sentry_feedback %}sentry_feedback=True{% endif %}"></script>
 {% if config.GOOGLE_ADS %}
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
