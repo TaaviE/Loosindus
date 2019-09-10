@@ -281,8 +281,17 @@ def events():
     """
     Displays all the events of a person
     """
-    # TODO:
-    return render_template("table_views/events.html")
+    user_id = int(session["user_id"])
+    user: User = User.query.get(user_id)
+
+    events: List[ShufflingEvent] = []
+    for family in user.families:
+        for group in family.groups:
+            for event in group.events:
+                events.append(event)
+
+    return render_template("table_views/events.html",
+                           events=events)
 
 
 @main_page.route("/families")
@@ -297,6 +306,25 @@ def families():
 
     return render_template("table_views/families.html",
                            families=user.families)
+
+
+@main_page.route("/groups")
+@login_required
+def groups():
+    """
+    Displays all the groups of a person
+    """
+
+    user_id = int(session["user_id"])
+    user = User.query.get(user_id)
+
+    groups = []
+    for family in user.families:
+        for group in family.groups:
+            groups.append(group)
+
+    return render_template("table_views/groups.html",
+                           groups=groups)
 
 
 @main_page.route("/notes")

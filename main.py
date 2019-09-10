@@ -72,10 +72,9 @@ from models.family_model import Group, Family
 
 from flask_security import SQLAlchemyUserDatastore, Security
 
-Group.events = relationship(ShufflingEvent)  # Because Python doesn't have forward decl.
+Group.events = relationship(ShufflingEvent)  # Because circular deps
 
-Family.members = relationship(User,
-                              secondary="users_families_admins")
+Family.members = relationship(User, secondary="users_families_admins")
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
