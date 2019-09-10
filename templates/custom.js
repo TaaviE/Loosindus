@@ -18,14 +18,6 @@ window.onload = function () {
         console.log(e);
     }
 };
-{% endif %}{% if config.SENTRY_PUBLIC_DSN %}
-Sentry.init({ dsn: "{{ config.SENTRY_PUBLIC_DSN }}" });
-{% endif %}{% if sentry_event_id or sentry_feedback %}
-try {
-    Sentry.showReportDialog({ eventId: "{{sentry_event_id}}" });
-} catch (e) {
-    console.log(e);
-}
 {% endif %}
 {% if no_tracking != true %}
 try {
