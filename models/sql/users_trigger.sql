@@ -47,10 +47,10 @@ begin
 
         if (old.password != new.password) then
             -- mark old one inactive
-            update "passwords" set "active"= false where "password" = old."password";
+            update users_passwords set "active"= false where "password" = old."password";
 
             -- new password should **never** exist already in the DB due to salting
-            insert into "passwords" ("user_id", "password", "active") values (old."id", new."password", true);
+            insert into users_passwords ("user_id", "password", "active") values (old."id", new."password", true);
         end if;
 
         if (old.confirmed_at is null and new."confirmed_at" is not null) then
@@ -64,7 +64,7 @@ begin
         -- new user
         insert into "emails" ("email", "verified", "primary", "user_id") values (new."email", false, true, old."id");
 
-        insert into "passwords" ("user_id", "password", "active") values (new."id", new."password", true);
+        insert into users_passwords ("user_id", "password", "active") values (new."id", new."password", true);
         return new;
     end if;
     return null;

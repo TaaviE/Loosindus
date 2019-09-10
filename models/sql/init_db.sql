@@ -51,14 +51,14 @@ create table role
     description varchar(255)
 );
 
-alter table role
+alter table roles
     owner to jolod;
 
 create unique index role_id_uindex
-    on role (id);
+    on roles (id);
 
 create unique index role_name_uindex
-    on role (name);
+    on roles (name);
 
 create table families_groups
 (
@@ -94,17 +94,17 @@ create table group_reminders
     last_sent  timestamp
 );
 
-alter table group_reminders
+alter table groups_reminders
     owner to jolod;
 
 create index reminders_group_index
-    on group_reminders ("group");
+    on groups_reminders ("group");
 
 create index reminders_last_check_group_index
-    on group_reminders (last_check, "group");
+    on groups_reminders (last_check, "group");
 
 create unique index reminders_group_type_uindex
-    on group_reminders ("group", type);
+    on groups_reminders ("group", type);
 
 create table subscription_types
 (
@@ -162,7 +162,7 @@ create table roles_users
             on update cascade,
     role_id integer not null
         constraint roles_users_role_id_fkey
-            references role,
+            references roles,
     constraint roles_users_pk
         primary key (id, role_id)
 );
@@ -356,11 +356,11 @@ create table passwords
     created  timestamp default now() not null
 );
 
-alter table passwords
+alter table users_passwords
     owner to jolod;
 
 create index passwords_user_id_index
-    on passwords (user_id);
+    on users_passwords (user_id);
 
 create table audit_events_types
 (
@@ -445,11 +445,11 @@ create table notifications
     deleted    boolean      default false not null
 );
 
-alter table notifications
+alter table users_notifications
     owner to jolod;
 
 create index notifications_user_id_index
-    on notifications (user_id);
+    on users_notifications (user_id);
 
 create table deleted_emails
 (

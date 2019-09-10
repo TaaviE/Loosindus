@@ -15,7 +15,7 @@ from models.family_model import Family, Group
 
 
 class Role(db.Model, RoleMixin):
-    __tablename__ = "role"
+    __tablename__ = "roles"
     id: int = Column(Integer(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(80), unique=True)
     description: str = Column(VARCHAR(255))
