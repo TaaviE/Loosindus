@@ -138,6 +138,11 @@ def custom_js():
     if "sentry_feedback" in request.args.keys():
         sentry_feedback = True
 
+    try:
+        raise Exception("Feedback")
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+
     return render_template("custom.js",
                            user_id=int(session["user_id"]),
                            sentry_feedback=sentry_feedback,
