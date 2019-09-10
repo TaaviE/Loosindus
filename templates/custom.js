@@ -18,19 +18,15 @@ window.onload = function () {
         console.log(e);
     }
 };
-{% endif %}
-
-{%if sentry_feedback %}
+{% endif %}{% if config.SENTRY_PUBLIC_DSN %}
+Sentry.init({ dsn: "{{ config.SENTRY_PUBLIC_DSN }}" });
+{% endif %}{% if sentry_event_id or sentry_feedback %}
 try {
-    Raven.showReportDialog({
-        eventId: "{{ sentry_event_id }}",
-        dsn: "{{ sentry_public_dsn }}"
-    });
+    Sentry.showReportDialog({ eventId: "{{sentry_event_id}}" });
 } catch (e) {
     console.log(e);
 }
 {% endif %}
-
 {% if no_tracking != true %}
 try {
     window.dataLayer = window.dataLayer || [];
@@ -46,7 +42,6 @@ try {
     console.log(e);
 }
 {% endif %}
-
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
