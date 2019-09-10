@@ -23,6 +23,10 @@ from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.flask import FlaskIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import CreateColumn
@@ -55,6 +59,10 @@ celery.conf.update(app.config)
 import sentry_sdk
 
 sentry_sdk.init(Config.SENTRY_PUBLIC_DSN,
+                integrations=[SqlalchemyIntegration(),
+                              CeleryIntegration(),
+                              FlaskIntegration(),
+                              RedisIntegration()],
                 debug=Config.DEBUG,
                 release=Config.CURRENT_GIT_SHA)
 
