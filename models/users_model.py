@@ -103,7 +103,7 @@ class AuthLinks(db.Model, OAuthConsumerMixin):
     """
     Specifies how 3rd party identity providers are linked to users
     """
-    __tablename__ = "user_connections"
+    __tablename__ = "users_connections"
     id = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     provider_user_id = Column(VARCHAR(255), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)

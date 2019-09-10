@@ -266,14 +266,14 @@ create table user_connections
     provider         varchar(255)            not null
 );
 
-alter table user_connections
+alter table users_connections
     owner to jolod;
 
 create unique index user_connection_id_uindex
-    on user_connections (id);
+    on users_connections (id);
 
 create index user_connections_user_id_index
-    on user_connections (user_id);
+    on users_connections (user_id);
 
 create table subscriptions
 (
