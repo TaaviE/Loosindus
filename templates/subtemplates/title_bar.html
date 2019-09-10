@@ -1,4 +1,4 @@
-<header class="mdl-layout__header">
+<header class="mdl-layout__header {% if scroll_header %}mdl-layout__header--scroll{% endif %}">
     <div class="mdl-layout__header-row">
         <span class="mdl-layout-title">{{ title }}</span>
         <div class="mdl-layout-spacer"></div>
@@ -30,17 +30,32 @@
 {% if not no_sidebar %}
     <div class="mdl-layout__drawer">
         <nav class="mdl-navigation">
+            <div class="mdl-layout-spacer mdl-card__supporting-text">Shortcuts</div>
             <a class="mdl-navigation__link" href="/notes">
                 <i class="material-icons" role="presentation">list</i> {{ _("My Wishlist") }}</a>
-            <a class="mdl-navigation__link" href="/giftingto">
+            {% if target %}
+                <a class="mdl-navigation__link" href="/wishlist/{{ target["group_id"] }}/{{ target["user_id"] }}">
                 <i class="material-icons" role="presentation">list</i> {{ _("Receiver's Wishlist") }}</a>
-            <a class="mdl-navigation__link" href="/graph">
-                <i class="material-icons" role="presentation">cached</i> {{ _("Graph") }}</a>
-            <div class="mdl-layout-spacer"></div>
+            {% endif %}
+            <div class="mdl-layout-spacer mdl-card__supporting-text">Management</div>
+            <a class="mdl-navigation__link" href="/graphs">
+                <i class="material-icons" role="presentation">cached</i> {{ _("Graphs") }}</a>
+            <a class="mdl-navigation__link" href="/families">
+                <i class="material-icons" role="presentation">people</i> {{ _("Families") }}</a>
+            <a class="mdl-navigation__link" href="/groups">
+                <i class="material-icons" role="presentation">group_work</i> {{ _("Groups") }}</a>
+            <a class="mdl-navigation__link" href="/events">
+                <i class="material-icons" role="presentation">event</i> {{ _("Events") }}</a>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">Personal</div>
             <a class="mdl-navigation__link" href="/settings">
                 <i class="material-icons" role="presentation">settings</i> {{ _("Settings") }}</a>
             <a class="mdl-navigation__link" href="/logout">
                 <i class="material-icons" role="presentation">exit_to_app</i> {{ _("Log out") }}</a>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">Help & Support</div>
+            <a class="mdl-navigation__link" href="/help">
+                <i class="material-icons" role="presentation">help</i> {{ _("Help") }}</a>
+            <a class="mdl-navigation__link" href="/feedback">
+                <i class="material-icons" role="presentation">feedback</i> {{ _("Feedback") }}</a>
         </nav>
     </div>
 {% endif %}
