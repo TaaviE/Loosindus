@@ -54,8 +54,9 @@ celery.conf.update(app.config)
 
 import sentry_sdk
 
-sentry_sdk.init("https://3e63e6ad09fd4ef98accaaf63819e7d7@sentry.io/278652",
-                debug=Config.DEBUG)
+sentry_sdk.init(Config.SENTRY_PUBLIC_DSN,
+                debug=Config.DEBUG,
+                release=Config.CURRENT_GIT_SHA)
 
 from models.users_model import User, Role
 from models.events_model import ShufflingEvent

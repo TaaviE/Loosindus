@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+import subprocess
 
 
 class Config(object):
@@ -12,10 +13,10 @@ class Config(object):
     CSRF_ENABLED = False  # TODO: Enable in production
     WTF_CSRF_ENABLED = False  # TODO: Enable in production
 
-    SENTRY_URL = ""  # TODO: Add sentry URL
-    SENTRY_USER_ATTRS = ["username",
-                         "id",
-                         "email"]
+    SENTRY_PUBLIC_DSN = ""  # The full DSN given without(!) the private key
+    SENTRY_PUBLIC_KEY = ""  # TODO: The hash part
+
+    CURRENT_GIT_SHA = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
 
     AES_KEY = b""  # TODO: Update AES key
     SECRET_KEY = ""  # TODO: Update secret key info
