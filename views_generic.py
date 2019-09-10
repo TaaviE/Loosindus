@@ -4,7 +4,6 @@ Contains all of the routes that aren't really super specific to Loosindus
 """
 from functools import lru_cache
 
-import sentry_sdk
 from flask import render_template, request, send_from_directory, session
 from flask_security import login_required, logout_user
 
@@ -133,20 +132,8 @@ def custom_js():
     """
     User-specific JS for custom functionality
     """
-    sentry_feedback = False
-
-    if "sentry_feedback" in request.args.keys():
-        sentry_feedback = True
-
-    try:
-        raise Exception("Feedback")
-    except Exception as e:
-        sentry_sdk.capture_exception(e)
-
     return render_template("custom.js",
                            user_id=int(session["user_id"]),
-                           sentry_feedback=sentry_feedback,
-                           sentry_event_id=sentry_sdk.last_event_id(),
                            ), 200, {"content-type": "application/javascript"}
 
 
@@ -165,8 +152,6 @@ def error_page():
         pass
 
     return render_template("utility/error.html",
-                           sentry_enabled=True,
-                           sentry_ask_feedback=True,
                            message=message,
                            no_video=True,
                            no_sidebar=not current_user.is_authenticated,
