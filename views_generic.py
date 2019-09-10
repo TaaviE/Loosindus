@@ -137,7 +137,7 @@ def custom_js():
     User-specific JS for custom functionality
     """
     sentry_feedback = False
-    sentry_event_id = ""
+    sentry_event_id = "0"
 
     if "event_id" in request.args.keys():
         sentry_event_id = request.args["event_id"]
