@@ -1464,34 +1464,7 @@ def api_login():
     except Exception:
         sentry.captureException()
         logger.info("API login failed for user {}".format(username))
-        return "{\"error\": \"error\"}", {"content-type": "text/json"}
-
-
-@main_page.route("/ads.txt", methods=["GET"])
-@lru_cache(maxsize=1)
-def ads_txt():
-    """
-    Displays ads.txt
-    """
-    return render_template("ads.txt"), {"content-type": "text/plain"}
-
-
-@main_page.route("/sitemap.xml", methods=["GET"])
-@lru_cache(maxsize=1)
-def sitemap():
-    """
-    Displays the software's sitemap
-    """
-    return render_template("sitemap.xml"), {"content-type": "text/xml"}
-
-
-@main_page.route("/robots.txt", methods=["GET"])
-@lru_cache(maxsize=1)
-def robots():
-    """
-    Displays the standard robots.txt
-    """
-    return render_template("robots.txt"), {"content-type": "text/plain"}
+        return "{\"error\": \"error\"}", {"content-type": "text/json"
 
 
 if Config.GOOGLE_OAUTH:
