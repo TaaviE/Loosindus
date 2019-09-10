@@ -18,7 +18,7 @@ from models.wishlist_model import Wishlist
 from datetime import datetime
 from sqlalchemy import and_
 
-from main import sentry
+import sentry_sdk
 
 
 def get_person_marked(user_id: int) -> list:
@@ -67,8 +67,8 @@ def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int
         return Shuffle.query.filter(and_(Shuffle.giver == passed_person_id,
                                          Shuffle.year == datetime.now().year,
                                          Shuffle.group == passed_group_id)).one().getter
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.captureException(e)
         return -1
 
 

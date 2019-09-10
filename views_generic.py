@@ -4,10 +4,12 @@ Contains all of the routes that aren't really super specific to Loosindus
 """
 from functools import lru_cache
 
+import sentry_sdk
 from flask import g, render_template, request, send_from_directory, session
 from flask_security import login_required, logout_user
 
-from views import _, app, current_user, index, logger, main_page, redirect, sentry
+from config import Config
+from views import _, app, current_user, index, logger, main_page, redirect
 
 
 # Show a friendlier error page
@@ -21,10 +23,10 @@ def error_500(err):
     """
     message = _("An error occured")
     try:
-        if not current_user.is_authenticated:
-            sentry_enabled = False
-        else:
+        if current_user.is_authenticated and Config.SENTRY_PUBLIC_DSN:
             sentry_enabled = True
+        else:
+            sentry_enabled = False
     except Exception:
         sentry_enabled = False
 
@@ -36,8 +38,7 @@ def error_500(err):
                            sentry_enabled=sentry_enabled,
                            sentry_ask_feedback=True,
                            no_video=True,
-                           sentry_event_id=g.sentry_event_id,
-                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
+                           sentry_event_id=sentry_sdk.last_event_id(),
                            message=message,
                            title=_("Error"))
 
@@ -71,8 +72,7 @@ def feedback():
     """
     return render_template("feedback.html",
                            sentry_feedback=True,
-                           sentry_event_id=g.sentry_event_id,
-                           sentry_public_dsn=sentry.client.get_public_dsn("https"))
+                           sentry_event_id=sentry_sdk.last_event_id())
 
 
 @main_page.route("/about")
@@ -132,25 +132,23 @@ def help_page():
 
 @main_page.route("/custom.js")
 @login_required
-@lru_cache(maxsize=10)
 def custom_js():
     """
     User-specific JS for custom functionality
     """
     sentry_feedback = False
     sentry_event_id = ""
-    sentry_public_dns = ""
 
     if "event_id" in request.args.keys():
-        sentry_feedback = True
         sentry_event_id = request.args["event_id"]
-        sentry_public_dns = request.args["dsn"]
+
+    if "sentry_feedback" in request.args.keys():
+        sentry_feedback = True
 
     return render_template("custom.js",
-                           sentry_feedback=sentry_feedback,
                            user_id=int(session["user_id"]),
+                           sentry_feedback=sentry_feedback,
                            sentry_event_id=sentry_event_id,
-                           sentry_public_dsn=sentry_public_dns,
                            ), 200, {"content-type": "application/javascript"}
 
 
@@ -172,7 +170,6 @@ def error_page():
                            sentry_enabled=True,
                            sentry_ask_feedback=True,
                            sentry_event_id=g.sentry_event_id,
-                           sentry_public_dsn=sentry.client.get_public_dsn("https"),
                            message=message,
                            no_video=True,
                            no_sidebar=not current_user.is_authenticated,

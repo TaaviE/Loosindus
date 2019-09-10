@@ -14,8 +14,3 @@
         </div>
     </div>
 {% endblock %}
-
-{% block footer %}
-    <script src="https://cdn.ravenjs.com/2.3.0/raven.min.js"></script>
-    <script src="./custom.js?event_id={{ sentry_event_id }}&dsn={{ sentry_public_dsn }}"></script>
-{% endblock %}

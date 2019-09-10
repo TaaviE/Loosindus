@@ -52,12 +52,10 @@ celery = Celery(app.import_name,
                 broker=Config.CELERY_BROKER_URL)
 celery.conf.update(app.config)
 
-from raven.contrib.flask import Sentry
+import sentry_sdk
 
-if not Config.DEBUG:
-    sentry = Sentry(app, dsn=Config.SENTRY_URL, logging=False)
-else:
-    sentry = Sentry(app, dsn=None, logging=False)
+sentry_sdk.init("https://3e63e6ad09fd4ef98accaaf63819e7d7@sentry.io/278652",
+                debug=Config.DEBUG)
 
 from models.users_model import User, Role
 from models.events_model import ShufflingEvent

@@ -18,6 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 # Cython
+from json import dumps
 from typing import List
 
 import pyximport
@@ -130,7 +131,7 @@ def index():
         # db.session.commit()
         pass
     except Exception:
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
 
     return render_template("index.html",
                            auth=user.first_name,
@@ -297,7 +298,7 @@ def notes():
         for note in db_notes:
             notes_from_file[note.item] = note.id
     except Exception as e:
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         raise e
 
     if len(notes_from_file) <= 0:
@@ -357,7 +358,7 @@ def createnote_add():
         for note in db_notes:
             currentnotes[note.item] = note.id
     except Exception as e:
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         raise e
 
     if len(currentnotes) >= 200:
@@ -374,7 +375,7 @@ def createnote_add():
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         raise e
 
     return render_template("utility/success.html",
@@ -397,8 +398,8 @@ def editnote():
         request_id = request.args["id"]
         request_id = int(request_id)
         logger.info("{} is trying to remove a note {}", user_id, request_id)
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("Pls no hax ") + username + "!!",
                                title=_("Error"))
@@ -406,8 +407,8 @@ def editnote():
     try:
         logger.info("{} is editing notes of {}".format(user_id, request_id))
         db_note = Wishlist.query.get(request_id)
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("An error occured"),
                                title=_("Error"))
@@ -435,9 +436,9 @@ def editnote_edit():
     try:
         request_id = request.form["extra_data"]
         request_id = int(request_id)
-    except Exception:
+    except Exception as e:
         logger.error("Error when decrypting note edit submission")
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("An error occured"),
                                title=_("Error"))
@@ -448,9 +449,9 @@ def editnote_edit():
         db_note.item = addednote
         db_note.status = wishlist_status_to_id["modified"]
         db.session.commit()
-    except Exception:
+    except Exception as e:
         logger.error("Error when committing note edit change into database")
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         db.session.rollback()
         return render_template("utility/error.html",
                                message=_("An error occured"),
@@ -483,8 +484,8 @@ def deletenote():
         request_id = request.form["extra_data"]
         request_id = int(request_id)
         logger.info("{} is trying to remove a note {}".format(user_id, request_id))
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("Broken link"),
                                title=_("Error"))
@@ -492,8 +493,8 @@ def deletenote():
     try:  # Let's try to delete it now
         Wishlist.query.filter_by(id=request_id).delete()
         db.session.commit()
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("Can't find what you wanted to delete"),
                                title=_("Error"))
@@ -541,7 +542,7 @@ def update_note_status(id: str):
         else:
             raise Exception("Invalid status code")
     except Exception as e:
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         logger.info("Failed toggling: {}".format(e))
         return render_template("utility/error.html",
                                message=_("Could not edit"),
@@ -653,8 +654,8 @@ def wishlist(group_id: str, person_id: str):
             note.statuses = selections
             note.status_modifyable = modifyable
             currentnotes.append(note)
-    except ValueError:
-        sentry.captureException()
+    except ValueError as e:
+        sentry_sdk.capture_exception(e)
     except Exception as e:
         currentnotes = [{}]
         invalid_notes = True
@@ -700,8 +701,8 @@ def graph():
                                graph_id=family_group,
                                unhide=unhide,
                                title=_("Graph"))
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_(
                                    "Shuffling has not yet been done for your group (or some other error occured)!"),
@@ -767,8 +768,8 @@ def graph_json(event_id, unhide):
             return dumps(people), 200, {"content-type": "application/json"}
         else:
             return "{}", 200, {"content-type": "application/json"}
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return "{}", 200, {"content-type": "application/json"}
 
 
@@ -838,8 +839,8 @@ def settings():
                 github_link_exists = True
             elif "facebook" == link.provider:
                 facebook_link_exists = True
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
 
     return render_template("settings.html",
                            user_id=user_id,
@@ -858,17 +859,15 @@ def settings():
                            family_admin=family_admin)
 
 
-
 @main_page.route("/editfam", methods=["GET"])
 @login_required
 def editfamily():
     user_id = int(session["user_id"])
 
     try:
-        request_id = request.args["id"]
-        request_id = int(decrypt_id(request_id))
-    except Exception:
-        sentry.captureException()
+        request_id = int(request.args["id"])
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("Broken link"),
                                no_sidebar=not current_user.is_authenticated,
@@ -920,7 +919,7 @@ def set_language():
                 user.language = request.form["language"]
                 db.session.commit()
             except Exception:
-                sentry.captureException()
+                sentry_sdk.capture_exception(e)
                 db.session.rollback()
                 return render_template("utility/error.html",
                                        message=_("Faulty input"),
@@ -945,9 +944,9 @@ def editgroup():
 
     try:
         group_id = request.args["id"]
-        group_id = int(decrypt_id(group_id))
-    except Exception:
-        sentry.captureException()
+        group_id = int(group_id)
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("Faulty input"),
                                title=_("Error"))
@@ -1001,8 +1000,8 @@ def editgroup_with_action():
                                    id=form_id,
                                    confirm=True)
         elif request.form["action"] == "REMOVEFAM" and request.form["confirm"] == "True":
-            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
-            group_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+            family_id = int(request.form["extra_data"])
+            group_id = int(request.form["id"])
 
             admin_relationship = UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
                                                                   UserGroupAdmin.user_id == user_id)).one()
@@ -1130,8 +1129,8 @@ def editfam_with_action():
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "REMOVEMEMBER" and request.form["confirm"] == "True":
-            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
-            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+            family_id = int(request.form["extra_data"])
+            target_id = int(request.form["id"])
 
             admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
                                                                    UserFamilyAdmin.family_id == family_id)).one()
@@ -1186,8 +1185,8 @@ def editfam_with_action():
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "ADDMEMBER" and request.form["confirm"] == "True":
-            family_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["extra_data"])))
-            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+            family_id = int(request.form["extra_data"])
+            target_id = int(request.form["id"])
 
             admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
                                                                    UserFamilyAdmin.family_id == family_id)).one()
@@ -1236,7 +1235,7 @@ def editfam_with_action():
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "DELETEFAM" and request.form["confirm"] == "True":
-            target_id = int(decrypt_id(auto_pad_urlsafe_b64(request.form["id"])))
+            target_id = int(request.form["id"])
 
             admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
                                                                    UserFamilyAdmin.family_id == target_id)).one()
@@ -1309,8 +1308,8 @@ def regraph():
     user_id = session["user_id"]
     try:
         event_id = int(request.form["extra_data"])
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("An error has occured"),
                                title=_("Error"))
@@ -1349,8 +1348,8 @@ def regraph():
         return render_template("utility/error.html",
                                message=_("Access denied"),
                                title=_("Error"))
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
 
     families = []
     family_ids_map = {}
@@ -1415,7 +1414,7 @@ def regraph():
             except Exception:
                 db.session.rollback()
 
-            sentry.captureException()
+            sentry_sdk.capture_exception(e)
 
     return render_template("utility/success.html",
                            action=_("Generated"),
@@ -1461,10 +1460,10 @@ def api_login():
             return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
         return redirect("/")
-    except Exception:
-        sentry.captureException()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
         logger.info("API login failed for user {}".format(username))
-        return "{\"error\": \"error\"}", {"content-type": "text/json"
+        return "{\"error\": \"error\"}", {"content-type": "text/json"}
 
 
 if Config.GOOGLE_OAUTH:
@@ -1603,8 +1602,8 @@ def oauth_handler(blueprint, token):
             logger.critical("Missing blueprint handler for {}".format(blueprint.name))
             flash(_("Error logging in"))
             return False
-    except ValueError:
-        sentry.captureException()
+    except ValueError as e:
+        sentry_sdk.capture_exception(e)
         flash(_("Error logging in"))
         return False
 
@@ -1629,8 +1628,8 @@ def oauth_handler(blueprint, token):
             token=token["access_token"],
         )
         logger.info("User not found, keeping token in memory")
-    except Exception:  # Failure in query!
-        sentry.captureException()
+    except Exception as e:  # Failure in query!
+        sentry_sdk.capture_exception(e)
         logger.error("Failed querying authentication links")
         flash(_("That account is not linked to any system account, check if you already have an account."))
         return False
@@ -1649,9 +1648,9 @@ def oauth_handler(blueprint, token):
             db.session.add(authentication_link)
             db.session.commit()
             return False
-        except Exception:
+        except Exception as e:
             db.session.rollback()
-            sentry.captureException()
+            sentry_sdk.capture_exception(e)
             logger.error("Could not store user and oauth link")
             flash(_("Error signing up, please try again"))
             return False
@@ -1741,9 +1740,9 @@ def oauth_handler(blueprint, token):
             try:
                 db.session.add(user)  # Populate User's ID first by committing
                 db.session.commit()
-            except Exception:
+            except Exception as e:
                 db.session.rollback()
-                sentry.captureException()
+                sentry_sdk.capture_exception(e)
                 logger.error("Could not store user and oauth link")
                 flash(_("Error signing up"))
                 return False
@@ -1752,9 +1751,9 @@ def oauth_handler(blueprint, token):
                 authentication_link.user_id = user.id  # Update link with user id
                 db.session.add(authentication_link)
                 db.session.commit()
-            except Exception:
+            except Exception as e:
                 db.session.rollback()
-                sentry.captureException()
+                sentry_sdk.capture_exception(e)
                 logger.error("Could not store user and oauth link")
                 flash(_("Error signing up"))
                 return False
@@ -1813,11 +1812,11 @@ def log_user_in_with_cert():
                                 try:
                                     db.session.add(new_link)
                                     db.session.commit()
-                                except Exception:
+                                except Exception as e:
                                     logger.debug("Error adding link")
                                     db.session.rollback()
                                     db.session.commit()
-                                    sentry.captureException()
+                                    sentry_sdk.capture_exception(e)
                                     return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
                                 return redirect("/")
                             else:
@@ -1852,9 +1851,9 @@ def try_to_log_in_with_dn(input_dn: str) -> object:
         login_user(User.query.get(user_id))
         return redirect("/success.html?" + "message=" + _("Added!") + "&action=" +
                         _("Added") + "&link=" + "notes" + "&title=" + _("Added"))
-    except Exception:
+    except Exception as e:
         logger.debug("Exception when trying to log user in")
-        sentry.captureException()
+        sentry_sdk.capture_exception(e)
         return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
 
 
