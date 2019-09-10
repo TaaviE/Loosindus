@@ -7,7 +7,6 @@ from functools import lru_cache
 from flask import render_template, request, send_from_directory, session
 from flask_security import login_required, logout_user
 
-from config import Config
 from views import _, app, current_user, index, logger, main_page, redirect
 
 
@@ -21,20 +20,12 @@ def error_500(err):
     Displays the nice error handling page
     """
     message = _("An error occured")
-    try:
-        if current_user.is_authenticated and Config.SENTRY_PUBLIC_DSN:
-            sentry_enabled = True
-        else:
-            sentry_enabled = False
-    except Exception:
-        sentry_enabled = False
 
     logger.info(str(err))
     if "404" in str(err):
         message = _("Unfortunately this page was not found")
 
     return render_template("utility/error.html",
-                           sentry_feedback=sentry_enabled,
                            no_video=True,
                            message=message,
                            title=_("Error"))

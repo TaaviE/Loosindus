@@ -8,9 +8,11 @@
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
             <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <p>{{ _("This page should pop up a feedback form you can fill") }}</p>
-            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                  href="/">{{ _("Back") }}</a></p>
+            <p>{{ _("Click on the button to get to the feedback form") }}</p>
+            <p><a target="_blank"
+                  rel="noopener noreferrer"
+                  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="https://forms.gle/SAKrqbGcd5EXtWU3A">{{ _("Open") }}</a></p>
         </div>
     </div>
 {% endblock %}

@@ -209,9 +209,10 @@ def event(id: str):
                            title=_("Event"))
 
 
-@main_page.route("/family/<family_id>/<group_id>")
+@main_page.route("/family/<group_id>/<family_id>")
+@main_page.route("/family/<family_id>")
 @login_required
-def family(family_id: str, group_id: str):
+def family(family_id: str, group_id: str = None):
     """
     Displays all the people in the family
     """
@@ -222,36 +223,50 @@ def family(family_id: str, group_id: str):
         return render_template("error.html",
                                message=_("You do are not authorized to access this family"))
 
-    group_id = int(group_id)
-    group = Group.query.get(group_id)
-    if not group:
+    authorized = False
+    if not group_id:
+        for member in family.members:
+            if member.id == user_id:
+                authorized = True
+                break
+    else:
+        authorized = True
+
+    if not authorized:
         return render_template("error.html",
                                message=_("You do are not authorized to access this family"))
 
-    authorized = False
-    for member in family.members:
-        if member.id == user_id:
-            authorized = True
-            break
+    if group_id:
+        group_id = int(group_id)
+        group = Group.query.get(group_id)
+        if not group:
+            return render_template("error.html",
+                                   message=_("You do are not authorized to access this family"))
 
-    if not authorized:
-        for family in group.families:
-            for member in family.members:
-                if member.id == user_id:
-                    authorized = True
-                    break
+        authorized = False
+        for member in family.members:
+            if member.id == user_id:
+                authorized = True
+                break
 
-    if not authorized:
-        for group in family.groups:
+        if not authorized:
             for family in group.families:
                 for member in family.members:
                     if member.id == user_id:
                         authorized = True
                         break
 
-    if not authorized:
-        return render_template("error.html",
-                               message=_("You do are not authorized to access this family"))
+        if not authorized:
+            for group in family.groups:
+                for family in group.families:
+                    for member in family.members:
+                        if member.id == user_id:
+                            authorized = True
+                            break
+
+        if not authorized:
+            return render_template("error.html",
+                                   message=_("You do are not authorized to access this family"))
 
     return render_template("table_views/users.html",
                            members=family.members,
@@ -276,8 +291,12 @@ def families():
     """
     Displays all the events of a person
     """
-    # TODO:
-    return render_template("table_views/events.html")
+
+    user_id = int(session["user_id"])
+    user = User.query.get(user_id)
+
+    return render_template("table_views/families.html",
+                           families=user.families)
 
 
 @main_page.route("/notes")
@@ -553,8 +572,9 @@ def update_note_status(id: str):
 
 
 @main_page.route("/wishlist/<group_id>/<person_id>")
+@main_page.route("/wishlist/<person_id>")
 @login_required
-def wishlist(group_id: str, person_id: str):
+def wishlist(person_id: str, group_id: str = None):
     """
     Display specific user's wishlist
     """
@@ -569,15 +589,6 @@ def wishlist(group_id: str, person_id: str):
                                title=_("Access denied"))
 
     person_id = int(person_id)
-
-    if not group_id.isnumeric():
-        return render_template("utility/error.html",
-                               no_sidebar=False,
-                               message=_("Access denied"),
-                               title=_("Access denied"))
-
-    group_id = int(group_id)
-
     if person_id == user_id:
         return render_template("utility/error.html",
                                no_sidebar=False,
@@ -587,25 +598,47 @@ def wishlist(group_id: str, person_id: str):
     target_user = User.query.get(person_id)
     first_name = target_user.first_name
 
-    authorized = False
-    group = Group.query.get(group_id)
-    if not group:
-        return render_template("utility/error.html",
-                               no_sidebar=False,
-                               message=_("To view your own list use the sidebar"),
-                               title=_("Access denied"))
+    if group_id:  # If group is given let's check if the person may access trough group
+        if not group_id.isnumeric():
+            return render_template("utility/error.html",
+                                   no_sidebar=False,
+                                   message=_("Access denied"),
+                                   title=_("Access denied"))
 
-    for family in group.families:
-        for member in family.members:
-            if member.id == user.id:
-                authorized = True
-                break
+        group_id = int(group_id)
+        group = Group.query.get(group_id)
+        if not group:
+            return render_template("utility/error.html",
+                                   no_sidebar=False,
+                                   message=_("To view your own list use the sidebar"),
+                                   title=_("Access denied"))
 
-    if not authorized:
-        return render_template("utility/error.html",
-                               no_sidebar=False,
-                               message=_("Not authorized"),
-                               title=_("Access denied"))
+        authorized = False
+        for family in group.families:
+            for member in family.members:
+                if member.id == user.id:
+                    authorized = True
+                    break
+
+        if not authorized:
+            return render_template("utility/error.html",
+                                   no_sidebar=False,
+                                   message=_("Not authorized"),
+                                   title=_("Access denied"))
+    else:  # Group wasn't given, if the person isn't in the family then forbidden
+        authorized = False
+        for family in user.families:
+            for member in family.members:
+                if member.id == user_id:
+                    authorized = True
+                    break
+
+        if not authorized:
+            return render_template("utility/error.html",
+                                   no_sidebar=False,
+                                   message=_("Not authorized"),
+                                   title=_("Access denied"))
+
 
     currentnotes = []
     try:
@@ -918,7 +951,7 @@ def set_language():
             try:
                 user.language = request.form["language"]
                 db.session.commit()
-            except Exception:
+            except Exception as e:
                 sentry_sdk.capture_exception(e)
                 db.session.rollback()
                 return render_template("utility/error.html",
