@@ -875,7 +875,7 @@ def settings():
         for group_relationship in family.groups:
             group_admin = UserGroupAdmin.query.filter(and_(
                 UserGroupAdmin.user_id == user_id,
-                UserGroupAdmin.group_id == group_relationship.id)).one()
+                UserGroupAdmin.group_id == group_relationship.id)).first()
 
             if not group_admin:
                 user_groups[group_relationship.description] = (group_relationship.id, False)
