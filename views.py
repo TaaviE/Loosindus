@@ -118,12 +118,13 @@ def index():
     user_id: int = int(session["user_id"])
     user: User = get_person(user_id)
 
-    events: List[dict] = []
-    for family in user.families:
-        for group in family.groups:
-            for event in group.events:
-                event.group_name = group.name
-                events.append(event)
+    user_events: List[dict] = []
+    for user_family in user.families:
+        for family_group in user_family.groups:
+            for group_event in family_group.events:
+                if datetime.now() < group_event.event_at:
+                    group_event.group_name = family_group.name
+                    user_events.append(group_event)
 
 
     try:
@@ -136,7 +137,7 @@ def index():
 
     return render_template("index.html",
                            auth=user.first_name,
-                           events=events,
+                           events=user_events,
                            uid=user_id,
                            title=_("Home"))
 

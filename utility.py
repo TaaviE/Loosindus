@@ -1,8 +1,10 @@
 # coding=utf-8
 # Copyright: Taavi Eomäe 2017-2019
 # SPDX-License-Identifier: AGPL-3.0-only
-# This file requires database being initialized
-
+"""
+Contains functions that abstracts a few queries
+This file requires database being initialized
+"""
 # Cython
 from functools import lru_cache
 
@@ -14,22 +16,10 @@ from models.family_model import Family, FamilyGroup
 from models.names_model import Name
 from models.shuffles_model import Shuffle
 from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
-from models.wishlist_model import Wishlist
 from datetime import datetime
 from sqlalchemy import and_
 
 import sentry_sdk
-
-
-def get_person_marked(user_id: int) -> list:
-    """
-    Get all notes that have been somehow marked by an user
-    :param user_id:
-    :return:
-    """
-    passed_person_id = int(user_id)
-    wishlist_marked = Wishlist.query.filter(Wishlist.purchased_by == passed_person_id).all()
-    return wishlist_marked
 
 
 def get_person(user_id: int) -> User:
@@ -68,7 +58,7 @@ def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int
                                          Shuffle.year == datetime.now().year,
                                          Shuffle.group == passed_group_id)).one().getter
     except Exception as e:
-        sentry_sdk.captureException(e)
+        sentry_sdk.capture_exception(e)
         return -1
 
 

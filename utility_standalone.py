@@ -5,7 +5,6 @@ Utility functions that aren't super specific to Loosindus
 # Copyright: Taavi Eomäe 2017-2019
 # SPDX-License-Identifier: AGPL-3.0-only
 
-# Cython
 import pyximport
 from flask import session
 
