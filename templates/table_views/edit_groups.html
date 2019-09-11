@@ -1,0 +1,59 @@
+{% extends "subtemplates/base.html" %}
+
+{% block title %}🎄{{ title }}{% endblock %}
+
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("This page lists all groups you're in") }}</p>
+        {% if admin %}
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               href="./group/{{ group_id }}">{{ _("Add new family") }}</a>
+            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+               href="./events/{{ group_id }}">{{ _("Manage events") }}</a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+        <tbody>
+        <tr>
+            <th>{{ _("Group") }}</th>
+            {% if admin %}
+                <th>{{ _("ID") }}</th>
+            {% endif %}
+            <th>{{ _("Action") }}</th>
+            {% if admin %}
+                <th></th>
+            {% endif %}
+        </tr>
+        {% for group in groups %}
+            <tr>
+                <td>{{ group["name"] }}</td>
+                {% if admin %}
+                    <td>
+                        <div class="mdl-textfield mdl-js-textfield">
+                            <input class="mdl-textfield__input" disabled value="{{ group["id"] }}" type="text">
+                        </div>
+                    </td>
+                {% endif %}
+                <td>
+                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="/group/{{ group["id"] }}">{{ _("Display") }}</a>
+                </td>
+                {% if admin %}
+                    <td>
+                        <form method="post" action="/groups">
+                            <input name="action" type="hidden" value="REMOVEGROUP">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                    name="id" type="submit" value="{{ group["id"] }}">{{ _("Remove") }}</button>
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

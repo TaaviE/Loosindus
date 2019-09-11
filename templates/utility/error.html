@@ -1,6 +1,8 @@
 {% extends "subtemplates/base.html" %}
 
+{% if not no_sidebar == False %}
 {% set no_sidebar = True %}
+{% endif %}
 
 {% block title %}🎄{{ title }}{% endblock %}
 

@@ -7,40 +7,38 @@
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
             <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
             {% if events|length > 1 %}
-                <h3>{{ _("Hi, which event do you wish to see?") }}</h3>
+                <h4>{{ _("Hi, which event do you wish to see?") }}</h4>
             {% elif events|length == 1 %}
-                <h3>{{ _("Hi, you currently have one active event") }}</h3>
+                <h4>{{ _("Welcome back!") }}</h4>
+                <h5>{{ _("You currently have one active event") }}</h5>
             {% else %}
-                <h3>{{ _("You don't have any events you're participating in") }}</h3>
+                <h4>{{ _("You don't have any events you're participating in") }}</h4>
                 <p>{{ _("Do you want to create one?") }}</p>
                 <p><a href="/setup">Setup</a></p>
             {% endif %}
         </div>
 
-        {% if events|length > 1 %}
-        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-            <tbody>
-            <tr>
-                <th>{{ _("Name") }}</th>
-                <th>{{ _("Takes place") }}</th>
-                <th>{{ _("Group") }}</th>
-                <th>{{ _("Action") }}</th>
-            </tr>
-            {% for event in events %}
+        {% if events %}
+            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+                <tbody>
                 <tr>
-                    <td>{{ event["name"] }}</td>
-                    <td>{{ event["event_at"] }}</td>
-                    <td>{{ event["group_name"] }}</td>
-                    <td><a href="./events/{{ event["id"] }}">Open</a></td>
+                    <th>{{ _("Name") }}</th>
+                    <th>{{ _("Takes place") }}</th>
+                    <th>{{ _("Group") }}</th>
+                    <th>{{ _("Action") }}</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% elif events|length == 1 %}
-            <p class="mdl-card__supporting-text">{{ _("You can see it here:") }} <a
-                    class="mdl-button mdl-color--pink-400 mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                    href="/event/{{ events[0]["id"] }}">Open</a></p>
-        {% else %}
+                {% for event in events %}
+                    <tr>
+                        <td>{{ event["name"] }}</td>
+                        <td>{{ event["event_at"] }}</td>
+                        <td>{{ event["group_name"] }}</td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="/event/{{ event["id"] }}">Open</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
     </div>
 {% endblock %}

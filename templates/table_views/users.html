@@ -49,8 +49,9 @@
                 {% if not member["self"] %}
                     <td>
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="/wishlist/
-                                   {% if group_id %}{{ group_id }}/{% endif %}{{ member["id"] }}">{{ _("Display") }}</a>
+                           href="/wishlist/{% if group_id %}{{ group_id }}/{% endif %}{{ member["id"] }}">
+                            {{ _("Display") }}
+                        </a>
                     </td>
                 {% else %}
                     <td></td>

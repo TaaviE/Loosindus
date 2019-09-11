@@ -122,6 +122,7 @@ def index():
     for family in user.families:
         for group in family.groups:
             for event in group.events:
+                event.group_name = group.name
                 events.append(event)
 
 
@@ -144,22 +145,23 @@ def index():
 @login_required
 def shuffles():
     """
-    Returns a page that displays a specific event's shuffle
+    Returns all the graphs the user could view
     """
     user_id = int(session["user_id"])
     user: User = User.query.get(user_id)
     username = user.first_name
-    gifter = get_person_id(username)
+    gifter = user.id
 
     if "event_id" in request.args.keys():
         event_id = int(request.args["event_id"])
         giftee = "1"
     else:
-        giftee = get_default_target_id(gifter)
+        giftee = "1"  # get_default_target_id(gifter)
+        pass
 
     logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
-    return render_template("shuffle.html",
-                           title=_("Shuffle"),
+    return render_template("table_views/graphs.html",
+                           title=_("Shuffles"),
                            id=giftee)
 
 
@@ -920,13 +922,13 @@ def settings():
                            family_admin=family_admin)
 
 
-@main_page.route("/editfam", methods=["GET"])
+@main_page.route("/editfam/<family_id>", methods=["GET"])
 @login_required
-def editfamily():
+def editfamily(family_id: str):
     user_id = int(session["user_id"])
 
     try:
-        request_id = int(request.args["id"])
+        family_id = int(family_id)
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
@@ -935,7 +937,7 @@ def editfamily():
                                title=_("Error"))
 
     db_family_members = UserFamilyAdmin.query.filter(
-        UserFamilyAdmin.family_id == request_id).all()
+        UserFamilyAdmin.family_id == family_id).all()
 
     family = []
     show_admin_column = False
@@ -963,7 +965,7 @@ def editfamily():
                            family=family,
                            title=_("Edit family"),
                            admin=show_admin_column,
-                           family_id=request_id)
+                           family_id=family_id)
 
 
 @main_page.route("/setlanguage", methods=["POST"])

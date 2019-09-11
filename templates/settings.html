@@ -183,10 +183,10 @@
                                 </td>
                                 <td>
                                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="./editfam?id={{ family[0] }}">{{ _("Change / Display") }}</a>
+                                       href="/editfam/{{ family[0] }}">{{ _("Change / Display") }}</a>
                                 </td>
                                 <td>
-                                    <form method="post" action="./editfam">
+                                    <form method="post" action="/editfam/{{ family[0] }}">
                                         <input name="action" type="hidden" value="DELETEFAM">
                                         <input name="extra_data" type="hidden" value="{{ family[0] }}">
                                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
@@ -197,7 +197,7 @@
                             {% else %}
                                 <td>
                                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="./editfam?id={{ family[0] }}">{{ _("Display") }}</a>
+                                       href="/editfam/{{ family[0] }}">{{ _("Display") }}</a>
                                 </td>
                             {% endif %}
                         </tr>
