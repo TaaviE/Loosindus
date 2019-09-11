@@ -25,7 +25,7 @@ import pyximport
 
 from models.events_model import ShufflingEvent
 from models.family_model import Group
-from models.wishlist_model import wishlist_status_to_id
+from models.wishlist_model import Wishlist, wishlist_status_to_id
 
 pyximport.install()
 
@@ -115,14 +115,14 @@ def index():
     except Exception:
         pass
 
-    user_id: int = int(session["user_id"])
-    user: User = get_person(user_id)
+    user_id = get_user_id()
+    user = get_person(user_id)
 
     user_events: List[dict] = []
     for user_family in user.families:
         for family_group in user_family.groups:
             for group_event in family_group.events:
-                if datetime.now() < group_event.event_at:
+                if datetime.now() < group_event.event_at:  # If event has taken place
                     group_event.group_name = family_group.name
                     user_events.append(group_event)
 
@@ -148,14 +148,18 @@ def shuffles():
     """
     Returns all the graphs the user could view
     """
-    user_id = int(session["user_id"])
-    shuffles = list(Shuffle.query.filter(Shuffle.giver == user_id).all())
-    for shuffle in shuffles:
+    user_id = get_user_id()
+    all_shuffles = list(Shuffle.query.filter(Shuffle.giver == user_id).all())
+    shuffles = []
+    for shuffle in all_shuffles:
         event = ShufflingEvent.query.get(shuffle.event_id)
         shuffle.event_name = event.name
         shuffle.group_id = event.group_id
+        shuffle.group_name = Group.query.get(event.group_id).name
         shuffle.giver_name = User.query.get(shuffle.giver).first_name
         shuffle.getter_name = User.query.get(shuffle.getter).first_name
+        if datetime.now() > event.event_at:
+            shuffles.append(shuffle)
 
     return render_template("table_views/shuffles.html",
                            title=_("Shuffles"),
@@ -168,24 +172,27 @@ def shuffle(event_id: str):
     """
     Returns a page that displays a specific event's shuffle
     """
-    user_id = int(session["user_id"])
+    user_id = get_user_id()
     user = User.query.get(user_id)
     username = user.first_name
+    event_id = int(event_id)
 
-    logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
+    shuffle = Shuffle.query.get((user_id, event_id))
+
+    logger.debug("Username: {}, From: {}, To: {}", username, shuffle.giver, shuffle.getter)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
-                           id=giftee)
+                           id=user_id)
 
 
-@main_page.route("/event/<id>")
+@main_page.route("/event/<event_id>")
 @login_required
-def event(id: str):
+def event(event_id: str):
     """
     Displays all the families in the event
     """
-    user_id = int(session["user_id"])
-    event_id = int(id)
+    user_id = get_user_id()
+    event_id = int(event_id)
     event = ShufflingEvent.query.get(event_id)
     if not event:
         return render_template("utility/error.html")

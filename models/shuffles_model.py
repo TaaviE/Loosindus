@@ -18,7 +18,7 @@ class Shuffle(db.Model):
     __tablename__ = "shuffles"
 
     giver: int = Column(Integer(), ForeignKey(User.id), primary_key=True, unique=False, nullable=False)
-    getter: int = Column(Integer(), ForeignKey(User.id), primary_key=True, unique=False, nullable=False)
+    getter: int = Column(Integer(), ForeignKey(User.id), unique=False, nullable=False)
     event_id: int = Column(Integer(), ForeignKey(ShufflingEvent.id), primary_key=True, unique=False, nullable=False)
 
     def __str__(self):

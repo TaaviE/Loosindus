@@ -3,12 +3,11 @@
 {% block title %}🎄{{ title }}{% endblock %}
 
 {% block additional_head %}
-    <script src="{{ url_for("static", filename="d3/d3.v5.min.js") }}"></script>
 {% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <h5>{{ _("You can find all the shuffles that you're in, here") }}</h5>
+        <h5>{{ _("This page shows you all the people you should be making a gift") }}</h5>
     </div>
 {% endblock %}
 
@@ -19,20 +18,22 @@
             <th>{{ _("From") }}</th>
             <th>{{ _("To") }}</th>
             <th>{{ _("Event name") }}</th>
-            <th>{{ _("Actions") }}</th>
+            <th>{{ _("Group") }}</th>
             <th></th>
         </tr>
         {% for shuffle in shuffles %}
             <tr>
                 <td>{{ shuffle["giver_name"] }}</td>
-                <td>{{ shuffle["getter_name"] }}</td>
-                <td>{{ shuffle["event_name"] }}</td>
                 <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="/group/{{ shuffle["group_id"] }}">
-                    {{ _("Group") }}</a></td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                       href="/wishlist/{{ shuffle["getter"] }}">
+                    {{ shuffle["getter_name"] }}</a></td>
+                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                        href="/event/{{ shuffle["event_id"] }}">
-                    {{ _("Event") }}</a></td>
+                    {{ shuffle["event_name"] }}</a></td>
+                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                       href="/group/{{ shuffle["group_id"] }}">
+                    {{ shuffle["group_name"] }}</a></td>
+                <td></td>
             </tr>
         {% endfor %}
         </tbody>

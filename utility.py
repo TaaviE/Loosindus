@@ -23,6 +23,9 @@ import sentry_sdk
 
 
 def get_person(user_id: int) -> User:
+    """
+    :return: Just the user based on the ID
+    """
     return User.query.get(user_id)
 
 
