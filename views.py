@@ -130,7 +130,7 @@ def index():
         # user.last_activity_ip = request.headers.getlist("X-Forwarded-For")[0].rpartition(" ")[-1]
         # db.session.commit()
         pass
-    except Exception:
+    except Exception as e:
         sentry_sdk.capture_exception(e)
 
     return render_template("index.html",
@@ -957,7 +957,7 @@ def editfamily():
             pass
 
         family.append(
-            (get_person_name(member.user_id), member.user_id, is_admin, is_person, birthday))
+            (User.query.get(member.user_id).first_name, member.user_id, is_admin, is_person, birthday))
 
     return render_template("editfam.html",
                            family=family,
