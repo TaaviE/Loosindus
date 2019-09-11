@@ -148,21 +148,17 @@ def shuffles():
     Returns all the graphs the user could view
     """
     user_id = int(session["user_id"])
-    user: User = User.query.get(user_id)
-    username = user.first_name
-    gifter = user.id
+    shuffles = list(Shuffle.query.filter(Shuffle.giver == user_id).all())
+    for shuffle in shuffles:
+        event = ShufflingEvent.query.get(shuffle.event_id)
+        shuffle.event_name = event.name
+        shuffle.group_id = event.group_id
+        shuffle.giver_name = User.query.get(shuffle.giver).first_name
+        shuffle.getter_name = User.query.get(shuffle.getter).first_name
 
-    if "event_id" in request.args.keys():
-        event_id = int(request.args["event_id"])
-        giftee = "1"
-    else:
-        giftee = "1"  # get_default_target_id(gifter)
-        pass
-
-    logger.debug("Username: {}, From: {}, To: {}", username, gifter, giftee)
-    return render_template("table_views/graphs.html",
+    return render_template("table_views/shuffles.html",
                            title=_("Shuffles"),
-                           id=giftee)
+                           shuffles=shuffles)
 
 
 @main_page.route("/shuffle/<event_id>")
@@ -925,6 +921,9 @@ def settings():
 @main_page.route("/editfam/<family_id>", methods=["GET"])
 @login_required
 def editfamily(family_id: str):
+    """
+    :param family_id: The family to modify
+    """
     user_id = int(session["user_id"])
 
     try:
