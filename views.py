@@ -43,7 +43,7 @@ getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
 
 # Flask
-from flask import request, render_template, session, redirect, Blueprint, flash, url_for
+from flask import request, render_template, redirect, Blueprint, flash, url_for
 from flask_security import login_required
 from flask_security.utils import verify_password, hash_password
 from flask_login import current_user, login_user
@@ -640,8 +640,8 @@ def wishlist(person_id: str, group_id: str = None):
                                    title=_("Access denied"))
 
         authorized = False
-        for family in group.families:
-            for member in family.members:
+        for user_family in group.families:
+            for member in user_family.members:
                 if member.id == user.id:
                     authorized = True
                     break
@@ -653,8 +653,8 @@ def wishlist(person_id: str, group_id: str = None):
                                    title=_("Access denied"))
     else:  # Group wasn't given, if the person isn't in the family then forbidden
         authorized = False
-        for family in user.families:
-            for member in family.members:
+        for user_family in user.families:
+            for member in user_family.members:
                 if member.id == user_id:
                     authorized = True
                     break
@@ -735,7 +735,7 @@ def graph():
     """
     Display default group's graph
     """
-    user_id = session["user_id"]
+    user_id = get_user_id()
     try:
         if "group_id" in request.args.keys():
             family_group = request.args["group_id"]
