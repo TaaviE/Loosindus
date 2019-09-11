@@ -220,7 +220,7 @@ def family(family_id: str, group_id: str = None):
     family_id = int(family_id)
     family = Family.query.get(family_id)
     if not family:
-        return render_template("error.html",
+        return render_template("utility/error.html",
                                message=_("You do are not authorized to access this family"))
 
     authorized = False
@@ -233,14 +233,14 @@ def family(family_id: str, group_id: str = None):
         authorized = True
 
     if not authorized:
-        return render_template("error.html",
+        return render_template("utility/error.html",
                                message=_("You do are not authorized to access this family"))
 
     if group_id:
         group_id = int(group_id)
         group = Group.query.get(group_id)
         if not group:
-            return render_template("error.html",
+            return render_template("utility/error.html",
                                    message=_("You do are not authorized to access this family"))
 
         authorized = False
@@ -265,7 +265,7 @@ def family(family_id: str, group_id: str = None):
                             break
 
         if not authorized:
-            return render_template("error.html",
+            return render_template("utility/error.html",
                                    message=_("You do are not authorized to access this family"))
 
     return render_template("table_views/users.html",
