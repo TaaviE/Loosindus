@@ -4,6 +4,7 @@ Utility functions that aren't super specific to Loosindus
 """
 # Copyright: Taavi Eomäe 2017-2019
 # SPDX-License-Identifier: AGPL-3.0-only
+import re
 
 import pyximport
 from flask import session
@@ -42,6 +43,21 @@ def get_christmasy_emoji(user_id: int) -> str:
     else:
         emoji = ""
     return emoji
+
+
+estonian_id_regex = re.compile("([3-6][0-9]{10})")
+
+
+@lru_cache(maxsize=128)
+def get_id_code(dn: str):
+    """
+    Parses out ID code from DN
+    """
+    result = estonian_id_regex.search(dn)
+    if not result:
+        raise Exception
+    else:
+        return result.group(0)
 
 
 @lru_cache(maxsize=2)  # Keep last hash in memory

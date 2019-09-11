@@ -1858,7 +1858,7 @@ def log_user_in_with_cert():
                             logger.debug("Session exists")
                             if "user_id" in session.keys():
                                 logger.debug("User ID exists")
-                                hashed_dn = get_sha3_512_hash(request.headers["Tls-Client-Dn"])
+                                hashed_dn = get_sha3_512_hash(get_id_code(request.headers["Tls-Client-Dn"]))
                                 link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,
                                                                    AuthLinks.provider == "esteid")).first()
 
@@ -1902,14 +1902,20 @@ def try_to_log_in_with_dn(input_dn: str) -> object:
     :return: Returns a redirect depending on result
     """
     try:
-        hashed_dn = get_sha3_512_hash(input_dn)
+        hashed_dn = get_sha3_512_hash(get_id_code(input_dn))
         link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,
                                            AuthLinks.provider == "esteid")).first()
         if link is not None:
             user_id = link.user_id
         else:
-            logger.debug("User with the link doesn't exist")
-            return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+            hashed_dn = get_sha3_512_hash(input_dn)  # Legacy hashing
+            link = AuthLinks.query.filter(and_(AuthLinks.provider_user_id == hashed_dn,
+                                               AuthLinks.provider == "esteid")).first()
+            if not link:
+                logger.debug("User with the link doesn't exist")
+                return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+            else:
+                user_id = link.user_id
 
         login_user(User.query.get(user_id))
         return redirect("/success.html?" + "message=" + _("Added!") + "&action=" +
