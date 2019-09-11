@@ -442,7 +442,7 @@ def editnote():
     try:
         request_id = request.args["id"]
         request_id = int(request_id)
-        logger.info("{} is trying to remove a note {}", user_id, request_id)
+        logger.info("{} is trying to remove a note {}".format(user_id, request_id))
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
