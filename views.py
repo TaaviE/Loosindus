@@ -158,7 +158,7 @@ def shuffles():
         shuffle.group_name = Group.query.get(event.group_id).name
         shuffle.giver_name = User.query.get(shuffle.giver).first_name
         shuffle.getter_name = User.query.get(shuffle.getter).first_name
-        if datetime.now() > event.event_at:
+        if datetime.now() < event.event_at:
             shuffles.append(shuffle)
 
     return render_template("table_views/shuffles.html",
