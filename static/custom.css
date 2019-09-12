@@ -14,7 +14,7 @@
     overflow: auto;
 }
 
-.custom_large_text {
+.custom-large-text {
     font-size: 200%;
 }
 
@@ -22,7 +22,12 @@
     font-size: 1000%;
 }
 
-.adsbygoogle {
+.custom-ads-by-google {
     display: block;
     text-align: center;
+}
+
+.custom-disable-link {
+    pointer-events: none;
+    color: #c0c0c0 !important
 }
