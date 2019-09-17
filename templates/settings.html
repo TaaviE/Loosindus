@@ -79,7 +79,7 @@
                                     {% if google_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not google_connected %}
-                                    href="{{ url_for("main_page.googlelogin") }}"
+                                    href="{{ url_for("main_page.google_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -101,7 +101,7 @@
                                     {% if github_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not github_connected %}
-                                    href="{{ url_for("main_page.githublogin") }}"
+                                    href="{{ url_for("main_page.github_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -124,7 +124,7 @@
                                     {% if facebook_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not facebook_connected %}
-                                    href="{{ url_for("main_page.facebooklogin") }}"
+                                    href="{{ url_for("main_page.facebook_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
