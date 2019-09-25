@@ -118,13 +118,17 @@ def index():
     user_id = get_user_id()
     user = get_person(user_id)
 
-    user_events: List[dict] = []
+    active_events: List[ShufflingEvent] = []
+    inactive_events: List[ShufflingEvent] = []
+
     for user_family in user.families:
         for family_group in user_family.groups:
             for group_event in family_group.events:
-                if datetime.now() < group_event.event_at:  # If event has taken place
-                    group_event.group_name = family_group.name
-                    user_events.append(group_event)
+                group_event.group_name = family_group.name
+                if datetime.now() < group_event.event_at:  # If event has not taken place
+                    active_events.append(group_event)
+                else:
+                    inactive_events.append(group_event)
 
 
     try:
@@ -137,7 +141,7 @@ def index():
 
     return render_template("index.html",
                            auth=user.first_name,
-                           events=user_events,
+                           events=active_events,
                            uid=user_id,
                            title=_("Home"))
 
@@ -150,20 +154,43 @@ def shuffles():
     """
     user_id = get_user_id()
     all_shuffles = list(Shuffle.query.filter(Shuffle.giver == user_id).all())
-    shuffles = []
-    for shuffle in all_shuffles:
-        event = ShufflingEvent.query.get(shuffle.event_id)
-        shuffle.event_name = event.name
-        shuffle.group_id = event.group_id
-        shuffle.group_name = Group.query.get(event.group_id).name
-        shuffle.giver_name = User.query.get(shuffle.giver).first_name
-        shuffle.getter_name = User.query.get(shuffle.getter).first_name
-        if datetime.now() < event.event_at:
-            shuffles.append(shuffle)
+    active_shuffles: List[ShufflingEvent] = []
+    inactive_shuffles: List[ShufflingEvent] = []
+    for shuffle_pair in all_shuffles:
+        shuffle_event = ShufflingEvent.query.get(shuffle_pair.event_id)
+        shuffle_pair.event_name = shuffle_event.name
+        shuffle_pair.group_id = shuffle_event.group_id
+        shuffle_pair.group_name = Group.query.get(shuffle_event.group_id).name
+        shuffle_pair.giver_name = User.query.get(shuffle_pair.giver).first_name
+        shuffle_pair.getter_name = User.query.get(shuffle_pair.getter).first_name
+        if datetime.now() < shuffle_event.event_at:
+            active_shuffles.append(shuffle_pair)
+        else:
+            inactive_shuffles.append(shuffle_pair)
 
     return render_template("table_views/shuffles.html",
                            title=_("Shuffles"),
-                           shuffles=shuffles)
+                           active_shuffles=active_shuffles,
+                           inactive_shuffles=inactive_shuffles)
+
+
+@main_page.route("/setup", methods=["GET"])
+@login_required
+def setup():
+    """
+    Provides a page where people can start setting up their
+    """
+    return render_template("setup.html", title=_("Setup"))
+
+
+@main_page.route("/setup", methods=["POST"])
+@login_required
+def setup_post():
+    """
+    Deals with the submitted setup form
+    """
+    # TODO:
+    return redirect()
 
 
 @main_page.route("/shuffle/<event_id>")

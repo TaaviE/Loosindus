@@ -31,3 +31,27 @@
     pointer-events: none;
     color: #c0c0c0 !important
 }
+
+.custom-display-none {
+    display: none;
+}
+
+.custom-top-bottom-margin {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.custom-left-margin {
+    margin-left: 8px;
+}
+
+.custom-equal {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid lightgray;
+}
+
+.custom-half {
+    flex: 0 0 45%;
+    margin-right: 16px;
+}

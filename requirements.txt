@@ -20,6 +20,5 @@ sqlalchemy-utils==0.34.2
 sentry-sdk[flask]==0.12.1
 passlib==1.7.1
 cython==0.29.13
-acopy==0.6.4
 git+https://github.com/celery/celery.git
 git+https://github.com/celery/kombu.git

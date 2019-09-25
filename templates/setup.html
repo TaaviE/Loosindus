@@ -31,8 +31,10 @@
             <p></p>
             <p>{{ _("Also make sure to enter the group's name:") }}</p>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input class="mdl-textfield__input" type="text" id="group-name">
-                <label class="mdl-textfield__label" for="group-name">Group's name</label>
+                <input class="mdl-textfield__input" minlength=1 pattern="[^;:()/<>\[\]\\,'|\x22]+" type="text"
+                       id="group-name">
+                <label class="mdl-textfield__label" for="group-name">{{ _("Group's name") }}</label>
+                <span class="mdl-textfield__error">{{ _("Make sure you enter a family name") }}</span>
             </div>
         </div>
     </div>
