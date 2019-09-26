@@ -85,6 +85,11 @@ security = Security(app,
                     send_confirmation_form=ExtendedConfirmationForm,
                     forgot_password_form=ExtendedForgotPasswordForm)
 
-from views import main_page
+from views import static, login, views, user_specific, edit, test
 
-app.register_blueprint(main_page)
+app.register_blueprint(edit)
+app.register_blueprint(login)
+app.register_blueprint(static)
+app.register_blueprint(test)
+app.register_blueprint(user_specific)
+app.register_blueprint(views)

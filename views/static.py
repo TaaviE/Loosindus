@@ -1,20 +1,26 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2017-2019
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 Contains all of the routes that aren't really super specific to Loosindus
 """
+import sentry_sdk
 from functools import lru_cache
-
-from flask import render_template, request, send_from_directory, session
+from flask import render_template, request, send_from_directory, session, Blueprint, redirect
+from flask_login import current_user
 from flask_security import login_required, logout_user
+from flask import render_template, Blueprint, session, request
+from flask_babelex import gettext as _
 
-from views import _, app, current_user, index, logger, main_page, redirect
+static_page = Blueprint("generic_page",
+                        __name__,
+                        template_folder="templates")
 
 
 # Show a friendlier error page
 @app.errorhandler(500)
 @app.errorhandler(404)
 @app.errorhandler(405)
-@main_page.route("/testerror/<err>", defaults={"err": "Testing error"})
 def error_500(err):
     """
     Displays the nice error handling page
@@ -32,7 +38,7 @@ def error_500(err):
 
 
 # Views
-@main_page.route("/test")
+@static_page.route("/test")
 @login_required
 def test():
     """
@@ -43,7 +49,7 @@ def test():
                            title=_("Error"))
 
 
-@main_page.route("/favicon.ico")
+@static_page.route("/favicon.ico")
 def favicon():
     """
     Returns the site's favicon
@@ -52,7 +58,7 @@ def favicon():
                                "favicon-16x16.png")
 
 
-@main_page.route("/feedback")
+@static_page.route("/feedback")
 @login_required
 def feedback():
     """
@@ -62,7 +68,7 @@ def feedback():
                            sentry_feedback=True)
 
 
-@main_page.route("/about")
+@static_page.route("/about")
 def about():
     """
     Displays a nice introductory page
@@ -70,7 +76,7 @@ def about():
     return render_template("generic/pretty_index.html", title="Loosindus")
 
 
-@main_page.route("/")
+@static_page.route("/")
 def home():
     """
     Displays a home page based on user logon status
@@ -81,7 +87,7 @@ def home():
         return about()
 
 
-@main_page.route("/contact")
+@static_page.route("/contact")
 def contact():
     """
     Displays a contact details page
@@ -91,7 +97,8 @@ def contact():
                            no_sidebar=not current_user.is_authenticated)
 
 
-@main_page.route("/worker.js")
+@static_page.route("/worker.js")
+@login_required
 def worker_js():
     """
     Returns serviceworker JS
@@ -99,17 +106,7 @@ def worker_js():
     return render_template("worker.js"), 200, {"content-type": "application/javascript"}
 
 
-@main_page.route("/logout")
-@login_required
-def logout():
-    """
-    Logs the user out
-    """
-    logout_user()
-    return redirect("/")
-
-
-@main_page.route("/help", methods=["GET"])
+@static_page.route("/help", methods=["GET"])
 def help_page():
     """
     :return: A help page
@@ -117,18 +114,7 @@ def help_page():
     return render_template("generic/help.html")
 
 
-@main_page.route("/custom.js")
-@login_required
-def custom_js():
-    """
-    User-specific JS for custom functionality
-    """
-    return render_template("custom.js",
-                           user_id=int(session["user_id"]),
-                           ), 200, {"content-type": "application/javascript"}
-
-
-@main_page.route("/error")
+@static_page.route("/error")
 def error_page():
     """
     Displays an error page
@@ -149,7 +135,7 @@ def error_page():
                            title=title)
 
 
-@main_page.route("/tos")
+@static_page.route("/tos")
 def terms_of_service():
     """
     Displays terms of service
@@ -159,7 +145,7 @@ def terms_of_service():
                            title=_("Terms of Service"))
 
 
-@main_page.route("/pp")
+@static_page.route("/pp")
 def privacy_policy():
     """
     Displays the service's privacy policy
@@ -170,7 +156,7 @@ def privacy_policy():
                            no_sidebar=not current_user.is_authenticated)
 
 
-@main_page.route("/success")
+@static_page.route("/success")
 def success_page():
     """
     Displays a success page based on given parameters
@@ -196,8 +182,7 @@ def success_page():
                            title=title)
 
 
-@main_page.route("/ads.txt", methods=["GET"])
-@lru_cache(maxsize=1)
+@static_page.route("/ads.txt", methods=["GET"])
 def ads_txt():
     """
     Displays ads.txt
@@ -205,8 +190,7 @@ def ads_txt():
     return render_template("generic/ads.txt"), {"content-type": "text/plain"}
 
 
-@main_page.route("/sitemap.xml", methods=["GET"])
-@lru_cache(maxsize=1)
+@static_page.route("/sitemap.xml", methods=["GET"])
 def sitemap():
     """
     Displays the software's sitemap
@@ -214,8 +198,7 @@ def sitemap():
     return render_template("generic/sitemap.xml"), {"content-type": "text/xml"}
 
 
-@main_page.route("/robots.txt", methods=["GET"])
-@lru_cache(maxsize=1)
+@static_page.route("/robots.txt", methods=["GET"])
 def robots():
     """
     Displays the standard robots.txt
