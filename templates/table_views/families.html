@@ -22,7 +22,7 @@
                 <td>{{ family["name"] }}</td>
                 <td>
                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="/family/{% if group_id %}{{ group_id }}/{% endif %}{{ family["id"] }}">
+                       href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
                         {{ _("Display") }}</a>
                 </td>
             </tr>

@@ -27,7 +27,7 @@ pyximport.install()
 
 from models.events_model import ShufflingEvent
 from models.family_model import Group
-from models.wishlist_model import Wishlist, wishlist_status_to_id
+from models.wishlist_model import Wishlist, wishlist_status_to_id, ArchivedWishlist
 
 # Utilities
 from logging import getLogger
@@ -225,23 +225,51 @@ def event(event_id: str):
                            title=_("Event"))
 
 
-@main_page.route("/family/<group_id>/<family_id>")
-@main_page.route("/family/<family_id>")
+@main_page.route("/group/<group_id>")
 @login_required
-def family(family_id: str, group_id: str = None):
+def group(group_id: str):
+    """
+    Displays all the families in the group
+    """
+    user_id = get_user_id()
+    group_id = int(group_id)
+    group = Group.query.get(group_id)
+    if not group:
+        return render_template("utility/error.html")
+
+    authorized = False
+    for family in group.families:
+        for member in family.members:
+            if member.id == user_id:
+                authorized = True
+                break
+
+    if not authorized:
+        return render_template("utility/error.html")
+
+    return render_template("table_views/families.html",
+                           families=group.families,
+                           group_id=group.id,
+                           title=_("Event"))
+
+
+@main_page.route("/family/<group_id>/<family_id>")
+@main_page.route("/family/<family_id>", defaults={"group_id": None})
+@login_required
+def family(group_id: str, family_id: str):
     """
     Displays all the people in the family
     """
-    user_id = int(session["user_id"])
+    user_id = get_user_id()
     family_id = int(family_id)
-    family = Family.query.get(family_id)
-    if not family:
+    requested_family = Family.query.get(family_id)
+    if not requested_family:
         return render_template("utility/error.html",
                                message=_("You do are not authorized to access this family"))
 
     authorized = False
     if not group_id:
-        for member in family.members:
+        for member in requested_family.members:
             if member.id == user_id:
                 authorized = True
                 break
@@ -254,26 +282,26 @@ def family(family_id: str, group_id: str = None):
 
     if group_id:
         group_id = int(group_id)
-        group = Group.query.get(group_id)
-        if not group:
+        requested_group = Group.query.get(group_id)
+        if not requested_group:
             return render_template("utility/error.html",
                                    message=_("You do are not authorized to access this family"))
 
         authorized = False
-        for member in family.members:
+        for member in requested_family.members:
             if member.id == user_id:
                 authorized = True
                 break
 
         if not authorized:
-            for family in group.families:
+            for family in requested_group.families:
                 for member in family.members:
                     if member.id == user_id:
                         authorized = True
                         break
 
         if not authorized:
-            for group in family.groups:
+            for group in requested_family.groups:
                 for family in group.families:
                     for member in family.members:
                         if member.id == user_id:
@@ -285,7 +313,7 @@ def family(family_id: str, group_id: str = None):
                                    message=_("You do are not authorized to access this family"))
 
     return render_template("table_views/users.html",
-                           members=family.members,
+                           members=requested_family.members,
                            family_id=family_id,
                            group_id=group_id,
                            title=_("Family"))
@@ -307,6 +335,39 @@ def events():
                 events.append(event)
 
     return render_template("table_views/events.html",
+                           events=events)
+
+
+@main_page.route("/reminders")
+@login_required
+def reminders():
+    """
+    Displays all the reminders that concern a group
+    """
+
+    return render_template("table_views/reminders.html",
+                           events=events)
+
+
+@main_page.route("/notifications")
+@login_required
+def notifications():
+    """
+    Displays all the notifications for an user
+    """
+
+    return render_template("table_views/notifications.html",
+                           events=events)
+
+
+@main_page.route("/subscriptions")
+@login_required
+def subscriptions():
+    """
+    Displays all the notifications for an user
+    """
+
+    return render_template("table_views/subscriptions.html",
                            events=events)
 
 
@@ -371,6 +432,38 @@ def notes():
     return render_template("table_views/notes_private.html",
                            list=notes_from_file,
                            empty=empty,
+                           title=_("My Wishlist"))
+
+
+@main_page.route("/archivednotes")
+@login_required
+def archived_notes():
+    """
+    Displays all the archived notes in one's wishlist
+    """
+    user_id = session["user_id"]
+    # username = get_person_name(user_id)
+    notes_from_file = {}
+    empty = False
+
+    try:
+        # noinspection PyComparisonWithNone
+        # SQLAlchemy doesn't like "is None"
+        db_notes = ArchivedWishlist.query.filter(ArchivedWishlist.user_id == user_id).all()
+        for note in db_notes:
+            notes_from_file[note.item] = note.id
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+        raise e
+
+    if len(notes_from_file) <= 0:
+        notes_from_file = {_("Right now there's nothing in the Wishlist"): ("", "")}
+        empty = True
+
+    return render_template("table_views/notes_private.html",
+                           list=notes_from_file,
+                           empty=empty,
+                           archived=True,
                            title=_("My Wishlist"))
 
 

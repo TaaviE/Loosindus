@@ -15,7 +15,7 @@ from config import Config
 from main import app
 from views.views import index
 
-static_page = Blueprint("generic_page",
+static_page = Blueprint("static_page",
                         __name__,
                         template_folder="templates")
 

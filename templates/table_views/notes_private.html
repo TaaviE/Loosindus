@@ -19,7 +19,14 @@
         </div>
         <div class="mdl-card__actions mdl-card--border">
             <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-               href="/createnote">{{ _("Add new") }}</a>
+               href="{{ url_for("edit_page.createnote") }}">{{ _("Add new") }}</a>
+            {% if not archived %}
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   href="{{ url_for("main_page.archived_notes") }}">{{ _("View archive") }}</a>
+            {% else %}
+                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
+                   href="{{ url_for("main_page.notes") }}">{{ _("View wishlist") }}</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
@@ -30,7 +37,7 @@
     <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
-        {% if not empty %}
+        {% if not empty and not archived %}
             <th class="mdl-data-table__cell--non-numeric">{{ _("Delete") }}</th>
             <th class="mdl-data-table__cell--non-numeric">{{ _("Edit") }}</th>
         {% else %}
@@ -41,21 +48,20 @@
         {% for item, id in list.items() %}
             <tr>
                 <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
-                {% if not empty %}
+                {% if not empty and not archived %}
                     <td class="mdl-data-table__cell--non-numeric">
-                        <form method="post" action="./removenote">
+                        <form method="post" action="{{ url_for("edit_page.note_remove", request_id=id) }}">
                             <input name="action" type="hidden" value="DELETENOTE">
-                            <input name="extra_data" type="hidden" value="{{ id }}">
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                                     type="submit">{{ _("Delete") }}</button>
                         </form>
                     </td>
                     <td class="mdl-data-table__cell--non-numeric">
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editnote?id={{ id }}">{{ _("Edit") }}</a>
+                           href="{{ url_for("edit_page.note_edit_get", request_id=id) }}">{{ _("Edit") }}</a>
                     </td>
                 {% else %}
-                    <td class="mdl-data-table__cell--non-numeric"></td>
+                    <td class="mdl-data-table__cell--non-numeric">{{ _("There's no wishlist items here") }}</td>
                     <td class="mdl-data-table__cell--non-numeric"></td>
                 {% endif %}
             </tr>

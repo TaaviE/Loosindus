@@ -11,40 +11,62 @@
 
 {% block content %}
     <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+    <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col ">
         <p>{{ _("Notifications not dismissed") }}</p>
-        <tbody>
-        <tr>
-            <th>{{ _("Description") }}</th>
-            <th>{{ _("Action") }}</th>
-            <th>{{ _("When") }}</th>
-        </tr>
-        {% for notification in notifications %}
+        <table class="mdl-color-text--grey-600 mdl-data-table mdl-js-data-table">
+            <tbody>
             <tr>
-                <td>{{ notification["description"] }}</td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="{{ notification["action"] }}">{{ _("Display") }}</a></td>
-                <td>{{ notification["when"] }}</td>
+                <th>{{ _("Description") }}</th>
+                <th>{{ _("Action") }}</th>
+                <th>{{ _("When") }}</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
-        <p>{{ _("Notifications that have been dismissed") }}</p>
-        <tbody>
-        <tr>
-            <th>{{ _("Description") }}</th>
-            <th>{{ _("Action") }}</th>
-            <th>{{ _("When") }}</th>
-        </tr>
-        {% for notification in dismissed_notifications %}
+            {% if notifications %}
+                {% for notification in notifications %}
+                    <tr>
+                        <td>{{ notification["description"] }}</td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="{{ notification["action"] }}">{{ _("Display") }}</a></td>
+                        <td>{{ notification["when"] }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>{{ _("You don't have any notifications") }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col ">
+        <table class="mdl-color-text--grey-600 mdl-data-table mdl-js-data-table">
+            <p>{{ _("Notifications that have been dismissed") }}</p>
+            <tbody>
             <tr>
-                <td>{{ notification["description"] }}</td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="{{ notification["action"] }}">{{ _("Display") }}</a></td>
-                <td>{{ notification["when"] }}</td>
+                <th>{{ _("Description") }}</th>
+                <th>{{ _("Action") }}</th>
+                <th>{{ _("When") }}</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            {% if notifications %}
+                {% for notification in dismissed_notifications %}
+                    <tr>
+                        <td>{{ notification["description"] }}</td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="{{ notification["action"] }}">{{ _("Display") }}</a></td>
+                        <td>{{ notification["when"] }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>{{ _("You don't have any notifications") }}</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

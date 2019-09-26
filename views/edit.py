@@ -65,6 +65,7 @@ def note_edit_get(request_id: str):
         logger.info("{} is editing notes of {}".format(user_id, request_id))
         db_note = Wishlist.query.get(request_id)
     except Exception as e:
+        logger.error(e)
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
                                message=_("An error occured"),
@@ -73,9 +74,9 @@ def note_edit_get(request_id: str):
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
-                           endpoint="editnote",
+                           endpoint=db_note.id,
                            row_count=3,
-                           extra_data=request.args["id"],
+                           extra_data=request_id,
                            label=_("Your wish"),
                            placeholder=db_note.item)
 
@@ -133,7 +134,7 @@ def note_remove(request_id: str):
         return render_template("creatething.html",
                                action="DELETE",
                                endpoint="removenote",
-                               extra_data=request.form["extra_data"],
+                               extra_data=request_id,
                                confirm=True)
 
     try:

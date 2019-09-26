@@ -57,7 +57,7 @@
                                     {% if id_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not id_connected %}
-                                    href="{{ url_for("main_page.log_user_in_with_cert") }}"
+                                    href="{{ url_for("login_page.log_user_in_with_cert") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -79,7 +79,7 @@
                                     {% if google_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not google_connected %}
-                                    href="{{ url_for("main_page.google_login") }}"
+                                    href="{{ url_for("login_page.google_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -101,7 +101,7 @@
                                     {% if github_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not github_connected %}
-                                    href="{{ url_for("main_page.github_login") }}"
+                                    href="{{ url_for("login_page.github_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -124,7 +124,7 @@
                                     {% if facebook_connected %}disabled{% endif %}
                                     class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                                     {% if not facebook_connected %}
-                                    href="{{ url_for("main_page.facebook_login") }}"
+                                    href="{{ url_for("login_page.facebook_login") }}"
                                     {% else %}
                                     href="#"
                                     {% endif %}>
@@ -186,18 +186,17 @@
                                        href="/editfam/{{ family[0] }}">{{ _("Change / Display") }}</a>
                                 </td>
                                 <td>
-                                    <form method="post" action="/editfam/{{ family[0] }}">
+                                    <form method="post"
+                                          action="{{ url_for("edit_page.editfam_with_action", family_id=family[0]) }}">
                                         <input name="action" type="hidden" value="DELETEFAM">
-                                        <input name="extra_data" type="hidden" value="{{ family[0] }}">
                                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                                name="id" type="submit"
-                                                value="{{ family[0] }}">{{ _("Delete") }}</button>
+                                                name="id" type="submit">{{ _("Delete") }}</button>
                                     </form>
                                 </td>
                             {% else %}
                                 <td>
                                     <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="/editfam/{{ family[0] }}">{{ _("Display") }}</a>
+                                       href="{{ url_for("edit_page.editfamily", family_id=family[0]) }}">{{ _("Display") }}</a>
                                 </td>
                             {% endif %}
                         </tr>

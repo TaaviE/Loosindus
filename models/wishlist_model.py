@@ -81,7 +81,7 @@ class ArchivedWishlist(db.Model):
                          nullable=False)
     purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
     event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)
-    archived: datetime = Column(TIMESTAMP, nullable=False)
+    when: datetime = Column(TIMESTAMP, server_default=FetchedValue(), nullable=False)
 
     def __init__(self, user_id: int, item: str, status: int = wishlist_status_to_id["default"],
                  purchased_by: int = None):

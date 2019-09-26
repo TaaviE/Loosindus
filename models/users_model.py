@@ -53,7 +53,7 @@ class User(db.Model, UserMixin):
 
     @property
     def last_login_ip(self):
-        return self.last_login_ip
+        return
 
     @last_login_ip.setter
     def last_login_ip(self, value):
@@ -61,7 +61,7 @@ class User(db.Model, UserMixin):
 
     @property
     def last_login_at(self):
-        return self.last_login_at
+        return
 
     @last_login_at.setter
     def last_login_at(self, value):
@@ -69,7 +69,7 @@ class User(db.Model, UserMixin):
 
     @property
     def current_login_at(self):
-        return self.current_login_at
+        return
 
     @current_login_at.setter
     def current_login_at(self, value):
@@ -77,7 +77,7 @@ class User(db.Model, UserMixin):
 
     @property
     def current_login_ip(self):
-        return self.current_login_ip
+        return
 
     @current_login_ip.setter
     def current_login_ip(self, value):
