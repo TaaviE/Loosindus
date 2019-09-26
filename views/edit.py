@@ -4,7 +4,6 @@
 """
 Contains all of the routes that display an edit or
 """
-from datetime import datetime
 from logging import getLogger
 
 import sentry_sdk
@@ -12,13 +11,10 @@ from flask import Blueprint, redirect, render_template, request, session
 from flask_babelex import gettext as _
 from flask_login import current_user, login_required
 from sqlalchemy import and_
-from sqlalchemy.orm.exc import NoResultFound
 
-import secretsanta
 from config import Config
 from main import db
 from models.family_model import Family, FamilyGroup
-from models.shuffles_model import Shuffle
 from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
 from models.wishlist_model import Wishlist, wishlist_status_to_id
 
@@ -48,7 +44,7 @@ def createnote():
 
 @edit_page.route("/note/<request_id>", methods=["GET"])
 @login_required
-def editnote(request_id: str):
+def note_edit_get(request_id: str):
     """
     Displays a page where a person can edit a note
     """
@@ -84,9 +80,9 @@ def editnote(request_id: str):
                            placeholder=db_note.item)
 
 
-@edit_page.route("/note", methods=["POST"])
+@edit_page.route("/note/<request_id>", methods=["POST"])
 @login_required
-def editnote_edit():
+def note_edit(request_id: str):
     """
     Allows submitting textual edits to notes
     """
@@ -95,7 +91,6 @@ def editnote_edit():
 
     addednote = request.form["textfield"]
     try:
-        request_id = request.form["extra_data"]
         request_id = int(request_id)
     except Exception as e:
         logger.error("Error when decrypting note edit submission")
@@ -124,9 +119,9 @@ def editnote_edit():
                            title=_("Changed"))
 
 
-@edit_page.route("/removenote", methods=["POST"])
+@edit_page.route("/note/remove/<request_id>", methods=["POST"])
 @login_required
-def deletenote():
+def note_remove(request_id: str):
     """
     Allows deleting a specific note
     """
@@ -142,7 +137,6 @@ def deletenote():
                                confirm=True)
 
     try:
-        request_id = request.form["extra_data"]
         request_id = int(request_id)
         logger.info("{} is trying to remove a note {}".format(user_id, request_id))
     except Exception as e:
@@ -167,9 +161,9 @@ def deletenote():
                            title=_("Removed"))
 
 
-@edit_page.route("/note", methods=["POST"])
+@edit_page.route("/note/add", methods=["POST"])
 @login_required
-def createnote_add():
+def note_add_new():
     """
     Allows submitting new notes to a wishlist
     """
@@ -225,7 +219,7 @@ def createnote_add():
                            title=_("Added"))
 
 
-@edit_page.route("/editfam/<family_id>", methods=["GET"])
+@edit_page.route("/family/<family_id>", methods=["GET"])
 @login_required
 def editfamily(family_id: str):
     """
@@ -274,7 +268,7 @@ def editfamily(family_id: str):
                            family_id=family_id)
 
 
-@edit_page.route("/setlanguage", methods=["POST"])
+@edit_page.route("/language", methods=["POST"])
 @login_required
 def set_language():
     """
@@ -305,14 +299,13 @@ def set_language():
                                title=_("Error"))
 
 
-@edit_page.route("/editgroup", methods=["GET"])
+@edit_page.route("/group/<group_id>", methods=["GET"])
 @login_required
-def editgroup():
+def group_edit_get(group_id: str):
     user_id = session["user_id"]
     # user_obj = User.query.get(user_id)
 
     try:
-        group_id = request.args["id"]
         group_id = int(group_id)
     except Exception as e:
         sentry_sdk.capture_exception(e)
@@ -337,9 +330,13 @@ def editgroup():
                            admin=is_admin)
 
 
-@edit_page.route("/editgroup", methods=["POST"])  # TODO: Maybe merge with editgroup
+@edit_page.route("/group/<group_id>", methods=["POST"])  # TODO: Maybe merge with editgroup
 @login_required
-def editgroup_with_action():
+def group_edit(group_id: str):
+    """
+
+    :param group_id: The Group ID that is being edited
+    """
     user_id = int(session["user_id"])
     endpoint = "editgroup"
     if "action" not in request.form.keys():
@@ -347,7 +344,9 @@ def editgroup_with_action():
                                message=_("An error has occured"),
                                title=_("Error"))
     else:
-        if request.form["action"] == "REMOVEFAM" and "confirm" not in request.form.keys():
+        if request.form["action"] == "REMOVEFAM" and \
+                "confirm" not in request.form.keys():
+            # When family is requested to be removed from a group
             if "extra_data" in request.form.keys():
                 extra_data = request.form["extra_data"]
             else:
@@ -368,9 +367,11 @@ def editgroup_with_action():
                                    extra_data=extra_data,
                                    id=form_id,
                                    confirm=True)
-        elif request.form["action"] == "REMOVEFAM" and request.form["confirm"] == "True":
+        elif request.form["action"] == "REMOVEFAM" and \
+                request.form["confirm"] == "True":
+            # When family is being removed from a group
             family_id = int(request.form["extra_data"])
-            group_id = int(request.form["id"])
+            group_id = int(group_id)
 
             admin_relationship = UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
                                                                   UserGroupAdmin.user_id == user_id)).one()
@@ -403,7 +404,9 @@ def editgroup_with_action():
                                    action=_("Deleted"),
                                    link="./",
                                    title=_("Deleted"))
-        elif request.form["action"] == "ADDFAMILY" and "confirm" not in request.form.keys():
+        elif request.form["action"] == "ADDFAMILY" and \
+                "confirm" not in request.form.keys():
+            # If family is being added to the group but hasn't been confirmed
             if "extra_data" in request.form.keys():
                 extra_data = request.form["extra_data"]
             else:
@@ -424,13 +427,17 @@ def editgroup_with_action():
                                    extra_data=extra_data,
                                    id=form_id,
                                    confirm=True)
-        elif request.form["action"] == "ADDFAMILY" and request.form["confirm"] == "True":
+        elif request.form["action"] == "ADDFAMILY" and \
+                request.form["confirm"] == "True":
+            # If adding family to group is confirmed
             # TODO: Add user to family
             return render_template("utility/success.html",
                                    action=_("Added"),
                                    link="./",
                                    title=_("Added"))
-        elif request.form["action"] == "DELETEGROUP" and "confirm" not in request.form.keys():
+        elif request.form["action"] == "DELETEGROUP" and \
+                "confirm" not in request.form.keys():
+            # Group deletion is requested but action is not confirmed
             if "extra_data" in request.form.keys():
                 extra_data = request.form["extra_data"]
             else:
@@ -451,7 +458,9 @@ def editgroup_with_action():
                                    id=form_id,
                                    extra_data=extra_data,
                                    confirm=True)
-        elif request.form["action"] == "DELETEGROUP" and request.form["confirm"] == "True":
+        elif request.form["action"] == "DELETEGROUP" and \
+                request.form["confirm"] == "True":
+            # If group deletion is requested and confirmed
             # TODO: Delete group
             return render_template("utility/success.html",
                                    action=_("Deleted"),
@@ -634,7 +643,7 @@ def editfam_with_action():
                                    title=_("Error"))
 
 
-@edit_page.route("/addfam", methods=["GET"])
+@edit_page.route("/family/add", methods=["GET"])
 @login_required
 def add_family():
     return render_template("creatething.html",
@@ -643,7 +652,7 @@ def add_family():
                            label=_("Group ID"))
 
 
-@edit_page.route("/addgroup", methods=["GET"])
+@edit_page.route("/group/add", methods=["GET"])
 @login_required
 def add_group():
     return render_template("creatething.html",
@@ -652,9 +661,9 @@ def add_group():
                            label=_("Group ID"))
 
 
-@edit_page.route("/recreategraph", methods=["GET"])
+@edit_page.route("/event/<event_id>/graph/regenerate", methods=["GET"])
 @login_required
-def ask_regraph():
+def ask_regraph(event_id: str):
     """
     Displays a confirmation page before reshuffling
     """
@@ -671,9 +680,9 @@ def ask_regraph():
                                title=_("Error"))
 
 
-@edit_page.route("/recreategraph", methods=["POST"])
+@edit_page.route("/event/<event_id>/graph/regenerate", methods=["POST"])
 @login_required
-def regraph():
+def regraph(event_id: str):
     user_id = session["user_id"]
     try:
         event_id = int(request.form["extra_data"])
@@ -682,113 +691,12 @@ def regraph():
         return render_template("utility/error.html",
                                message=_("An error has occured"),
                                title=_("Error"))
-    family_obj = Family.query.get(family_id)
-    time_right_now = datetime.now()
-
-    database_families = Family.query.filter(
-        Family.id.in_(
-            set([familygroup.family_id for familygroup in FamilyGroup.query.filter(
-                FamilyGroup.family_id == family_obj.id
-            ).all()])
-        )
-    ).all()
-    database_all_families_with_members = []
-    for db_family in database_families:
-        database_family_members = UserFamilyAdmin.query.filter(
-            UserFamilyAdmin.family_id == db_family.id).all()
-        database_all_families_with_members.append((db_family.id, database_family_members))
-
-    user_id_to_user_number = {}
-    user_number_to_user_id = {}
-    start_id = 0
-    for family_id, db_family in database_all_families_with_members:
-        for member in db_family:
-            user_number_to_user_id[start_id] = member.user_id
-            user_id_to_user_number[member.user_id] = start_id
-            start_id += 1
-
-    try:
-        if not UserGroupAdmin.query.filter(
-                UserGroupAdmin.user_id == int(user_id) and UserGroupAdmin.admin == True).one():
-            return render_template("utility/error.html",
-                                   message=_("Access denied"),
-                                   title=_("Error"))
-    except NoResultFound:
-        return render_template("utility/error.html",
-                               message=_("Access denied"),
-                               title=_("Error"))
-    except Exception as e:
-        sentry_sdk.capture_exception(e)
-
-    families = []
-    family_ids_map = {}
-    for family_index, (list_family_id, list_family) in enumerate(database_all_families_with_members):
-        families.insert(family_index, {})
-        for person_index, person in enumerate(list_family):
-            family_ids_map[family_index] = list_family_id
-            families[family_index][get_person_name(person.user_id)] = user_id_to_user_number[person.user_id]
-
-    families_shuf_ids = {}
-    members_to_families = {}
-    for family_id, family_members in enumerate(families):
-        for person, person_id in family_members.items():
-            members_to_families[person_id] = family_id
-
-    families_to_members = {}
-    for family_id, family_members in enumerate(families):
-        families_to_members[family_id] = set()
-        for person, person_id in family_members.items():
-            currentset = families_to_members[family_id]
-            currentset.update([person_id])
-
-    last_connections = secretsanta.connectiongraph.ConnectionGraph(members_to_families, families_to_members)
-
-    family_group = FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id
-    for group_shuffle in Shuffle.query.filter(Shuffle.group == family_group).all():  # Get last previous shuffles
-        last_connections.add(user_id_to_user_number[group_shuffle.giver],
-                             user_id_to_user_number[group_shuffle.getter],
-                             group_shuffle.year)
-
-    logger.info("{} is the year of Linux Desktop".format(time_right_now.year))
-
-    santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
-
-    shuffled_ids_str = {}
-    for connection in santa.generate_connections(time_right_now.year):
-        families_shuf_ids[connection.source] = connection.target
-        shuffled_ids_str[str(connection.source)] = str(connection.target)
-
-    logger.info(shuffled_ids_str)
-
-    for giver, getter in families_shuf_ids.items():
-        # The assumption is that one group shouldn't have more than one shuffle a year active
-        # at the same time, there can be multiple with different years
-        db_entry_shuffle = Shuffle(
-            giver=user_number_to_user_id[giver],
-            getter=user_number_to_user_id[getter],
-            year=time_right_now.year,
-            group=family_group
-        )
-        try:
-            db.session.add(db_entry_shuffle)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            try:
-                row = Shuffle.query.filter(and_(Shuffle.giver == user_number_to_user_id[giver],
-                                                Shuffle.year == time_right_now.year)).one()
-                if row.getter != user_number_to_user_id[getter]:
-                    row.getter = user_number_to_user_id[getter]
-                    db.session.commit()
-            except Exception:
-                db.session.rollback()
-
-            sentry_sdk.capture_exception(e)
+    # TODO: Celery task invoke
 
     return render_template("utility/success.html",
-                           action=_("Generated"),
-                           link="./notes",
-                           title=_("Generated"))
+                           action=_("Added to queue"),
+                           link="/notes",
+                           title=_("Shuffling started"))
 
 
 @edit_page.route("/note/<id>", methods=["POST"])

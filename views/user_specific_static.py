@@ -18,3 +18,12 @@ def custom_js():
     """
     return render_template("custom.js",
                            user_id=int(session["user_id"])), 200, {"content-type": "application/javascript"}
+
+
+@user_specific.route("/worker.js")
+@login_required
+def worker_js():
+    """
+    Returns serviceworker JS
+    """
+    return render_template("worker.js"), 200, {"content-type": "application/javascript"}

@@ -301,8 +301,11 @@ def oauth_handler(blueprint, token):
                             return False
                         else:
                             response = response.json()
-                            user_email = response[0]["email"] if len(response) > 0 and \
-                                                                 "email" in response[0].keys() else None
+                            if len(response) > 0 and "email" in response[0].keys():
+                                user_email = response[0]["email"]
+                            else:
+                                user_email = None
+
                             # Take the first email
                             if not response[0]["verified"] or \
                                     user_email is None or \

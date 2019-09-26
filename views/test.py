@@ -23,6 +23,7 @@ test_page = Blueprint("test_page",
 
 
 @test_page.route("/testerror/<err>", defaults={"err": "404"})
+@login_required
 def test_err(err):
     """
     Returns the specific error code's error

@@ -13,6 +13,7 @@ from flask_security import login_required
 
 from config import Config
 from main import app
+from views.views import index
 
 static_page = Blueprint("generic_page",
                         __name__,
@@ -92,7 +93,7 @@ def home():
         return about()
 
 
-@static_page.route("/contact")
+@static_page.route("/contact", methods=["GET"])
 def contact():
     """
     Displays a contact details page
@@ -100,15 +101,6 @@ def contact():
 
     return render_template("generic/contact.html",
                            no_sidebar=not current_user.is_authenticated)
-
-
-@static_page.route("/worker.js")
-@login_required
-def worker_js():
-    """
-    Returns serviceworker JS
-    """
-    return render_template("worker.js"), 200, {"content-type": "application/javascript"}
 
 
 @static_page.route("/help", methods=["GET"])
