@@ -8,7 +8,7 @@ from logging import getLogger
 from secrets import token_bytes
 
 import sentry_sdk
-from flask import Blueprint, app, flash, request, session, url_for
+from flask import Blueprint, flash, request, session, url_for
 from flask_babelex import gettext as _
 from flask_dance.consumer import oauth_authorized
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
@@ -22,7 +22,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.utils import redirect
 
 from config import Config
-from main import db
+from main import app, db
 from models.users_model import AuthLinks, User
 from utility_standalone import get_id_code, get_sha3_512_hash
 

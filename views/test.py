@@ -7,12 +7,12 @@ Contains views that allow testing some specific functionality
 from logging import getLogger
 
 from flask import Blueprint, render_template
+from flask_babelex import gettext as _
 from flask_login import login_required
 from flask_mail import Message
-from flask_babelex import gettext as _
 
 from config import Config
-from views import generic
+from views.static import error_500
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
@@ -27,7 +27,7 @@ def test_err(err):
     """
     Returns the specific error code's error
     """
-    return generic.error_500(err)
+    return error_500(err)
 
 
 @test_page.route("/testmail")

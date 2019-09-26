@@ -4,17 +4,22 @@
 """
 Contains all of the routes that aren't really super specific to Loosindus
 """
-import sentry_sdk
-from functools import lru_cache
-from flask import render_template, request, send_from_directory, session, Blueprint, redirect
-from flask_login import current_user
-from flask_security import login_required, logout_user
-from flask import render_template, Blueprint, session, request
+from logging import getLogger
+
+from flask import Blueprint, render_template, request, send_from_directory
 from flask_babelex import gettext as _
+from flask_login import current_user
+from flask_security import login_required
+
+from config import Config
+from main import app
 
 static_page = Blueprint("generic_page",
                         __name__,
                         template_folder="templates")
+
+getLogger().setLevel(Config.LOGLEVEL)
+logger = getLogger()
 
 
 # Show a friendlier error page

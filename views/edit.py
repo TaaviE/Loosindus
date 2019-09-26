@@ -4,16 +4,22 @@
 """
 Contains all of the routes that display an edit or
 """
+from datetime import datetime
 from logging import getLogger
 
 import sentry_sdk
 from flask import Blueprint, redirect, render_template, request, session
 from flask_babelex import gettext as _
 from flask_login import current_user, login_required
+from sqlalchemy import and_
+from sqlalchemy.orm.exc import NoResultFound
 
+import secretsanta
 from config import Config
 from main import db
-from models.users_model import User, UserFamilyAdmin
+from models.family_model import Family, FamilyGroup
+from models.shuffles_model import Shuffle
+from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
 from models.wishlist_model import Wishlist, wishlist_status_to_id
 
 getLogger().setLevel(Config.LOGLEVEL)
@@ -21,7 +27,7 @@ logger = getLogger()
 
 edit_page = Blueprint("edit_page",
                       __name__,
-                      url_prefix="edit",
+                      url_prefix="/edit",
                       template_folder="templates")
 
 
@@ -677,7 +683,7 @@ def regraph():
                                message=_("An error has occured"),
                                title=_("Error"))
     family_obj = Family.query.get(family_id)
-    time_right_now = datetime.datetime.now()
+    time_right_now = datetime.now()
 
     database_families = Family.query.filter(
         Family.id.in_(
