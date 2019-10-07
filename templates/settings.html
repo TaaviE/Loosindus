@@ -1,4 +1,6 @@
 {% extends "subtemplates/base.html" %}
+{% set tabs_bar = True %}
+{% set no_information = True %}
 
 {% block title %}🎄 {{ title }}{% endblock %}
 
@@ -8,256 +10,144 @@
     </div>
 {% endblock %}
 
-{% if group_admin %}
-    {% block buttons %}
-        <div class="mdl-card mdl-shadow--2dp mdl-cell">
-            <div class="mdl-card__title mdl-card--expand mdl-color--teal-300">
-                <h2 class="custom-white-text mdl-card__title-text">{{ _("Create new...") }}</h2>
-            </div>
-            <div class="mdl-card__supporting-text">
-                <p>{{ _("Use these buttons to start creating new families and groups") }}</p>
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                   href="./createfam">{{ _("Create family") }}</a>
-            </div>
-            <div class="mdl-card__actions mdl-card--border">
-                <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                   href="./creategroup">{{ _("Create group") }}</a>
-            </div>
-        </div>
-    {% endblock %}
-{% endif %}
-
 {% block content %}
-    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-            <p>{{ _("Your ID:") }}
-            <div class="mdl-textfield mdl-js-textfield">
+    <noscript>
+        <div class="mdl-card__supporting-text mdl-card mdl-cell mdl-shadow--2dp mdl-cell--12-col mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
+            {{ _("Your browser does not support JavaScript, certain functionality might be limited") }}
+        </div>
+    </noscript>
+
+    <div class="mdl-layout__tab-panel is-active" id="overview">
+        <div class="mdl-card__supporting-text mdl-card mdl-cell mdl-shadow--2dp mdl-cell--12-col mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
+            {{ _("Your ID:") }}
+            <div class="custom-half mdl-textfield mdl-js-textfield">
                 <input class="mdl-textfield__input" type="text" id="user_id" value="{{ user_id }}" disabled>
             </div>
-            </p>
             <p>{{ _("Your name:") }} {{ user_name }}</p>
+        </div>
+    </div>
 
-            {% if config.ESTEID_AUTH or config.GOOGLE_OAUTH or config.FACEBOOK_OAUTH or config.GITHUB_OAUTH %}
-                <table class="mdl-data-table">
-                    <thead>
-                    <tr>
-                        <td>{{ _("Link Status") }}</td>
-                        <td>{{ _("Action") }}</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if config.ESTEID_AUTH %}
-                        <tr>
-                            <td>{% if id_connected %}{{ _("Estonian ID card is linked") }}{% else %}
-                                {{ _("Connect Estonian ID card:") }}{% endif %}</td>
-                            <td><a
-                                    {% if id_connected %}disabled{% endif %}
-                                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                    {% if not id_connected %}
-                                    href="{{ url_for("login_page.log_user_in_with_cert") }}"
-                                    {% else %}
-                                    href="#"
-                                    {% endif %}>
-                                {% if id_connected %}
-                                    {{ _("Linked") }}
-                                {% else %}
-                                    {{ _("Link") }}
-                                {% endif %}
-                            </a>
-                            </td>
-                        </tr>
-                    {% endif %}
-
-                    {% if config.GOOGLE_OAUTH %}
-                        <tr>
-                            <td>{% if google_connected %}{{ _("Google account is linked") }}{% else %}
-                                {{ _("Connect Google account:") }}{% endif %}</td>
-                            <td><a
-                                    {% if google_connected %}disabled{% endif %}
-                                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                    {% if not google_connected %}
-                                    href="{{ url_for("login_page.google_login") }}"
-                                    {% else %}
-                                    href="#"
-                                    {% endif %}>
-                                {% if google_connected %}
-                                    {{ _("Linked") }}
-                                {% else %}
-                                    {{ _("Link") }}
-                                {% endif %}
-                            </a>
-                            </td>
-                        </tr>
-                    {% endif %}
-
-                    {% if config.GITHUB_OAUTH %}
-                        <tr>
-                            <td>{% if github_connected %}{{ _("Github account is linked") }}{% else %}
-                                {{ _("Connect Github account:") }}{% endif %}</td>
-                            <td><a
-                                    {% if github_connected %}disabled{% endif %}
-                                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                    {% if not github_connected %}
-                                    href="{{ url_for("login_page.github_login") }}"
-                                    {% else %}
-                                    href="#"
-                                    {% endif %}>
-                                {% if github_connected %}
-                                    {{ _("Linked") }}
-                                {% else %}
-                                    {{ _("Link") }}
-                                {% endif %}
-                            </a>
-                            </td>
-                        </tr>
-                    {% endif %}
-
-
-                    {% if config.FACEBOOK_OAUTH %}
-                        <tr>
-                            <td>{% if facebook_connected %}{{ _("Facebook account is linked") }}{% else %}
-                                {{ _("Connect Facebook account:") }}{% endif %}</td>
-                            <td><a
-                                    {% if facebook_connected %}disabled{% endif %}
-                                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                    {% if not facebook_connected %}
-                                    href="{{ url_for("login_page.facebook_login") }}"
-                                    {% else %}
-                                    href="#"
-                                    {% endif %}>
-                                {% if facebook_connected %}
-                                    {{ _("Linked") }}
-                                {% else %}
-                                    {{ _("Link") }}
-                                {% endif %}
-                            </a>
-                            </td>
-                        </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
-            {% endif %}
-
+    <div class="mdl-layout__tab-panel" id="personal">
+        <div class="mdl-card__supporting-text mdl-card mdl-cell mdl-shadow--2dp mdl-cell--12-col mdl-cell--12-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
             <p>{{ _("Your language:") }}</p>
-            <form method="post" action="./setlanguage">
-                <select class="mdl-textfield__input" id="language" name="language">
+            <form method="post" action="/setlanguage">
+                <p><select class="mdl-textfield__input" id="language" name="language">
                     <option value="{{ user_language }}">{{ user_language }}</option>
                     <option value="ee">{{ _("Estonian") }}</option>
                     <option value="en">{{ _("English") }}</option>
-                </select>
-                <input type="submit"
-                       class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       value={{ _("Send") }}>
+                </select></p>
+                <p><input type="submit"
+                          class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                          value={{ _("Send") }}></p>
             </form>
-
-            {% if in_family %}
-                <p>{{ _("Your families:") }}</p>
-                <table class="mdl-data-table">
-                    <thead>
-                    <tr>
-                        <th>{{ _("Family") }}</th>
-                        {% if group_admin %}
-                            <th>{{ _("ID") }}</th>
-                        {% endif %}
-                        <th>{{ _("Options") }}</th>
-                        {% if family_admin %}
-                            <th></th>
-                        {% endif %}
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for name, family in families.items() %}
-                        <tr>
-                            <td>{{ name }}</td>
-                            {% if family[1] %}
-                                <td>
-                                    <div class="mdl-textfield mdl-js-textfield">
-                                        <input class="mdl-textfield__input" type="text" id="user_id"
-                                               value="{{ family[0] }}"
-                                               disabled>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="/editfam/{{ family[0] }}">{{ _("Change / Display") }}</a>
-                                </td>
-                                <td>
-                                    <form method="post"
-                                          action="{{ url_for("edit_page.editfam_with_action", family_id=family[0]) }}">
-                                        <input name="action" type="hidden" value="DELETEFAM">
-                                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                                name="id" type="submit">{{ _("Delete") }}</button>
-                                    </form>
-                                </td>
-                            {% else %}
-                                <td>
-                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="{{ url_for("edit_page.editfamily", family_id=family[0]) }}">{{ _("Display") }}</a>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-
-            {% if in_group %}
-                <p>{{ _("Your groups:") }}</p>
-                <table class="mdl-data-table">
-                    <thead>
-                    <tr>
-                        <th>{{ _("Group") }}</th>
-                        {% if group_admin %}
-                            <th>{{ _("ID") }}</th>
-                        {% endif %}
-                        <th>{{ _("Options") }}</th>
-                        {% if group_admin %}
-                            <th></th>
-                        {% endif %}
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {% for name, group in groups.items() %}
-                        <tr>
-                            <td>{{ name }}</td>
-                            {% if group[1] %}
-                                <td>
-                                    <div class="mdl-textfield mdl-js-textfield">
-                                        <input class="mdl-textfield__input" type="text" id="user_id"
-                                               value="{{ group[0] }}"
-                                               disabled>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="./editgroup?id={{ group[0] }}">{{ _("Change / Display") }}</a>
-                                </td>
-                                <td>
-                                    <form method="post" action="./editgroup">
-                                        <input name="action" type="hidden" value="DELETEGROUP">
-                                        <input name="extra_data" type="hidden" value="{{ group[0] }}">
-                                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                                name="id" type="submit"
-                                                value="{{ group[0] }}">{{ _("Delete") }}</button>
-                                    </form>
-                                </td>
-                            {% else %}
-                                <td>
-                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                                       href="./editgroup?id={{ group[0] }}">{{ _("Display") }}</a>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
         </div>
+    </div>
+
+    <div class="mdl-layout__tab-panel" id="security">
+        {% if config.ESTEID_AUTH or config.GOOGLE_OAUTH or config.FACEBOOK_OAUTH or config.GITHUB_OAUTH %}
+            <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
+                <tbody>
+                <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Link Status") }}</th>
+                <th class="mdl-data-table__cell--non-numeric">{{ _("Action") }}</th>
+                {% if config.ESTEID_AUTH %}
+                    <tr>
+                        <td class="custom-white-space mdl-card__supporting-text mdl-data-table__cell--non-numeric">
+                            {% if id_connected %}{{ _("Estonian ID card is linked") }}{% else %}
+                                {{ _("Connect Estonian ID card:") }}{% endif %}</td>
+                        <td class="mdl-data-table__cell--non-numeric"><a
+                                {% if id_connected %}disabled{% endif %}
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                {% if not id_connected %}
+                                href="{{ url_for("login_page.log_user_in_with_cert") }}"
+                                {% else %}
+                                href="#"
+                                {% endif %}>
+                            {% if id_connected %}
+                                {{ _("Linked") }}
+                            {% else %}
+                                {{ _("Link") }}
+                            {% endif %}
+                        </a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if config.GOOGLE_OAUTH %}
+                    <tr>
+                        <td class="custom-white-space mdl-card__supporting-text mdl-data-table__cell--non-numeric">
+                            {% if google_connected %}{{ _("Google account is linked") }}{% else %}
+                                {{ _("Connect Google account:") }}{% endif %}</td>
+                        <td class="mdl-data-table__cell--non-numeric"><a
+                                {% if google_connected %}disabled{% endif %}
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                {% if not google_connected %}
+                                href="{{ url_for("login_page.google_login") }}"
+                                {% else %}
+                                href="#"
+                                {% endif %}>
+                            {% if google_connected %}
+                                {{ _("Linked") }}
+                            {% else %}
+                                {{ _("Link") }}
+                            {% endif %}
+                        </a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {% if config.GITHUB_OAUTH %}
+                    <tr>
+                        <td class="custom-white-space mdl-card__supporting-text mdl-data-table__cell--non-numeric">
+                            {% if github_connected %}{{ _("Github account is linked") }}{% else %}
+                                {{ _("Connect Github account:") }}{% endif %}</td>
+                        <td class="mdl-data-table__cell--non-numeric"><a
+                                {% if github_connected %}disabled{% endif %}
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                {% if not github_connected %}
+                                href="{{ url_for("login_page.github_login") }}"
+                                {% else %}
+                                href="#"
+                                {% endif %}>
+                            {% if github_connected %}
+                                {{ _("Linked") }}
+                            {% else %}
+                                {{ _("Link") }}
+                            {% endif %}
+                        </a>
+                        </td>
+                    </tr>
+                {% endif %}
+
+
+                {% if config.FACEBOOK_OAUTH %}
+                    <tr>
+                        <td class="custom-white-space mdl-card__supporting-text mdl-data-table__cell--non-numeric">
+                            {% if facebook_connected %}{{ _("Facebook account is linked") }}{% else %}
+                                {{ _("Connect Facebook account:") }}{% endif %}</td>
+                        <td class="mdl-data-table__cell--non-numeric"><a
+                                {% if facebook_connected %}disabled{% endif %}
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                {% if not facebook_connected %}
+                                href="{{ url_for("login_page.facebook_login") }}"
+                                {% else %}
+                                href="#"
+                                {% endif %}>
+                            {% if facebook_connected %}
+                                {{ _("Linked") }}
+                            {% else %}
+                                {{ _("Link") }}
+                            {% endif %}
+                        </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="mdl-layout__tab-panel" id="manage">
+
     </div>
 {% endblock %}
 

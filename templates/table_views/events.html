@@ -22,10 +22,14 @@
         {% for event in events %}
             <tr>
                 <td>{{ event["id"] }}</td>
-                <td>{{ event["name"] }}</td>
+                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                       href="/event/{{ event["id"] }}">
+                    {{ event["name"] }}</a></td>
                 <td>{{ event["created_at"] }}</td>
                 <td>{{ event["event_at"] }}</td>
-                <td>{{ event["group_id"] }}</td>
+                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                       href="/group/{{ event["group_id"] }}">
+                    {{ event["group_id"] }}</a></td>
                 <td>{{ event["event_type"] }}</td>
             </tr>
         {% endfor %}

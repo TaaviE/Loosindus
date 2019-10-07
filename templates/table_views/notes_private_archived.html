@@ -4,8 +4,7 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        {# TODO: Turn "group" into a proper link #}
-        <p>{{ _("Here is your personal wishlist, this can be viewed by anyone in your groups, including your personal santa") }}🎄</p>
+        <p>{{ _("Here are your archived wishlist items") }}🎄</p>
     </div>
 {% endblock %}
 
@@ -30,34 +29,10 @@
     <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
-        {% if not empty %}
-            <th class="mdl-data-table__cell--non-numeric">{{ _("Delete") }}</th>
-            <th class="mdl-data-table__cell--non-numeric">{{ _("Edit") }}</th>
-        {% else %}
-            <th class="mdl-data-table__cell--non-numeric"></th>
-            <th class="mdl-data-table__cell--non-numeric"></th>
-        {% endif %}
-
         {% for item, id in list.items() %}
             <tr>
                 <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
-                {% if not empty %}
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <form method="post" action="./removenote">
-                            <input name="action" type="hidden" value="DELETENOTE">
-                            <input name="extra_data" type="hidden" value="{{ id }}">
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                    type="submit">{{ _("Delete") }}</button>
-                        </form>
-                    </td>
-                    <td class="mdl-data-table__cell--non-numeric">
-                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="./editnote?id={{ id }}">{{ _("Edit") }}</a>
-                    </td>
-                {% else %}
-                    <td class="mdl-data-table__cell--non-numeric"></td>
-                    <td class="mdl-data-table__cell--non-numeric"></td>
-                {% endif %}
+                <td></td>
             </tr>
         {% endfor %}
         </tbody>

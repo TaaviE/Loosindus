@@ -460,10 +460,9 @@ def archived_notes():
         notes_from_file = {_("Right now there's nothing in the Wishlist"): ("", "")}
         empty = True
 
-    return render_template("table_views/notes_private.html",
+    return render_template("table_views/notes_private_archived.html",
                            list=notes_from_file,
                            empty=empty,
-                           archived=True,
                            title=_("My Wishlist"))
 
 

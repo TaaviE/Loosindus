@@ -37,7 +37,7 @@
     <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
-        {% if not empty and not archived %}
+        {% if not empty %}
             <th class="mdl-data-table__cell--non-numeric">{{ _("Delete") }}</th>
             <th class="mdl-data-table__cell--non-numeric">{{ _("Edit") }}</th>
         {% else %}
@@ -48,7 +48,7 @@
         {% for item, id in list.items() %}
             <tr>
                 <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
-                {% if not empty and not archived %}
+                {% if not empty %}
                     <td class="mdl-data-table__cell--non-numeric">
                         <form method="post" action="{{ url_for("edit_page.note_remove", request_id=id) }}">
                             <input name="action" type="hidden" value="DELETENOTE">
@@ -63,6 +63,7 @@
                 {% else %}
                     <td class="mdl-data-table__cell--non-numeric">{{ _("There's no wishlist items here") }}</td>
                     <td class="mdl-data-table__cell--non-numeric"></td>
+                    <td></td>
                 {% endif %}
             </tr>
         {% endfor %}

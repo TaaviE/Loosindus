@@ -1,4 +1,4 @@
-<header class="mdl-layout__header {% if scroll_header %}mdl-layout__header--scroll{% endif %}">
+<header class="mdl-layout__header {% if scroll_header %}mdl-layout__header--scroll {% else %}mdl-layout--fixed-header {% endif %}mdl-layout--fixed-tabs">
     <div class="mdl-layout__header-row">
         <span class="mdl-layout-title">{{ title }}</span>
         <div class="mdl-layout-spacer"></div>
@@ -25,43 +25,54 @@
             </label>
         {% endif %}
     </div>
+
+    {% if tabs_bar %}
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
+            <a href="#overview" class="mdl-layout__tab is-active">Overview</a>
+            <a href="#personal" class="mdl-layout__tab">Personal</a>
+            <a href="#security" class="mdl-layout__tab">Account & Security</a>
+            <a href="#manage" class="mdl-layout__tab">Management</a>
+        </div>
+    {% endif %}
 </header>
 
 {% if not no_sidebar %}
     <div class="mdl-layout__drawer">
         <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="{{ url_for("static_page.home") }}">
+                <i class="material-icons">list</i> {{ _("Dashboard") }}</a>
             <div class="mdl-layout-spacer mdl-card__supporting-text">Shortcuts</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.notes") }}">
-                <i class="material-icons" role="presentation">list</i> {{ _("My Wishlist") }}</a>
+                <i class="material-icons">list</i> {{ _("My Wishlist") }}</a>
             {% if target %}
                 <a class="mdl-navigation__link" href="/wishlist/{{ target["group_id"] }}/{{ target["user_id"] }}">
-                    <i class="material-icons" role="presentation">list</i> {{ _("Receiver's Wishlist") }}</a>
+                    <i class="material-icons">list</i> {{ _("Receiver's Wishlist") }}</a>
             {% endif %}
             <div class="mdl-layout-spacer mdl-card__supporting-text">Overview</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.shuffles") }}">
-                <i class="material-icons" role="presentation">cached</i> {{ _("Shuffles") }}</a>
+                <i class="material-icons">cached</i> {{ _("Shuffles") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.families") }}">
-                <i class="material-icons" role="presentation">people</i> {{ _("Families") }}</a>
+                <i class="material-icons">people</i> {{ _("Families") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.groups") }}">
-                <i class="material-icons" role="presentation">group_work</i> {{ _("Groups") }}</a>
+                <i class="material-icons">group_work</i> {{ _("Groups") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.events") }}">
-                <i class="material-icons" role="presentation">event</i> {{ _("Events") }}</a>
+                <i class="material-icons">event</i> {{ _("Events") }}</a>
             <a class="mdl-navigation__link custom-disable-link" href="{{ url_for("main_page.reminders") }}">
-                <i class="material-icons" role="presentation">alarm</i> {{ _("Reminders") }}</a>
+                <i class="material-icons">alarm</i> {{ _("Reminders") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.notifications") }}">
-                <i class="material-icons" role="presentation">notification_important</i> {{ _("Notifications") }}</a>
+                <i class="material-icons">notification_important</i> {{ _("Notifications") }}</a>
             <a class="mdl-navigation__link custom-disable-link" href="{{ url_for("main_page.subscriptions") }}">
-                <i class="material-icons" role="presentation">attach_money</i> {{ _("Subscriptions") }}</a>
+                <i class="material-icons">attach_money</i> {{ _("Subscriptions") }}</a>
             <div class="mdl-layout-spacer mdl-card__supporting-text">Personal</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.settings") }}">
-                <i class="material-icons" role="presentation">settings</i> {{ _("Settings") }}</a>
+                <i class="material-icons">settings</i> {{ _("Settings") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("login_page.logout") }}">
-                <i class="material-icons" role="presentation">exit_to_app</i> {{ _("Log out") }}</a>
+                <i class="material-icons">exit_to_app</i> {{ _("Log out") }}</a>
             <div class="mdl-layout-spacer mdl-card__supporting-text">Help & Support</div>
             <a class="mdl-navigation__link custom-disable-link" href="{{ url_for("static_page.help_page") }}">
-                <i class="material-icons" role="presentation">help</i> {{ _("Help") }}</a>
+                <i class="material-icons">help</i> {{ _("Help") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("static_page.feedback") }}">
-                <i class="material-icons" role="presentation">feedback</i> {{ _("Feedback") }}</a>
+                <i class="material-icons">feedback</i> {{ _("Feedback") }}</a>
         </nav>
     </div>
 {% endif %}

@@ -7,39 +7,42 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <h5>{{ _("This page shows you all the people you should be making a gift") }}</h5>
+        <p>{{ _("This page shows you all the people you should be making a gift") }}</p>
     </div>
 {% endblock %}
 
 {% block content %}
-    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
-        <tbody>
-        <tr>
-            <th>{{ _("From") }}</th>
-            <th>{{ _("To") }}</th>
-            <th>{{ _("Event name") }}</th>
-            <th>{{ _("Group") }}</th>
-            <th></th>
-        </tr>
-        {% for shuffle in active_shuffles %}
-            <tr>
-                <td>{{ shuffle["giver_name"] }}</td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="/wishlist/{{ shuffle["getter"] }}">
-                    {{ shuffle["getter_name"] }}</a></td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                       href="/event/{{ shuffle["event_id"] }}">
-                    {{ shuffle["event_name"] }}</a></td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                       href="/group/{{ shuffle["group_id"] }}">
-                    {{ shuffle["group_name"] }}</a></td>
-                <td></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>{{ _("Older shuffles") }}</p>
+        <h3>{{ _("Current shuffles") }}</h3>
+        <table class="mdl-data-table mdl-js-data-table">
+            <tbody>
+            <tr>
+                <th>{{ _("From") }}</th>
+                <th>{{ _("To") }}</th>
+                <th>{{ _("Event name") }}</th>
+                <th>{{ _("Group") }}</th>
+                <th></th>
+            </tr>
+            {% for shuffle in active_shuffles %}
+                <tr>
+                    <td>{{ shuffle["giver_name"] }}</td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="/wishlist/{{ shuffle["getter"] }}">
+                        {{ shuffle["getter_name"] }}</a></td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                           href="/event/{{ shuffle["event_id"] }}">
+                        {{ shuffle["event_name"] }}</a></td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                           href="/group/{{ shuffle["group_id"] }}">
+                        {{ shuffle["group_name"] }}</a></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600">
+        <h6>{{ _("Older shuffles") }}</h6>
         <table class="mdl-data-table mdl-js-data-table">
             <tbody>
             <tr>
