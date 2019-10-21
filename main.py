@@ -63,6 +63,7 @@ sentry_sdk.init(Config.SENTRY_PUBLIC_DSN,
                               CeleryIntegration(),
                               FlaskIntegration(),
                               RedisIntegration()],
+                send_default_pii=True,
                 debug=Config.DEBUG,
                 release=Config.CURRENT_GIT_SHA)
 
