@@ -584,7 +584,7 @@ def wishlist(person_id: str, group_id: str = None):
     except ValueError as e:
         sentry_sdk.capture_exception(e)
     except Exception as e:
-        currentnotes = [{}]
+        currentnotes = []
         invalid_notes = True
         logger.info("Error displaying notes, there might be none: {}".format(e))
 
