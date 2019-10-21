@@ -26,19 +26,19 @@
         </form>
         <p></p>
         {% if config.GITHUB_OAUTH %}
-            <p><a href="{{ url_for("main_page.github_signup") }}"
+            <p><a href="{{ url_for("login_page.github_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Github") }}</a></p>
         {% endif %}
 
         {% if config.GOOGLE_OAUTH %}
-            <p><a href="{{ url_for("main_page.google_signup") }}"
+            <p><a href="{{ url_for("login_page.google_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Google") }}</a></p>
         {% endif %}
 
         {% if config.FACEBOOK_OAUTH %}
-            <p><a href="{{ url_for("main_page.facebook_signup") }}"
+            <p><a href="{{ url_for("login_page.facebook_signup") }}"
                   class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
             >{{ _("Sign up using Facebook") }}</a></p>
         {% endif %}

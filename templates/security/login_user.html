@@ -19,9 +19,9 @@
         </form>
 
         {% if config.ESTEID_AUTH %}
-        <p><a href="{{ url_for("main_page.log_user_in_with_cert") }}"
-              class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-        >{{ _("Log in using Estonian ID card") }}</a></p>
+            <p><a href="{{ url_for("login_page.log_user_in_with_cert") }}"
+                  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+            >{{ _("Log in using Estonian ID card") }}</a></p>
         {% endif %}
 
         {% if config.GITHUB_OAUTH %}
