@@ -7,7 +7,7 @@ Contains all of the routes that display an edit or
 from logging import getLogger
 
 import sentry_sdk
-from flask import Blueprint, redirect, render_template, request, session
+from flask import Blueprint, redirect, render_template, request, session, url_for
 from flask_babelex import gettext as _
 from flask_login import current_user, login_required
 from sqlalchemy import and_
@@ -36,7 +36,7 @@ def createnote():
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
-                           endpoint="createnote",
+                           endpoint=url_for("edit_page.note_add_new"),
                            row_count=3,
                            label=_("Your wish"),
                            placeholder="")
@@ -74,7 +74,7 @@ def note_edit_get(request_id: str):
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
-                           endpoint=db_note.id,
+                           endpoint=url_for("edit_page.note_edit", request_id=request_id),
                            row_count=3,
                            extra_data=request_id,
                            label=_("Your wish"),

@@ -15,7 +15,7 @@
 {% block content %}
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-            <form method="post" action="./{{ endpoint }}">
+            <form method="post" action="{{ endpoint }}">
                 <div class="mdl-textfield mdl-js-textfield">
                     <input name="action" type="hidden" value="{{ action }}">
                     {# <!--suppress HtmlFormInputWithoutLabel --> #}
