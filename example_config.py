@@ -16,7 +16,7 @@ class Config(object):
     SENTRY_PUBLIC_DSN = ""  # The full DSN given without(!) the private key
     SENTRY_PUBLIC_KEY = ""  # TODO: The hash part
 
-    CURRENT_GIT_SHA = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).strip()
+    CURRENT_GIT_SHA = subprocess.check_output(["git", "rev-parse", "HEAD"]).strip()
 
     AES_KEY = b""  # TODO: Update AES key
     SECRET_KEY = ""  # TODO: Update secret key info
