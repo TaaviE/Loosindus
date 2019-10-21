@@ -17,7 +17,7 @@
     <table class="custom-wrap mdl-card mdl-shadow--2dp mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-cell mdl-cell--12-col-desktop mdl-cell--8-col-tablet mdl-cell--6-col-phone">
         <tbody>
         <th class="mdl-data-table__cell--non-numeric mdl-textfield--full-width">{{ _("Description") }}</th>
-        {% if notes|length > 1 %}
+        {% if notes|length > 0 %}
             {% if not invalid %}
                 <th class="mdl-data-table__cell--non-numeric">{{ _("Status") }}</th>
                 <th class="mdl-data-table__cell--non-numeric">{{ _("By whom") }}</th>
