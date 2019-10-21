@@ -87,6 +87,10 @@ venv*/
 ENV/
 env/
 
+# Node
+node_modules/
+package-lock.json
+
 # Spyder project settings
 .spyderproject
 .spyproject

@@ -133,7 +133,7 @@ def note_remove(request_id: str):
     if "confirm" not in request.form.keys():
         return render_template("creatething.html",
                                action="DELETE",
-                               endpoint="removenote",
+                               endpoint=url_for("edit_page.note_remove", request_id=request_id),
                                extra_data=request_id,
                                confirm=True)
 
@@ -152,7 +152,8 @@ def note_remove(request_id: str):
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
-                               message=_("Can't find what you wanted to delete"),
+                               message=_(
+                                   "Can't find what you wanted to delete or some other error occured while deleting"),
                                title=_("Error"))
 
     logger.info("Removed {} note with ID {}".format(username, request_id))
@@ -339,7 +340,7 @@ def group_edit(group_id: str):
     :param group_id: The Group ID that is being edited
     """
     user_id = int(session["user_id"])
-    endpoint = "editgroup"
+    endpoint = url_for("edit_page.group_edit")
     if "action" not in request.form.keys():
         return render_template("utility/error.html",
                                message=_("An error has occured"),
@@ -480,7 +481,7 @@ def editfam_with_action():
     Deals with all the possible modifications to a family
     """
     user_id = int(session["user_id"])
-    endpoint = "editfam"
+    endpoint = url_for("edit_page.editfam_with_action")
     if "action" not in request.form.keys():
         return render_template("utility/error.html",
                                message=_("An error has occured"),
