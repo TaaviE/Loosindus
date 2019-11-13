@@ -42,6 +42,11 @@ class AuditEvent(db.Model):
     user_id: int = Column(Integer(), ForeignKey(Group.id), nullable=False)
     ip: str = Column(VARCHAR(255), nullable=False)
 
+    def __init__(self, event_type_id: int, user_id: int, ip: str = None):
+        self.event_type_id = event_type_id
+        self.user_id = user_id
+        self.ip = ip
+
     def __str__(self):
         return "{" \
                "\"id\": {id}, " \

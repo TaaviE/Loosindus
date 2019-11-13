@@ -47,40 +47,54 @@ class User(db.Model, UserMixin):
 
     families: List[Family] = relationship(
         Family,
-        secondary="users_families_admins",
+        secondary="users_families",
         backref=backref("User", lazy="dynamic")
     )
 
     @property
     def last_login_ip(self):
-        return
+        try:
+            return AuditEvent.query.filter(and_(AuditEvent.type_id == audit_event_type_to_id["last_login"],
+                                                AuditEvent.user_id == self.id)).order_by("when").limit(1).one().ip
+        except Exception:
+            return ""
 
     @last_login_ip.setter
     def last_login_ip(self, value):
+        AuditEvent(audit_event_type_to_id["last_login"], self.id, value)
         self.last_login_ip = value
 
     @property
     def last_login_at(self):
-        return
+        try:
+            return AuditEvent.query.filter(and_(AuditEvent.type_id == audit_event_type_to_id["last_login"],
+                                                AuditEvent.user_id == self.id)).order_by("when").limit(1).one().when
+        except Exception:
+            return ""
 
     @last_login_at.setter
     def last_login_at(self, value):
-        self.last_login_at = value
+        # This is already set when last_login_ip is set
+        return None
 
     @property
     def current_login_at(self):
+        # TODO:
         return
 
     @current_login_at.setter
     def current_login_at(self, value):
+        # TODO:
         self.current_login_at = value
 
     @property
     def current_login_ip(self):
+        # TODO:
         return
 
     @current_login_ip.setter
     def current_login_ip(self, value):
+        # TODO:
         self.current_login_ip = value
 
     def __init__(self, email, username, password, active=False):
@@ -154,7 +168,7 @@ class UserFamilyAdmin(db.Model):
     @param admin: if the user is the admin of the family
     """
 
-    __tablename__ = "users_families_admins"
+    __tablename__ = "families_admins"
     user_id: int = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False)
     family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
     admin: bool = Column(Boolean, nullable=False)
@@ -169,25 +183,20 @@ class UserFamilyAdmin(db.Model):
         return "<user_id {}>".format(self.user_id)
 
 
-class UserGroupAdmin(db.Model):
-    """
-    Specifies how user-group-admin relationships are modeled in the database
-
-    @param user_id: user's ID
-    @param group_id: family_id where the family belongs ID
-    @param admin: if the user is the adming of the group
+class UserFamily(db.Model):
     """
 
-    __tablename__ = "users_groups_admins"
+    """
+
+    __tablename__ = "users_families"
     user_id: int = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
-    group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False)
+    family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
     confirmed: bool = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, user_id: int, group_id: int, admin: bool):
+    def __init__(self, user_id: int, family_id: int, confirmed: bool):
         self.user_id = user_id
-        self.group_id = group_id
-        self.admin = admin
+        self.family_id = family_id
+        self.confirmed = confirmed
 
     def __repr__(self):
-        return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)
+        return "<user_id {}, family_id {}>".format(self.user_id, self.group_id)

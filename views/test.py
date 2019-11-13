@@ -49,3 +49,10 @@ def test_mail():
                            action=_("Sent"),
                            link="./testmail",
                            title=_("Sent"))
+
+"""
+@test_page.route("/testlogin/<user_id>")
+def test_login(user_id):
+    login_user(User.query.get(int(user_id)))
+    return ""
+"""
