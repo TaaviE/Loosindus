@@ -199,6 +199,7 @@ def note_add_new():
         raise e
 
     if len(currentnotes) >= 200:
+        logger.info("User {user_id} wanted to add too many notes".format(user_id=user_id))
         return render_template("utility/error.html",
                                message=_("You're wishing for too much, ") + username + ".",
                                title=_("Error"))
@@ -212,9 +213,11 @@ def note_add_new():
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
+        logger.error("User {user_id} caused an error adding a note to database".format(user_id=user_id))
         sentry_sdk.capture_exception(e)
         raise e
 
+    logger.info("User {user_id} successfully added a note to database".format(user_id=user_id))
     return render_template("utility/success.html",
                            action=_("Added"),
                            link="./notes",
