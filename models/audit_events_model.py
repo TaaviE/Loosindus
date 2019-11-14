@@ -15,7 +15,6 @@ class AuditEventType(db.Model):
     """
     Specifies how event types are stored in the database
     """
-
     __tablename__ = "audit_events_types"
 
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
