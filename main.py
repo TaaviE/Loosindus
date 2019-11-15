@@ -28,7 +28,6 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import relationship
 from sqlalchemy.schema import CreateColumn
 
 from config import Config
@@ -68,15 +67,8 @@ sentry_sdk.init(Config.SENTRY_PUBLIC_DSN,
                 release=Config.CURRENT_GIT_SHA)
 
 from models.users_model import User, Role
-from models.events_model import ShufflingEvent
-from models.family_model import Group, Family
 
 from flask_security import SQLAlchemyUserDatastore, Security
-
-Group.events = relationship(ShufflingEvent)  # Because circular deps
-
-Family.members = relationship(User, secondary="users_families_admins")
-
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 security = Security(app,

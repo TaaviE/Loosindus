@@ -159,7 +159,7 @@ class Password(db.Model):
     created: datetime = Column(DateTime, default=datetime.now(), nullable=False)
 
 
-class UserFamilyAdmin(db.Model):
+class FamilyAdmin(db.Model):
     """
     Specifies how user-family (admin) relationships are modeled in the database
 
