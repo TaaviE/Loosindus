@@ -100,16 +100,17 @@ def calculate_shuffle(self, people, connections):
         try:
             db.session.add(db_entry_shuffle)
             db.session.commit()
-        except Exception:
+        except Exception as e:
             db.session.rollback()
+            sentry_sdk.capture_exception(e)
+
             try:
                 row = Shuffle.query.filter(and_(Shuffle.giver == user_number_to_user_id[giver],
                                                 Shuffle.year == time_right_now.year)).one()
                 if row.getter != user_number_to_user_id[getter]:
                     row.getter = user_number_to_user_id[getter]
                     db.session.commit()
-            except Exception:
+            except Exception as e2:
                 db.session.rollback()
-
-            sentry_sdk.capture_exception(e)
+                sentry_sdk.capture_exception(e2)
     return
