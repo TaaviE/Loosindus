@@ -40,6 +40,30 @@ class Group(db.Model):
         return "<id {}>".format(self.id)
 
 
+class GroupAdmin(db.Model):
+    """
+    Specifies how user-group-admin relationships are modeled in the database
+
+    @param user_id: user's ID
+    @param group_id: family_id where the family belongs ID
+    @param admin: if the user is the adming of the group
+    """
+
+    __tablename__ = "groups_admins"
+    user_id: int = Column(Integer, ForeignKey("User.id"), primary_key=True, unique=True, nullable=False)
+    group_id: int = Column(Integer, ForeignKey("Group.id"), primary_key=True, nullable=False)
+    admin: bool = Column(Boolean, nullable=False)
+    confirmed: bool = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, user_id: int, group_id: int, admin: bool):
+        self.user_id = user_id
+        self.group_id = group_id
+        self.admin = admin
+
+    def __repr__(self):
+        return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)
+
+
 class Family(db.Model):
     """
     Specifies how families are modeled in the database
@@ -90,4 +114,3 @@ class FamilyGroup(db.Model):
 
     def __repr__(self):
         return "<id {}>".format(self.family_id)
-

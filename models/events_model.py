@@ -2,6 +2,7 @@
 """
 Contains all the models related to events organized in one specific group
 """
+from __future__ import annotations
 
 from datetime import datetime
 
@@ -70,3 +71,26 @@ class ShufflingEvent(db.Model):
 
     def __hash__(self):
         return hash(str(self))
+
+
+class EventAdmin(db.Model):
+    """
+    Specifies how event admin relationships are modeled in the database
+
+    @param user_id: user's ID
+    @param event_id: event_id where the family belongs ID
+    @param admin: if the user is the adming of the group
+    """
+    __tablename__ = "events_admins"
+    user_id: int = Column(Integer, ForeignKey("User.id"), primary_key=True, unique=True, nullable=False)
+    event_id: int = Column(Integer, ForeignKey("ShufflingEvent.id"), primary_key=True, nullable=False)
+    admin: bool = Column(Boolean, nullable=False)
+    confirmed: bool = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, user_id: int, group_id: int, admin: bool):
+        self.user_id = user_id
+        self.group_id = group_id
+        self.admin = admin
+
+    def __repr__(self):
+        return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)
