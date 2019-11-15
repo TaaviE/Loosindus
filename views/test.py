@@ -10,6 +10,7 @@ from flask import Blueprint, render_template
 from flask_babelex import gettext as _
 from flask_login import login_required
 from flask_mail import Message
+from flask_security import roles_required
 
 from config import Config
 from views.static import error_500
@@ -24,6 +25,7 @@ test_page = Blueprint("test_page",
 
 @test_page.route("/testerror/<err>", defaults={"err": "404"})
 @login_required
+@roles_required("Tester")
 def test_err(err):
     """
     Returns the specific error code's error
@@ -33,6 +35,7 @@ def test_err(err):
 
 @test_page.route("/testmail")
 @login_required
+@roles_required("Tester")
 def test_mail():
     """
     Allows testing mail sending to self
