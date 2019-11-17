@@ -5,34 +5,19 @@ Contains all the models related to events organized in one specific group
 from __future__ import annotations
 
 from datetime import datetime
+from typing import List
 
-from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
+from sqlalchemy import BigInteger, Boolean, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
+from sqlalchemy.orm import relationship
 
 from main import db
 from models.family_model import Group
-
-
-class ShufflingEventType(db.Model):
-    """
-    Specifies how event types are stored in the database
-    """
-
-    __tablename__ = "event_types"
-
-    id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name: str = Column(VARCHAR(), nullable=True)
-
-
-event_type_to_id: dict = {}
-for event_type in ShufflingEventType.query.all():
-    event_type_to_id[event_type.name.lower().replace(" ", "_")] = event_type.id
 
 
 class ShufflingEvent(db.Model):
     """
     Specifies how events are stored in the database
     """
-
     __tablename__ = "events"
 
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
@@ -40,7 +25,11 @@ class ShufflingEvent(db.Model):
     name: str = Column(VARCHAR(255), nullable=False)
     event_at: datetime = Column(TIMESTAMP(), nullable=True)
     group_id: int = Column(Integer(), ForeignKey(Group.id), nullable=False)
-    event_type: int = Column(Integer(), ForeignKey(ShufflingEventType.id), nullable=False)
+    event_type: int = Column(Integer(), ForeignKey("event_types.id"), nullable=False)
+
+    admins: List[User] = relationship("User",
+                                      secondary="events_admins",
+                                      backref="events_administered")
 
     def __str__(self):
         return "{" \
@@ -60,6 +49,9 @@ class ShufflingEvent(db.Model):
         )
 
     def as_dict(self):
+        """
+        Returns a dictionary of the event with all relevant information
+        """
         return {
             "id": self.id,
             "created_at": self.created_at,
@@ -75,22 +67,13 @@ class ShufflingEvent(db.Model):
 
 class EventAdmin(db.Model):
     """
-    Specifies how event admin relationships are modeled in the database
-
-    @param user_id: user's ID
-    @param event_id: event_id where the family belongs ID
-    @param admin: if the user is the adming of the group
+    Specifies how user-event administration relationships are modeled in the database
     """
     __tablename__ = "events_admins"
-    user_id: int = Column(Integer, ForeignKey("User.id"), primary_key=True, unique=True, nullable=False)
-    event_id: int = Column(Integer, ForeignKey("ShufflingEvent.id"), primary_key=True, nullable=False)
+    user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, unique=True, nullable=False)
+    event_id: int = Column(Integer, ForeignKey("events.id"), primary_key=True, nullable=False)
     admin: bool = Column(Boolean, nullable=False)
     confirmed: bool = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, user_id: int, group_id: int, admin: bool):
-        self.user_id = user_id
-        self.group_id = group_id
-        self.admin = admin
 
     def __repr__(self):
         return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)

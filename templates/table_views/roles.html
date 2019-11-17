@@ -10,19 +10,22 @@
 {% endblock %}
 
 {% block content %}
-    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
-    <table class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col mdl-card__supporting-text mdl-color-text--grey-600 mdl-data-table mdl-js-data-table mdl-shadow--2dp">
-        <tbody>
-        <tr>
-            <th>{{ _("Role") }}</th>
-            <th>{{ _("Description") }}</th>
-        </tr>
-        {% for role in roles %}
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">{{ _("Roles") }}</h2>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table custom-fill">
+            <tbody>
             <tr>
-                <td>{{ role["role"] }}</td>
-                <td>{{ role["description"] }}</td>
+                <th>{{ _("Role") }}</th>
+                <th>{{ _("Description") }}</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            {% for role in roles %}
+                <tr>
+                    <td>{{ role["role"] }}</td>
+                    <td>{{ role["description"] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 {% endblock %}

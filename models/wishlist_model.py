@@ -5,6 +5,7 @@ from flask_babelex import gettext as _
 from sqlalchemy import BigInteger, Column, FetchedValue, ForeignKey, Integer, TIMESTAMP, VARCHAR
 
 from main import db
+from models.enums import wishlist_status_to_id
 # To make sure these strings get translated
 from models.events_model import ShufflingEvent
 from models.users_model import User
@@ -14,20 +15,6 @@ reserved = _("Reserved")
 purchased = _("Purchased")
 modified = _("Modified")
 archived = _("Archived")
-
-
-class WishlistStatusType(db.Model):
-    """
-    Specifies the different states a note can be in
-    """
-    __tablename__ = "wishlist_status_types"
-    id: int = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name: str = Column(VARCHAR(255), nullable=False)
-
-
-wishlist_status_to_id = {}
-for status in WishlistStatusType.query.all():
-    wishlist_status_to_id[status.name.lower().replace(" ", "_")] = status.id
 
 
 class Wishlist(db.Model):
@@ -44,7 +31,7 @@ class Wishlist(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
     item: str = Column(VARCHAR(1024), nullable=False)
-    status: int = Column(Integer, ForeignKey(WishlistStatusType.id), default=wishlist_status_to_id["default"],
+    status: int = Column(Integer, ForeignKey("wishlist_status_types.id"), default=wishlist_status_to_id["default"],
                          nullable=False)
     purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
     event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)
@@ -77,7 +64,7 @@ class ArchivedWishlist(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
     item: str = Column(VARCHAR(1024), nullable=False)
-    status: int = Column(Integer, ForeignKey(WishlistStatusType.id), default=wishlist_status_to_id["purchased"],
+    status: int = Column(Integer, ForeignKey("wishlist_status_types.id"), default=wishlist_status_to_id["purchased"],
                          nullable=False)
     purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
     event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)

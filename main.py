@@ -67,8 +67,8 @@ sentry_sdk.init(Config.SENTRY_PUBLIC_DSN,
                 release=Config.CURRENT_GIT_SHA)
 
 from models.users_model import User, Role
-
 from flask_security import SQLAlchemyUserDatastore, Security
+
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
 security = Security(app,
@@ -77,6 +77,9 @@ security = Security(app,
                     reset_password_form=ExtendedResetForm,
                     send_confirmation_form=ExtendedConfirmationForm,
                     forgot_password_form=ExtendedForgotPasswordForm)
+
+# noinspection PyUnresolvedReferences
+from models.enums import event_type_to_id, subscription_type_to_id, audit_event_type_to_id, wishlist_status_to_id
 
 from views import static, login, views, user_specific, edit, test
 

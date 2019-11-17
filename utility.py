@@ -15,7 +15,7 @@ pyximport.install()
 from models.family_model import Family, FamilyGroup
 from models.names_model import Name
 from models.shuffles_model import Shuffle
-from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
+from models.users_model import User
 from datetime import datetime
 from sqlalchemy import and_
 
@@ -37,20 +37,6 @@ def get_families_in_group(group_id: int) -> list:
             ).all()])
         )
     ).all()
-
-
-def if_user_is_group_admin(group_id: int, user_id: int) -> bool:
-    try:
-        return UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
-                                                UserGroupAdmin.user_id == user_id
-                                                )).one().admin
-    except Exception:
-        return False
-
-
-def get_families(passed_person_id: int) -> int:
-    passed_person_id = int(passed_person_id)  # Recast to avoid mistakes
-    return UserFamilyAdmin.query.filter(UserFamilyAdmin.user_id == passed_person_id).all()
 
 
 def get_target_id_with_group(passed_person_id: int, passed_group_id: int) -> int:

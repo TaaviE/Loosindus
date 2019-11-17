@@ -53,6 +53,7 @@ def test_mail():
                            link="./testmail",
                            title=_("Sent"))
 
+
 """
 @test_page.route("/testlogin/<user_id>")
 def test_login(user_id):

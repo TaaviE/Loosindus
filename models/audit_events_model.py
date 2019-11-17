@@ -11,22 +11,6 @@ from main import db
 from models.family_model import Group
 
 
-class AuditEventType(db.Model):
-    """
-    Specifies how event types are stored in the database
-    """
-    __tablename__ = "audit_events_types"
-
-    id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    name: str = Column(VARCHAR(), nullable=False)
-    description: str = Column(VARCHAR(1024), nullable=False)
-
-
-audit_event_type_to_id: dict = {}
-for event_type in AuditEventType.query.all():
-    audit_event_type_to_id[event_type.name.lower().replace(" ", "_")] = event_type.id
-
-
 class AuditEvent(db.Model):
     """
     Specifies how audit events are stored in the database
@@ -34,7 +18,7 @@ class AuditEvent(db.Model):
 
     __tablename__ = "audit_events"
 
-    event_type_id: int = Column(Integer(), ForeignKey(AuditEventType.id), nullable=False)
+    event_type_id: int = Column(Integer(), ForeignKey("event_types.id"), nullable=False)
     when: datetime = Column(TIMESTAMP(), server_default=FetchedValue(), nullable=False)
     id: int = Column(BigInteger(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     event_at: datetime = Column(TIMESTAMP(), nullable=True)

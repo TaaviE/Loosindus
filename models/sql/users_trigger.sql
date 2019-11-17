@@ -51,6 +51,8 @@ begin
 
             -- new password should **never** exist already in the DB due to salting
             insert into users_passwords ("user_id", "password", "active") values (old."id", new."password", true);
+
+            insert into audit_events (event_type_id, user_id) values (13, old.id);
         end if;
 
         if (old.confirmed_at is null and new."confirmed_at" is not null) then

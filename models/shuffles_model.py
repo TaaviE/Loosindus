@@ -22,12 +22,19 @@ class Shuffle(db.Model):
     event_id: int = Column(Integer(), ForeignKey(ShufflingEvent.id), primary_key=True, unique=False, nullable=False)
 
     def __str__(self):
-        return "{\"id\": {id}, \"giver\": {giver}, \"getter\": {getter}, \"year\": {year}, \"event\": {event}}".format(
+        return "{" \
+               "\"id\": {id}," \
+               "\"giver\": {giver}, " \
+               "\"getter\": {getter}, " \
+               "\"year\": {year}, " \
+               "\"event\": {event}" \
+               "}".format(
             id=self.id,
             giver=self.giver,
             getter=self.getter,
             year=self.year,
-            event=self.event)
+            event=self.event
+        )
 
     def __hash__(self):
         return hash(str(self))
