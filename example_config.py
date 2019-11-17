@@ -1,9 +1,15 @@
 # coding=utf-8
+"""
+This file should contain the app's configuration, make sure to fill out everything
+"""
 import logging
 import subprocess
 
 
 class Config(object):
+    """
+    Contains everything required for configuring the application
+    """
     ENV = "debug"  # TODO: Replace with "production"
     FLASK_DEBUG = True  # TODO: Disable in production
     DEVELOPMENT = True  # TODO: Disable in production

@@ -55,3 +55,7 @@
     flex: 0 0 45%;
     margin-right: 16px;
 }
+
+.custom-fill {
+    width: 100%;
+}

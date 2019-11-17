@@ -32,6 +32,14 @@ class Group(db.Model):
         backref=backref("Group", lazy="dynamic")
     )
 
+    admins: List[User] = relationship(
+        "User",
+        secondary="groups_admins",
+        backref="groups_administered"
+    )
+
+    events: List[ShufflingEvent] = relationship("ShufflingEvent")
+
     def __init__(self, group_id: int, group_name: str):
         self.id = group_id
         self.name = group_name
@@ -40,37 +48,9 @@ class Group(db.Model):
         return "<id {}>".format(self.id)
 
 
-class GroupAdmin(db.Model):
-    """
-    Specifies how user-group-admin relationships are modeled in the database
-
-    @param user_id: user's ID
-    @param group_id: family_id where the family belongs ID
-    @param admin: if the user is the adming of the group
-    """
-
-    __tablename__ = "groups_admins"
-    user_id: int = Column(Integer, ForeignKey("User.id"), primary_key=True, unique=True, nullable=False)
-    group_id: int = Column(Integer, ForeignKey("Group.id"), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False)
-    confirmed: bool = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, user_id: int, group_id: int, admin: bool):
-        self.user_id = user_id
-        self.group_id = group_id
-        self.admin = admin
-
-    def __repr__(self):
-        return "<user_id {}, group_id {}>".format(self.user_id, self.group_id)
-
-
 class Family(db.Model):
     """
     Specifies how families are modeled in the database
-
-    @param family_id: family's ID
-    @param family_group: group where the family belongs ID
-    @param family_name: 255 letter name of the group
     """
 
     __tablename__ = "families"
@@ -84,10 +64,16 @@ class Family(db.Model):
         backref=backref("Family", lazy="dynamic")
     )
 
-    def __init__(self, family_id, family_group, family_name):
-        self.id = family_id
-        self.group = family_group
-        self.name = family_name
+    members: List[User] = relationship(
+        "User",
+        secondary="users_families"
+    )
+
+    admins: List[User] = relationship(
+        "User",
+        secondary="families_admins",
+        backref=backref("User", lazy="dynamic")
+    )
 
     def __repr__(self):
         return "<id {}>".format(self.id)
@@ -96,10 +82,6 @@ class Family(db.Model):
 class FamilyGroup(db.Model):
     """
     Specifies how family-group relationships are defined in the database
-
-    @param family_id: family's ID
-    @param group_id: ID of the group where the family belongs
-    @param confirmed: if the family has been authorized to be in the group
     """
 
     __tablename__ = "families_groups"
@@ -107,10 +89,35 @@ class FamilyGroup(db.Model):
     group_id: int = Column(Integer, ForeignKey(Group.id), unique=False, nullable=False)
     confirmed: bool = Column(Boolean, default=False, unique=False, nullable=False)
 
-    def __init__(self, family_id: int, group_id: int, confirmed: bool = False):
-        self.family_id = family_id
-        self.group_id = group_id
-        self.confirmed = confirmed
-
     def __repr__(self):
         return "<id {}>".format(self.family_id)
+
+
+class FamilyAdmin(db.Model):
+    """
+    Specifies how user-family administration relationships are modeled in the database
+    """
+
+    __tablename__ = "families_admins"
+    user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, nullable=False)
+    family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
+    admin: bool = Column(Boolean, nullable=False)
+    confirmed: bool = Column(Boolean, nullable=False, default=False)
+
+    def __repr__(self):
+        return "<user_id {}>".format(self.user_id)
+
+
+class GroupAdmin(db.Model):
+    """
+    Specifies how user-group-admin relationships are modeled in the database
+    """
+
+    __tablename__ = "groups_admins"
+    user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, unique=True, nullable=False)
+    group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
+    admin: bool = Column(Boolean, nullable=False)
+    confirmed: bool = Column(Boolean, nullable=False, default=False)
+
+    def __repr__(self):
+        return "<user_id {}, group_id {}, admin {}>".format(self.user_id, self.group_id, self.admin)

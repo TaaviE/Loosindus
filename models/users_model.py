@@ -2,16 +2,18 @@
 """
 Contains everything very directly related to users
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import List
 
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_security import RoleMixin, UserMixin
-from sqlalchemy import Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, VARCHAR
+from sqlalchemy import Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, VARCHAR, and_
 from sqlalchemy.orm import backref, relationship
 
 from main import db
-from models.family_model import Family, Group
+from models.audit_events_model import AuditEvent
 
 
 class Role(db.Model, RoleMixin):
@@ -46,7 +48,7 @@ class User(db.Model, UserMixin):
     )
 
     families: List[Family] = relationship(
-        Family,
+        "Family",
         secondary="users_families",
         backref=backref("User", lazy="dynamic")
     )
@@ -119,16 +121,21 @@ class AuthLinks(db.Model, OAuthConsumerMixin):
     """
     __tablename__ = "users_connections"
     id = Column(Integer, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
-    provider_user_id = Column(VARCHAR(255), nullable=False)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    provider_user_id = Column(VARCHAR(255), nullable=False)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)
     token = Column(VARCHAR(255), nullable=True)
     provider = Column(VARCHAR(255), nullable=False)
 
-    def __init__(self, provider_user_id, provider, token=None, user_id=None):
+    def __init__(self, provider, provider_user_id, token):
+        self.provider = provider
         self.provider_user_id = provider_user_id
+        self.token = token
+
+    def __init__(self, user_id, provider, provider_user_id, token):
         self.user_id = user_id
         self.provider = provider
+        self.provider_user_id = provider_user_id
         self.token = token
 
 
@@ -159,44 +166,14 @@ class Password(db.Model):
     created: datetime = Column(DateTime, default=datetime.now(), nullable=False)
 
 
-class FamilyAdmin(db.Model):
-    """
-    Specifies how user-family (admin) relationships are modeled in the database
-
-    @param user_id: user's ID
-    @param family_id: family_id where the family belongs ID
-    @param admin: if the user is the admin of the family
-    """
-
-    __tablename__ = "families_admins"
-    user_id: int = Column(Integer, ForeignKey(User.id), primary_key=True, nullable=False)
-    family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False)
-    confirmed: bool = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, user_id, family_id, admin):
-        self.user_id = user_id
-        self.family_id = family_id
-        self.admin = admin
-
-    def __repr__(self):
-        return "<user_id {}>".format(self.user_id)
-
-
 class UserFamily(db.Model):
     """
-
+    Specifies how users belong to families
     """
-
     __tablename__ = "users_families"
     user_id: int = Column(Integer, ForeignKey(User.id), primary_key=True, unique=True, nullable=False)
-    family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
+    family_id: int = Column(Integer, ForeignKey("families.id"), primary_key=True, nullable=False)
     confirmed: bool = Column(Boolean, nullable=False, default=False)
-
-    def __init__(self, user_id: int, family_id: int, confirmed: bool):
-        self.user_id = user_id
-        self.family_id = family_id
-        self.confirmed = confirmed
 
     def __repr__(self):
         return "<user_id {}, family_id {}>".format(self.user_id, self.group_id)

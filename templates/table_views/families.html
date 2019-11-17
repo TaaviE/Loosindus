@@ -4,7 +4,12 @@
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
-        <p>{{ _("This page lists all the families you're connected to or that are in the group you wished to see") }}</p>
+        {% if title != "Families" %}
+            <p>{{ _("This page lists all the families in the ") + title.lower() + _(" you've requested.") }}</p>
+        {% else %}
+            <p>{{ _("This page lists all the families you're administering or just belong to.") }}</p>
+        {% endif %}
+        <p>{{ _("You can display specific families or if you administer this ") + title.lower() + _(" you can edit its details.") }}</p>
     </div>
 {% endblock %}
 
@@ -14,29 +19,79 @@
     {% if event %}
         <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
             <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
-                <h2 class="mdl-card__title-text">{{ _("Event details") }}</h2>
+                <h2 class="mdl-card__title-text">{{ _("Event description") }}</h2>
             </div>
-            <p>{{ _("Name:") }} {{ event_name }}</p>
-            <p>{{ _("Takes place:") }} {{ event_name }}</p>
-            <p>{{ _("Shuffles:") }} {{ event_name }}</p>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                <p>{{ _("Name:") }} {{ event.name }}</p>
+                <p>{{ _("Date:") }} {{ event.event_at }}</p>
+                <p>{{ _("Has taken place:") }} {{ _(event_has_taken_place) }}</p>
+            </div>
         </div>
     {% endif %}
-    <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-        <tbody>
-        <tr>
-            <th>{{ _("Member") }}</th>
-            <th>{{ _("Action") }}</th>
-        </tr>
-        {% for family in families %}
+    {% if event and event_admin %}
+        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
+            <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="mdl-card__title-text">{{ _("Administration controls") }}</h2>
+            </div>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.modify_event", id=event.id) }}">{{ _("Modify details") }}</a></p>
+            </div>
+        </div>
+    {% endif %}
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">{{ _("Families") }}</h2>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table custom-fill">
+            <tbody>
             <tr>
-                <td>{{ family["name"] }}</td>
-                <td>
-                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                       href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
-                        {{ _("Display") }}</a>
-                </td>
+                <th>{{ _("Family's name") }}</th>
+                <th>{{ _("Action") }}</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            {% for family in families %}
+                <tr>
+                    <td>{{ family["name"] }}</td>
+                    <td>
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
+                            {{ _("Display") }}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not event and administered_families %}
+        <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+            <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="mdl-card__title-text">{{ _("Families") }}</h2>
+            </div>
+            <table class="mdl-data-table mdl-js-data-table custom-fill">
+                <tbody>
+                <tr>
+                    <th>{{ _("Family's name") }}</th>
+                    <th>{{ _("Action") }}</th>
+                    <th></th>
+                </tr>
+                {% for family in administered_families %}
+                    <tr>
+                        <td>{{ family["name"] }}</td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
+                                {{ _("Display") }}</a>
+                        </td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="/edit/family/{{ family["id"] }}">
+                                {{ _("Modify") }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 {% endblock %}

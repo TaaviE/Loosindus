@@ -203,15 +203,15 @@ def event(event_id: str):
     """
     user_id = get_user_id()
     event_id = int(event_id)
-    event = ShufflingEvent.query.get(event_id)
-    if not event:
+    requested_event = ShufflingEvent.query.get(event_id)
+    if not requested_event:
         return render_template("utility/error.html")
 
-    group = Group.query.get(event.group_id)
+    requested_group = Group.query.get(requested_event.group_id)
 
     authorized = False
-    for family in group.families:
-        for member in family.members:
+    for group_family in requested_group.families:
+        for member in group_family.members:
             if member.id == user_id:
                 authorized = True
                 break
@@ -219,9 +219,16 @@ def event(event_id: str):
     if not authorized:
         return render_template("utility/error.html")
 
+    if requested_event.event_at < datetime.now():
+        taken_place = True
+    else:
+        taken_place = False
+
     return render_template("table_views/families.html",
-                           families=group.families,
-                           group_id=group.id,
+                           event=requested_event,
+                           event_has_taken_place=taken_place,
+                           families=requested_group.families,
+                           group_id=requested_group.id,
                            title=_("Event"))
 
 
@@ -301,10 +308,10 @@ def family(group_id: str, family_id: str):
                         break
 
         if not authorized:
-            for group in requested_family.groups:
-                for family in group.families:
-                    for member in family.members:
-                        if member.id == user_id:
+            for f_group in requested_family.groups:
+                for g_family in f_group.families:
+                    for f_member in g_family.members:
+                        if f_member.id == user_id:
                             authorized = True
                             break
 
@@ -382,6 +389,7 @@ def families():
     user = User.query.get(user_id)
 
     return render_template("table_views/families.html",
+                           title=_("Families"),
                            families=user.families)
 
 
@@ -649,7 +657,7 @@ def graph_json(event_id, unhide):
 
     try:
         group_id = int(event_id)
-        if unhide is "True":
+        if unhide == "True":
             user_group_admin = UserGroupAdmin.query.filter(and_(UserGroupAdmin.user_id == user_id,
                                                                 UserGroupAdmin.group_id == int(group_id),
                                                                 UserGroupAdmin.confirmed == True)

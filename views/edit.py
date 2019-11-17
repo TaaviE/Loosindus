@@ -14,8 +14,8 @@ from sqlalchemy import and_
 
 from config import Config
 from main import db
-from models.family_model import Family, FamilyGroup
-from models.users_model import User, UserFamilyAdmin, UserGroupAdmin
+from models.family_model import Family, GroupAdmin
+from models.users_model import User, UserFamily
 from models.wishlist_model import Wishlist, wishlist_status_to_id
 
 getLogger().setLevel(Config.LOGLEVEL)
@@ -220,7 +220,7 @@ def note_add_new():
     logger.info("User {user_id} successfully added a note to database".format(user_id=user_id))
     return render_template("utility/success.html",
                            action=_("Added"),
-                           link="./notes",
+                           link="/notes",
                            title=_("Added"))
 
 
@@ -241,8 +241,7 @@ def editfamily(family_id: str):
                                no_sidebar=not current_user.is_authenticated,
                                title=_("Error"))
 
-    db_family_members = UserFamilyAdmin.query.filter(
-        UserFamilyAdmin.family_id == family_id).all()
+    db_family_members = UserFamily.query.filter(UserFamily.family_id == family_id).all()
 
     family = []
     show_admin_column = False
@@ -378,8 +377,8 @@ def group_edit(group_id: str):
             family_id = int(request.form["extra_data"])
             group_id = int(group_id)
 
-            admin_relationship = UserGroupAdmin.query.filter(and_(UserGroupAdmin.group_id == group_id,
-                                                                  UserGroupAdmin.user_id == user_id)).one()
+            admin_relationship = GroupAdmin.query.filter(and_(GroupAdmin.group_id == group_id,
+                                                              GroupAdmin.user_id == user_id)).one()
 
             if not admin_relationship.admin:
                 logger.warning("User {} is trying to forge requests".format(user_id))
@@ -387,8 +386,8 @@ def group_edit(group_id: str):
                                        message=_("An error has occured"),
                                        title=_("Error"))
 
-            target_relationship = FamilyGroup.query.filter(and_(FamilyGroup.group_id == group_id,
-                                                                FamilyGroup.family_id == family_id)).one()
+            target_relationship = GroupAdmin.query.filter(and_(GroupAdmin.group_id == group_id,
+                                                               GroupAdmin.family_id == family_id)).one()
 
             if target_relationship.admin:
                 return render_template("utility/error.html",
@@ -515,8 +514,8 @@ def editfam_with_action():
             family_id = int(request.form["extra_data"])
             target_id = int(request.form["id"])
 
-            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
-                                                                   UserFamilyAdmin.family_id == family_id)).one()
+            admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
+                                                              UserFamily.family_id == family_id)).one()
 
             if not admin_relationship.admin:
                 logger.warning("User {} is trying to forge requests".format(user_id))
@@ -524,8 +523,8 @@ def editfam_with_action():
                                        message=_("An error has occured"),
                                        title=_("Error"))
 
-            target_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == target_id,
-                                                                    UserFamilyAdmin.family_id == family_id))
+            target_relationship = UserFamily.query.filter(and_(UserFamily.user_id == target_id,
+                                                               UserFamily.family_id == family_id))
 
             if target_relationship.admin:
                 return render_template("utility/error.html",
@@ -571,8 +570,8 @@ def editfam_with_action():
             family_id = int(request.form["extra_data"])
             target_id = int(request.form["id"])
 
-            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
-                                                                   UserFamilyAdmin.family_id == family_id)).one()
+            admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
+                                                              UserFamily.family_id == family_id)).one()
 
             if not admin_relationship.admin:
                 logger.warning("User {} is trying to forge requests".format(user_id))
@@ -580,9 +579,10 @@ def editfam_with_action():
                                        message=_("An error has occured"),
                                        title=_("Error"))
 
-            target_relationship = UserFamilyAdmin(user_id=target_id,
-                                                  admin=False,
-                                                  family_id=family_id)
+            target_relationship = UserFamily()
+            target_relationship.user_id = target_id
+            target_relationship.admin = False
+            target_relationship.family_id = family_id
 
             try:
                 db.session.add(target_relationship)
@@ -620,8 +620,8 @@ def editfam_with_action():
         elif request.form["action"] == "DELETEFAM" and request.form["confirm"] == "True":
             target_id = int(request.form["id"])
 
-            admin_relationship = UserFamilyAdmin.query.filter(and_(UserFamilyAdmin.user_id == user_id,
-                                                                   UserFamilyAdmin.family_id == target_id)).one()
+            admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
+                                                              UserFamily.family_id == target_id)).one()
 
             if not admin_relationship.admin:
                 logger.warning("User {} is trying to forge requests".format(user_id))
@@ -702,6 +702,18 @@ def regraph(event_id: str):
                            action=_("Added to queue"),
                            link="/notes",
                            title=_("Shuffling started"))
+
+
+@edit_page.route("/event/<id>", methods=["GET"])
+@login_required
+def modify_event(id: str):
+    return ""
+
+
+@edit_page.route("/event/<id>", methods=["POST"])
+@login_required
+def modify_event_with_action(id: str):
+    return ""
 
 
 @edit_page.route("/note/<id>", methods=["POST"])

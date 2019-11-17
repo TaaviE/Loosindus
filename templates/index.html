@@ -10,9 +10,9 @@
                 <h4>{{ _("Hi, which event do you wish to see?") }}</h4>
             {% elif events|length == 1 %}
                 <h4>{{ _("Welcome back!") }}</h4>
-                <h5>{{ _("You currently have one active event") }}</h5>
+                <p>{{ _("You currently have one active event") }}</p>
             {% else %}
-                <h4>{{ _("You don't have any events you're participating in") }}</h4>
+                <h6>{{ _("You don't have any events you're participating in") }}</h6>
                 <p>{{ _("Do you want to create one?") }}</p>
                 <p><a href="/setup">Setup</a></p>
             {% endif %}
@@ -52,7 +52,7 @@
             <h5>{{ _("Shuffling has not yet been done for your group!") }}</h5>
         {% else %}
             <h5>{{ _("This web service is in Beta testing, please report any errors you see") }}</h5>
-            <p class="mdl-card__supporting-text">{{ _("NOTE: A few features are currently being rewritten!") }}</p>
         {% endif %}
+        <p class="mdl-card__supporting-text">{{ _("NOTE: A few features are currently being rewritten!") }}</p>
     </div>
 {% endblock %}
