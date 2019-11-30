@@ -1,3 +1,7 @@
+.custom-theme {
+    --primary-color-dark: #303f9f;
+}
+
 .custom-white-text {
     color: #ffffff;
 }
@@ -61,9 +65,9 @@
 }
 
 .mdl-layout__tab-bar-button.mdl-layout__tab-bar-left-button {
-    background-color: #303f9f;
+    background-color: var(--primary-color-dark);
 }
 
 .mdl-layout__tab-bar-button.mdl-layout__tab-bar-right-button {
-    background-color: #303f9f;
+    background-color: var(--primary-color-dark);
 }
