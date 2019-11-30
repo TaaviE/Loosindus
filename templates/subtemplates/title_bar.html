@@ -11,6 +11,11 @@
             <label class="mdl-textfield__label" for="search">Enter your query...</label>
           </div>
         </div> --> #}
+        {% if show_login_navigation %}
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="/login"><b>Log in</b></a>
+            </nav>
+        {% endif %}
 
         {% if three_dot %}
             <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="header_button">
