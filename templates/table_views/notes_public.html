@@ -30,7 +30,7 @@
                     <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ note["item"] }}</td>
 
                     {% if not invalid %}
-                        <form action="" method="post">
+                        <form action="{{ url_for("edit_page.update_note_status", id=note["id"]) }}" method="post">
                             <td class="mdl-data-table__cell--non-numeric">
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                     {% if note["status_modifyable"] %}

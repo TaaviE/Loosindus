@@ -64,7 +64,9 @@ class ArchivedWishlist(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)
     item: str = Column(VARCHAR(1024), nullable=False)
-    status: int = Column(Integer, ForeignKey("wishlist_status_types.id"), default=wishlist_status_to_id["purchased"],
+    status: int = Column(Integer,
+                         ForeignKey("wishlist_status_types.id"),
+                         default=wishlist_status_to_id["purchased"],
                          nullable=False)
     purchased_by: int = Column(Integer, ForeignKey(User.id), nullable=True)
     event_id: int = Column(Integer, ForeignKey(ShufflingEvent.id), nullable=False)

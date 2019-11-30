@@ -716,7 +716,7 @@ def modify_event_with_action(id: str):
     return ""
 
 
-@edit_page.route("/note/<id>", methods=["POST"])
+@edit_page.route("/note/<id>/status", methods=["POST"])
 @login_required
 def update_note_status(id: str):
     """
@@ -742,7 +742,7 @@ def update_note_status(id: str):
         elif requested_status == wishlist_status_to_id["default"]:
             # If the request is to set it to default
             # If the note has already been purchased or someone tried to set it to modified
-            # then abort (modified only happens after edit of a note)
+            # then abort (modified state should only happens after edit of a note)
             if note.status == wishlist_status_to_id["purchased"] or \
                     requested_status == wishlist_status_to_id["modified"]:
                 raise Exception("Invalid access")
@@ -759,4 +759,4 @@ def update_note_status(id: str):
                                title=_("Error"),
                                back=True)
 
-    return redirect("/" + str(id), code=303)
+    return redirect(url_for("main_page.wishlist", person_id=note.user_id), code=303)
