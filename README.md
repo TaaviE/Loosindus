@@ -33,7 +33,7 @@ Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid m
 
 My aim is to keep this project as simple as possible in every aspect, including deploying.
 
- 1. Install Python 3 (This application is developed on 3.7)
+ 1. Install Python 3.8
  2. Make a virtual environment (`python3 -m venv .venv && source .venv/bin/activate`)
  3. Install wheel with pip (`python3 -m pip install wheel`)
  4. Install requirements (`python3 -m pip install -r requirements.txt`)
@@ -56,6 +56,8 @@ In case this above was too complex you can just use the version hosted by me and
 ### Keywords
 
   * Kingituste tegemise rakendus
+  * Kingituste loosimine
   * Secret santa web application
   * Loosipakkide tegemise rakendus
+  * Loosipakkide loosimine
   * Loosipakirakendus
