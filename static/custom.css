@@ -59,3 +59,11 @@
 .custom-fill {
     width: 100%;
 }
+
+.mdl-layout__tab-bar-button.mdl-layout__tab-bar-left-button {
+    background-color: #303f9f;
+}
+
+.mdl-layout__tab-bar-button.mdl-layout__tab-bar-right-button {
+    background-color: #303f9f;
+}

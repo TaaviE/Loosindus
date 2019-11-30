@@ -26,7 +26,7 @@ import pyximport
 pyximport.install()
 
 from models.events_model import ShufflingEvent
-from models.family_model import Group
+from models.family_model import Group, FamilyAdmin, GroupAdmin
 from models.wishlist_model import Wishlist, wishlist_status_to_id, ArchivedWishlist
 
 # Utilities
@@ -737,25 +737,21 @@ def settings():
     user_families = {}
     family_admin = False
     for family in user.families:
-        family_relationship = UserFamilyAdmin.query.get((user.id, family.id))
-        user_families[family.name] = (family.id, family_relationship.admin)
-        if family_relationship.admin:
-            family_admin = True
+        if user in family.admins:
+            if FamilyAdmin.query.get(user_id=user.id, family_id=family.id).admin:
+                family_admin = True
 
     user_groups = {}
     is_in_group = False
     group_admin = False
     for family in user.families:
         for group_relationship in family.groups:
-            group_admin = UserGroupAdmin.query.filter(and_(
-                UserGroupAdmin.user_id == user_id,
-                UserGroupAdmin.group_id == group_relationship.id)).first()
-
-            if not group_admin:
-                user_groups[group_relationship.description] = (group_relationship.id, False)
-            else:
-                user_groups[group_relationship.description] = (group_relationship.id, group_admin.admin)
-                group_admin = True
+            if user in group_relationship.admins:
+                if GroupAdmin.query.get(user_id=user.id, group_id=group_relationship.id):
+                    user_groups[group_relationship.description] = (group_relationship.id, group_admin.admin)
+                    group_admin = True
+                else:
+                    user_groups[group_relationship.description] = (group_relationship.id, False)
 
             is_in_group = True
 
