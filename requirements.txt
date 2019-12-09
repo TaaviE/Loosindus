@@ -16,7 +16,7 @@ pycryptodomex==3.9.4
 raven==6.10.0
 celery[redis]==4.3.0
 gunicorn==20.0.4
-sqlalchemy-utils==0.35.0
+sqlalchemy-utils==0.36.0
 sentry-sdk[flask]==0.13.4
 passlib==1.7.2
 cython==0.29.14
