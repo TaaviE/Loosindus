@@ -4,6 +4,7 @@
 """
 Contains all of the routes that display an edit or
 """
+from datetime import datetime
 from logging import getLogger
 
 import sentry_sdk
@@ -51,7 +52,6 @@ def note_edit_get(request_id: str):
     user_id = int(session["user_id"])
     user: User = User.query.get(user_id)
     username = user.first_name
-
     try:
         request_id = int(request_id)
         logger.info("{} is trying to remove a note {}".format(user_id, request_id))
@@ -70,6 +70,11 @@ def note_edit_get(request_id: str):
         return render_template("utility/error.html",
                                message=_("An error occured"),
                                title=_("Error"))
+
+    if (db_note.when - datetime.now()).days > 90:
+        return render_template("utility/error.html",
+                               message=_("Time to change your wishes is over, ") + username + "!!",
+                               title=_("Warning"))
 
     return render_template("creatething.html",
                            action="ADD",
@@ -116,7 +121,7 @@ def note_edit(request_id: str):
 
     return render_template("utility/success.html",
                            action=_("Changed"),
-                           link="./notes",
+                           link="/notes",
                            title=_("Changed"))
 
 
@@ -159,7 +164,7 @@ def note_remove(request_id: str):
     logger.info("Removed {} note with ID {}".format(username, request_id))
     return render_template("utility/success.html",
                            action=_("Removed"),
-                           link="./notes",
+                           link="/notes",
                            title=_("Removed"))
 
 
@@ -189,8 +194,6 @@ def note_add_new():
     logger.info("Trying to add a note: {}".format(addednote))
     try:
         logger.info("Opening file: {}".format(user_id))
-        #    with open("./notes/" + useridno, "r") as file:
-        #        currentnotes = json.load(file)
         db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
         for note in db_notes:
             currentnotes[note.item] = note.id
@@ -294,7 +297,7 @@ def set_language():
 
         return render_template("utility/success.html",
                                action=_("Added"),
-                               link="./notes",
+                               link="/notes",
                                title=_("Added"))
     except Exception:
         # No need to capture with Sentry, someone's just meddling
@@ -406,7 +409,7 @@ def group_edit(group_id: str):
 
             return render_template("utility/success.html",
                                    action=_("Deleted"),
-                                   link="./",
+                                   link="/",
                                    title=_("Deleted"))
         elif request.form["action"] == "ADDFAMILY" and \
                 "confirm" not in request.form.keys():
@@ -437,7 +440,7 @@ def group_edit(group_id: str):
             # TODO: Add user to family
             return render_template("utility/success.html",
                                    action=_("Added"),
-                                   link="./",
+                                   link="/",
                                    title=_("Added"))
         elif request.form["action"] == "DELETEGROUP" and \
                 "confirm" not in request.form.keys():
@@ -468,7 +471,7 @@ def group_edit(group_id: str):
             # TODO: Delete group
             return render_template("utility/success.html",
                                    action=_("Deleted"),
-                                   link="./",
+                                   link="/",
                                    title=_("Deleted"))
         else:
             return render_template("utility/error.html",
@@ -543,7 +546,7 @@ def editfam_with_action():
 
             return render_template("utility/success.html",
                                    action=_("Deleted"),
-                                   link="./",
+                                   link="/",
                                    title=_("Deleted"))
         elif request.form["action"] == "ADDMEMBER" and "confirm" not in request.form.keys():
             if "extra_data" in request.form.keys():
@@ -594,7 +597,7 @@ def editfam_with_action():
                                        title=_("Error"))
             return render_template("utility/success.html",
                                    action=_("Added"),
-                                   link="./",
+                                   link="/",
                                    title=_("Added"))
         elif request.form["action"] == "DELETEFAM" and "confirm" not in request.form.keys():
             if "extra_data" in request.form.keys():
@@ -640,7 +643,7 @@ def editfam_with_action():
                                        title=_("Error"))
             return render_template("utility/success.html",
                                    action=_("Deleted"),
-                                   link="./",
+                                   link="/",
                                    title=_("Deleted"))
         else:
             return render_template("utility/error.html",
