@@ -425,7 +425,9 @@ def log_user_in_with_cert():
                                     db.session.rollback()
                                     db.session.commit()
                                     sentry_sdk.capture_exception(e)
-                                    return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+                                    return redirect(
+                                        url_for("static_page.error_page") + "?message=" + _("Error!") + "&title=" + _(
+                                            "Error"))
                                 return redirect("/")
                             else:
                                 logger.debug("User ID doesn't exist")
@@ -433,7 +435,7 @@ def log_user_in_with_cert():
                         else:
                             return try_to_log_in_with_dn(request.headers["Tls-Client-Dn"])
     logger.debug("Check failed")
-    return redirect("error?message=" + _("Error!") + "&title=" + _("Error"))
+    return redirect(url_for("static_page.error_page") + "?message=" + _("Error!") + "&title=" + _("Error"))
 
 
 def try_to_log_in_with_dn(input_dn: str) -> object:
@@ -458,14 +460,14 @@ def try_to_log_in_with_dn(input_dn: str) -> object:
                                                AuthLinks.provider == "esteid")).first()
             if not link:
                 logger.debug("User with the link doesn't exist")
-                return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+                return redirect(url_for("static_page.error_page") + "?message=" + _("Error!") + "&title=" + _("Error"))
             else:
                 user_id = link.user_id
 
         login_user(User.query.get(user_id))
-        return redirect("/success.html?" + "message=" + _("Added!") + "&action=" +
+        return redirect(url_for("static_page.success_page") + "?message=" + _("Added!") + "&action=" +
                         _("Added") + "&link=" + "notes" + "&title=" + _("Added"))
     except Exception as e:
         logger.debug("Exception when trying to log user in")
         sentry_sdk.capture_exception(e)
-        return redirect("/error?message=" + _("Error!") + "&title=" + _("Error"))
+        return redirect(url_for("static_page.error_page") + "?message=" + _("Error!") + "&title=" + _("Error"))

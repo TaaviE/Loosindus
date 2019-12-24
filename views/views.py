@@ -25,12 +25,14 @@ import pyximport
 
 pyximport.install()
 
+# Models
 from models.events_model import ShufflingEvent
 from models.family_model import Group, FamilyAdmin, GroupAdmin
 from models.wishlist_model import Wishlist, wishlist_status_to_id, ArchivedWishlist
 
 # Utilities
 from logging import getLogger
+from datetime import timedelta
 
 # App specific config
 from config import Config
@@ -176,20 +178,20 @@ def setup_post():
     return redirect()
 
 
-@main_page.route("/shuffle/<event_id>")
+@main_page.route("/curr_shuffle/<event_id>")
 @login_required
 def shuffle(event_id: str):
     """
-    Returns a page that displays a specific event's shuffle
+    Returns a page that displays a specific event's curr_shuffle
     """
     user_id = get_user_id()
     user = User.query.get(user_id)
     username = user.first_name
     event_id = int(event_id)
 
-    shuffle = Shuffle.query.get((user_id, event_id))
+    curr_shuffle = Shuffle.query.get((user_id, event_id))
 
-    logger.debug("Username: {}, From: {}, To: {}", username, shuffle.giver, shuffle.getter)
+    logger.debug("Username: {}, From: {}, To: {}", username, curr_shuffle.giver, curr_shuffle.getter)
     return render_template("shuffle.html",
                            title=_("Shuffle"),
                            id=user_id)
@@ -382,13 +384,14 @@ def subscriptions():
 @login_required
 def families():
     """
-    Displays all the events of a person
+    Displays all the families of a person
     """
 
     user_id = int(session["user_id"])
     user = User.query.get(user_id)
 
     return render_template("table_views/families.html",
+                           group_id=None,
                            title=_("Families"),
                            families=user.families)
 
@@ -420,26 +423,24 @@ def notes():
     """
     user_id = session["user_id"]
     # username = get_person_name(user_id)
-    notes_from_file = {}
     empty = False
 
     try:
         # noinspection PyComparisonWithNone
         # SQLAlchemy doesn't like "is None"
         db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
-        for note in db_notes:
-            notes_from_file[note.item] = note.id
     except Exception as e:
         sentry_sdk.capture_exception(e)
         raise e
 
-    if len(notes_from_file) <= 0:
-        notes_from_file = {_("Right now there's nothing in the Wishlist"): ("", "")}
+    if len(db_notes) <= 0:
         empty = True
 
     return render_template("table_views/notes_private.html",
-                           list=notes_from_file,
+                           list=db_notes,
                            empty=empty,
+                           datetime=datetime,
+                           timedelta=timedelta,
                            title=_("My Wishlist"))
 
 
@@ -716,7 +717,9 @@ def graph_js(graph_id, unhide):
     """
     Returns the JS required to graph one specific graph
     """
-    return render_template("grapher.js", graph_id=graph_id, unhide=unhide), \
+    return render_template("grapher.js",
+                           graph_id=graph_id,
+                           unhide=unhide), \
            200, {"content-type": "application/javascript"}
 
 

@@ -49,20 +49,31 @@
                 <th class="mdl-data-table__cell--non-numeric"></th>
             {% endif %}
 
-            {% for item, id in list.items() %}
+            {% for item in list %}
                 <tr>
-                    <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
+                    <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item.item }}</td>
                     {% if not empty %}
                         <td class="mdl-data-table__cell--non-numeric">
-                            <form method="post" action="{{ url_for("edit_page.note_remove", request_id=id) }}">
-                                <input name="action" type="hidden" value="DELETENOTE">
-                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                            {% if (datetime.now() - item.when).days < 60 %}
+                                <form method="post"
+                                      action="{{ url_for("edit_page.note_remove", request_id=item.id) }}">
+                                    <input name="action" type="hidden" value="DELETENOTE">
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                            type="submit">{{ _("Delete") }}</button>
+                                </form>
+                            {% else %}
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--disabled"
                                         type="submit">{{ _("Delete") }}</button>
-                            </form>
+                            {% endif %}
                         </td>
                         <td class="mdl-data-table__cell--non-numeric">
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="{{ url_for("edit_page.note_edit_get", request_id=id) }}">{{ _("Edit") }}</a>
+                            {% if (datetime.now() - item.when).days < 90 %}
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                                   href="{{ url_for("edit_page.note_edit_get", request_id=item.id) }}">{{ _("Edit") }}</a>
+                            {% else %}
+                                <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent mdl-button--disabled"
+                                   href="#">{{ _("Edit") }}</a>
+                            {% endif %}
                         </td>
                     {% else %}
                         <td class="mdl-data-table__cell--non-numeric">{{ _("There's no wishlist items here") }}</td>
