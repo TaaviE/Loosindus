@@ -1,294 +1,68 @@
-# English translations for PROJECT.
-# Copyright (C) 2018 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+# English translations for Loosindus.
+# Copyright (C) 2019 Loosindus
+# This file is distributed under the same license as the Loosindus project.
+# Taavi Eomäe <taavi.eomae@gmail.com>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-07-29 15:55+0300\n"
+"Report-Msgid-Bugs-To: taavi.eomae@gmail.com\n"
+"POT-Creation-Date: 2019-12-24 22:13+0200\n"
 "PO-Revision-Date: 2018-12-01 17:22+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: Taavi Eomäe <taavi.eomae@gmail.com>\n"
 "Language: en\n"
-"Language-Team: en <LL@li.org>\n"
+"Language-Team: en <taavi.eomae@gmail.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.7.0\n"
 
-#: forms.py:8
-msgid "Eesnimi"
+#: forms.py:15
+msgid "First name"
 msgstr ""
 
-#: views.py:149 views.py:373 views.py:401 views.py:414
-msgid "An error occured"
-msgstr ""
-
-#: views.py:150 views.py:159 views.py:310 views.py:314 views.py:331
-#: views.py:365 views.py:374 views.py:402 views.py:415 views.py:445
-#: views.py:454 views.py:492 views.py:520 views.py:531 views.py:558
-#: views.py:655 views.py:826 views.py:860 views.py:892 views.py:941
-#: views.py:951 views.py:967 views.py:994 views.py:1002 views.py:1009
-#: views.py:1028 views.py:1036 views.py:1046 views.py:1058 views.py:1065
-#: views.py:1085 views.py:1092 views.py:1109 views.py:1120 views.py:1128
-#: views.py:1135 views.py:1154 views.py:1162 views.py:1172 views.py:1184
-#: views.py:1191 views.py:1210 views.py:1223 views.py:1234 views.py:1241
-#: views.py:1259 views.py:1269 views.py:1277 views.py:1311 views.py:1324
-#: views.py:1355 views.py:1359 views.py:1802 views.py:1810 views.py:1822
-#: views.py:1830
-msgid "Error"
-msgstr ""
-
-#: views.py:158
-msgid "Here you go!"
-msgstr ""
-
-#: views.py:204
-msgid "Home"
-msgstr ""
-
-#: templates/editgroup.html:13 views.py:252
-msgid "Shuffle"
-msgstr ""
-
-#: views.py:275
-msgid "Right now there's nothing in the Wishlist"
-msgstr ""
-
-#: templates/index.html:13 templates/title_bar.html:32 views.py:281
-msgid "My Wishlist"
-msgstr ""
-
-#: views.py:292 views.py:382
-msgid "Your wish"
-msgstr ""
-
-#: views.py:309
-msgid "You're wishing for too much"
-msgstr ""
-
-#: views.py:313
-msgid "Santa can't bring you nothin', "
-msgstr ""
-
-#: views.py:330
-msgid "You're wishing for too much, "
-msgstr ""
-
-#: views.py:346 views.py:348 views.py:944 views.py:946 views.py:1076
-#: views.py:1078 views.py:1225 views.py:1227 views.py:1826
-msgid "Added"
-msgstr ""
-
-#: views.py:364 views.py:530
-msgid "Pls no hax "
-msgstr ""
-
-#: views.py:418 views.py:420
-msgid "Changed"
-msgstr ""
-
-#: views.py:444 views.py:825 views.py:859 views.py:891
-msgid "Broken link"
-msgstr ""
-
-#: views.py:453
-msgid "Can't find what you wanted to delete"
-msgstr ""
-
-#: views.py:458 views.py:460
-msgid "Removed"
-msgstr ""
-
-#: views.py:491
-msgid "Could not edit"
-msgstr ""
-
-#: templates/index.html:26 views.py:519
-msgid "Shuffling has not yet been done for your group!"
-msgstr ""
-
-#: views.py:525
-msgid "Access to this list is forbidden"
-msgstr ""
-
-#: views.py:526
-msgid "Forbidden"
-msgstr ""
-
-#: views.py:557 views.py:1354 views.py:1358
+#: shuffler_worker.py:42 shuffler_worker.py:46 views/views.py:492
+#: views/views.py:493 views/views.py:500 views/views.py:509 views/views.py:510
+#: views/views.py:518 views/views.py:531 views/views.py:544
 msgid "Access denied"
 msgstr ""
 
-#: views.py:609
-msgid "Right now there isn't anything on the list"
+#: shuffler_worker.py:43 shuffler_worker.py:47 views/edit.py:62
+#: views/edit.py:72 views/edit.py:101 views/edit.py:115 views/edit.py:147
+#: views/edit.py:157 views/edit.py:183 views/edit.py:187 views/edit.py:203
+#: views/edit.py:240 views/edit.py:291 views/edit.py:301 views/edit.py:316
+#: views/edit.py:347 views/edit.py:357 views/edit.py:364 views/edit.py:385
+#: views/edit.py:393 views/edit.py:403 views/edit.py:417 views/edit.py:424
+#: views/edit.py:448 views/edit.py:455 views/edit.py:474 views/edit.py:488
+#: views/edit.py:496 views/edit.py:503 views/edit.py:522 views/edit.py:530
+#: views/edit.py:540 views/edit.py:552 views/edit.py:559 views/edit.py:578
+#: views/edit.py:592 views/edit.py:603 views/edit.py:610 views/edit.py:628
+#: views/edit.py:638 views/edit.py:646 views/edit.py:683 views/edit.py:696
+#: views/edit.py:757 views/login.py:429 views/login.py:438 views/login.py:463
+#: views/login.py:473 views/static.py:43 views/static.py:55 views/static.py:120
+#: views/static.py:162 views/views.py:645
+msgid "Error"
 msgstr ""
 
-#: views.py:617
-msgid "Wishlist"
-msgstr ""
-
-#: views.py:638
-msgid "or with your own name"
-msgstr ""
-
-#: templates/title_bar.html:36 views.py:649
-msgid "Graph"
-msgstr ""
-
-#: views.py:653
-msgid ""
-"Shuffling has not yet been done for your group (or some other error "
-"occured)!"
-msgstr ""
-
-#: templates/title_bar.html:39 views.py:814
-msgid "Settings"
-msgstr ""
-
-#: views.py:848
-msgid "Terms of Service"
-msgstr ""
-
-#: templates/privacy_policy.html:8 views.py:854
-msgid "Privacy Policy"
-msgstr ""
-
-#: views.py:921
-msgid "Edit family"
-msgstr ""
-
-#: views.py:940 views.py:950 views.py:966
-msgid "Faulty input"
-msgstr ""
-
-#: views.py:980
-msgid "Edit group"
-msgstr ""
-
-#: views.py:993 views.py:1001 views.py:1008 views.py:1027 views.py:1045
-#: views.py:1057 views.py:1064 views.py:1084 views.py:1091 views.py:1108
-#: views.py:1119 views.py:1127 views.py:1134 views.py:1153 views.py:1171
-#: views.py:1183 views.py:1190 views.py:1209 views.py:1222 views.py:1233
-#: views.py:1240 views.py:1258 views.py:1268 views.py:1276 views.py:1310
-#: views.py:1323
-msgid "An error has occured"
-msgstr ""
-
-#: views.py:1035 views.py:1161
-msgid "You can not delete an admin from your family"
-msgstr ""
-
-#: views.py:1049 views.py:1051 views.py:1103 views.py:1105 views.py:1175
-#: views.py:1177 views.py:1271 views.py:1273
-msgid "Deleted"
-msgstr ""
-
-#: views.py:1286 views.py:1295
-msgid "Group ID"
-msgstr ""
-
-#: views.py:1429 views.py:1431
-msgid "Generated"
-msgstr ""
-
-#: views.py:1446 views.py:1448
-msgid "Sent"
-msgstr ""
-
-#: views.py:1581 views.py:1593 views.py:1597 views.py:1603
-msgid "Error logging in"
-msgstr ""
-
-#: views.py:1624
-msgid ""
-"That account is not linked to any system account, check if you already "
-"have an account."
-msgstr ""
-
-#: views.py:1643
-msgid "Error signing up, please try again"
-msgstr ""
-
-#: views.py:1662 views.py:1668 views.py:1679 views.py:1703 views.py:1732
-#: views.py:1743
-msgid "Error signing up"
-msgstr ""
-
-#: views.py:1691
-msgid "You have no associated email addresses with your account"
-msgstr ""
-
-#: views.py:1699
-msgid "You have no associated email addresses with that account"
-msgstr ""
-
-#: views.py:1711
-msgid ""
-"This email address is in use, you must log in with your password to link "
-"{provider}"
-msgstr ""
-
-#: views.py:1723
-msgid "Password is set randomly, use \"Forgot password\" to set another password"
-msgstr ""
-
-#: views.py:1752
-msgid "You do not have an account"
-msgstr ""
-
-#: views.py:1802 views.py:1810 views.py:1822 views.py:1830
-msgid "Error!"
-msgstr ""
-
-#: views.py:1825
-msgid "Added!"
-msgstr ""
-
-#: models/wishlist_model.py:8 models/wishlist_model.py:19
+#: models/wishlist_model.py:13
 msgid "Unclaimed"
 msgstr ""
 
-#: models/wishlist_model.py:9 models/wishlist_model.py:21
+#: models/wishlist_model.py:14
 msgid "Reserved"
 msgstr ""
 
-#: models/wishlist_model.py:10 models/wishlist_model.py:23
+#: models/wishlist_model.py:15
 msgid "Purchased"
 msgstr ""
 
-#: models/wishlist_model.py:11 models/wishlist_model.py:25
+#: models/wishlist_model.py:16
 msgid "Modified"
 msgstr ""
 
-#: models/wishlist_model.py:12
+#: models/wishlist_model.py:17
 msgid "Archived"
-msgstr ""
-
-#: templates/base.html:26 templates/security/base.html:29
-msgid "Information"
-msgstr ""
-
-#: templates/contact.html:8 templates/editfam.html:13
-#: templates/editgroup.html:19 templates/error.html:10
-#: templates/feedback.html:10 templates/graph.html:11 templates/home.html:11
-#: templates/index.html:8 templates/notes.html:27
-#: templates/security/base.html:46 templates/settings.html:35
-#: templates/show_notes.html:15 templates/shuffle.html:8
-#: templates/success.html:8
-msgid ""
-"Your browser does not support JavaScript, certain functionality might be "
-"limited"
-msgstr ""
-
-#: templates/contact.html:9
-msgid "Just send me an email (for ex. whois contains my email)"
-msgstr ""
-
-#: templates/contact.html:14 templates/feedback.html:5
-msgid "Contact page"
 msgstr ""
 
 #: templates/creatething.html:8
@@ -299,7 +73,8 @@ msgstr ""
 msgid "Do you really want to do this? You won't be asked again."
 msgstr ""
 
-#: templates/creatething.html:45 templates/settings.html:153
+#: templates/creatething.html:45 templates/settings.html:41
+#: templates/setup.html:30
 msgid "Send"
 msgstr ""
 
@@ -308,317 +83,210 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: templates/creatething.html:53
+#: templates/creatething.html:53 templates/setup.html:45
 msgid "Page for creating a note"
 msgstr ""
 
-#: templates/editfam.html:7
-msgid "This page lists all the people in this family"
+#: templates/feedback.html:5 templates/generic/contact.html:18
+#: templates/generic/help.html:16 templates/generic/placeholder.html:16
+msgid "Contact page"
 msgstr ""
 
-#: templates/editfam.html:17
-msgid "Member"
+#: templates/feedback.html:10
+msgid "Click on the button to get to the feedback form"
 msgstr ""
 
-#: templates/editfam.html:19 templates/editgroup.html:25
-#: templates/settings.html:163 templates/settings.html:216
-msgid "ID"
+#: templates/feedback.html:14
+msgid "Open"
 msgstr ""
 
-#: templates/editfam.html:21
-msgid "Birthday"
+#: templates/generic/contact.html:9 templates/grapher.html:11
+#: templates/index.html:8 templates/settings.html:16 templates/shuffle.html:8
+#: templates/table_views/families.html:18
+#: templates/table_views/notes_private.html:35
+#: templates/table_views/notes_private_archived.html:27
+#: templates/utility/error.html:14 templates/utility/success.html:8
+msgid ""
+"Your browser does not support JavaScript, certain functionality might be "
+"limited"
 msgstr ""
 
-#: templates/editfam.html:22
-msgid "Actions"
-msgstr ""
-
-#: templates/editfam.html:42
-msgid "Unknown"
-msgstr ""
-
-#: templates/editfam.html:48 templates/editgroup.html:44
-#: templates/settings.html:200 templates/settings.html:253
-msgid "Display"
-msgstr ""
-
-#: templates/editfam.html:60 templates/editgroup.html:52
-msgid "Remove"
-msgstr ""
-
-#: templates/editgroup.html:8
-msgid "This page lists all the families that the group contains"
-msgstr ""
-
-#: templates/editgroup.html:11
-msgid "Add new family"
-msgstr ""
-
-#: templates/editgroup.html:23 templates/settings.html:161
-msgid "Family"
-msgstr ""
-
-#: templates/editgroup.html:27 templates/settings.html:48
-#: templates/show_notes.html:23
-msgid "Action"
-msgstr ""
-
-#: templates/error.html:14
-msgid "Error ID is: "
-msgstr ""
-
-#: templates/error.html:18 templates/feedback.html:13 templates/success.html:12
-msgid "Back"
-msgstr ""
-
-#: templates/feedback.html:11
-msgid "This page should pop up a feedback form you can fill"
-msgstr ""
-
-#: templates/graph.html:12
+#: templates/grapher.html:12
 msgid "You are marked with "
 msgstr ""
 
-#: templates/graph.html:13
+#: templates/grapher.html:13
 msgid "Names are not displayed intentionally"
 msgstr ""
 
-#: templates/home.html:3
-msgid "Jõulurakendus"
+#: templates/index.html:10
+msgid "Hi, which event do you wish to see?"
 msgstr ""
 
-#: templates/home.html:6
-msgid ""
-"Simple and free web service for managing secret santa shuffling, sharing "
-"wishlists and reminding everyone"
+#: templates/index.html:12
+msgid "Welcome back!"
 msgstr ""
 
-#: templates/home.html:12
-msgid ""
-"Selle lehe puhul on tegu väga lihtsa lehega enda jõulunimekirja "
-"koostamise jaoks, selle\n"
-"                enda\n"
-"                \"jõuluvanaga\"\n"
-"                jagamiseks 🎅, nimede loosimise korraldamise jaoks. Töötab"
-" hästi nii mobiilil kui arvutil! Katsetamiseks\n"
-"                registreeru (või logi sisse)."
-msgstr ""
-"This website tries to make handling everything Secret Santa related as "
-"easy as possible. Creating shuffles, wishlists and sharing them with each"
-" other has never been this easy (if you actually know of a service that "
-"makes it easier, let me know).\n"
-"Sign up or log in to test it out, you may need more than one user to test"
-" out full functionality"
-
-#: templates/home.html:18 templates/security/_menu.html:5
-#: templates/security/email/login_instructions.html:5
-#: templates/security/send_login.html:4 templates/security/send_login.html:9
-#: templates/security/title_bar.html:6
-msgid "Log in"
+#: templates/index.html:13
+msgid "You currently have one active event"
 msgstr ""
 
-#: templates/home.html:20 templates/security/_menu.html:9
-#: templates/security/register_user.html:4
-#: templates/security/register_user.html:8
-msgid "Register"
+#: templates/index.html:15
+msgid "You don't have any events you're participating in"
 msgstr ""
 
-#: templates/index.html:9
-msgid "Hi, which list do you wish to display?"
+#: templates/index.html:16
+msgid "Do you want to create one?"
 msgstr ""
 
-#: templates/index.html:16 templates/title_bar.html:34
-msgid "Receiver's Wishlist"
+#: templates/index.html:25 templates/table_views/events.html:20
+msgid "Name"
 msgstr ""
 
-#: templates/index.html:28
-msgid "This web service is in Beta testing, please report any errors you see"
+#: templates/index.html:26 templates/table_views/events.html:22
+msgid "Takes place"
 msgstr ""
 
-#: templates/notes.html:7
-msgid ""
-"Here is your personal wishlist, this can be viewed by anyone in your "
-"group, including your personal santa"
-msgstr ""
-
-#: templates/notes.html:14 templates/security/_menu.html:2
-#: templates/settings.html:165 templates/settings.html:218
-msgid "Options"
-msgstr ""
-
-#: templates/notes.html:21
-msgid "Add new"
-msgstr ""
-
-#: templates/notes.html:31 templates/show_notes.html:19
-msgid "Description"
-msgstr ""
-
-#: templates/notes.html:33 templates/notes.html:49 templates/settings.html:194
-#: templates/settings.html:247
-msgid "Delete"
-msgstr ""
-
-#: templates/notes.html:34 templates/notes.html:54
-msgid "Edit"
-msgstr ""
-
-#: templates/privacy_policy.html:18
-msgid ""
-"The service uses Google Analytics for analytics and Sentry for crash "
-"reporting, so by using this website you agree to them processing your "
-"data."
-msgstr ""
-
-#: templates/privacy_policy.html:19
-msgid ""
-"Crash reporting data may consist of but is not limited to usernames, IP "
-"addresses, feedback given and e-mails. This is simply because otherwise "
-"problems occuring with the service would be too hard for me to debug, "
-"special arrangements can in theory be made."
-msgstr ""
-
-#: templates/privacy_policy.html:20
-msgid ""
-"Analytics data consists of browser metadata, visited pages and IP "
-"addresses."
-msgstr ""
-
-#: templates/privacy_policy.html:21
-msgid ""
-"In addition to those, using this service means that you agree that the "
-"host of this site processes your data for the functionality of the site. "
-"Wishlist data, shuffling data and connections between people are shared "
-"with no third party unless with your explicit consent."
-msgstr ""
-
-#: templates/settings.html:7
-msgid "Page for managing your account, families and groups"
-msgstr ""
-
-#: templates/settings.html:15
-msgid "Create new..."
-msgstr ""
-
-#: templates/settings.html:18
-msgid "Use these buttons to start creating new families and groups"
-msgstr ""
-
-#: templates/settings.html:22
-msgid "Create family"
-msgstr ""
-
-#: templates/settings.html:26
-msgid "Create group"
-msgstr ""
-
-#: templates/settings.html:36
-msgid "Your ID:"
-msgstr ""
-
-#: templates/settings.html:41
-msgid "Your name:"
-msgstr ""
-
-#: templates/settings.html:47
-msgid "Link Status"
-msgstr ""
-
-#: templates/settings.html:54
-msgid "Estonian ID card is linked"
-msgstr ""
-
-#: templates/settings.html:55
-msgid "Connect Estonian ID card:"
-msgstr ""
-
-#: templates/settings.html:65 templates/settings.html:87
-#: templates/settings.html:109 templates/settings.html:132
-msgid "Linked"
-msgstr ""
-
-#: templates/settings.html:67 templates/settings.html:89
-#: templates/settings.html:111 templates/settings.html:134
-msgid "Link"
-msgstr ""
-
-#: templates/settings.html:76
-msgid "Google account is linked"
-msgstr ""
-
-#: templates/settings.html:77
-msgid "Connect Google account:"
-msgstr ""
-
-#: templates/settings.html:98
-msgid "Github account is linked"
-msgstr ""
-
-#: templates/settings.html:99
-msgid "Connect Github account:"
-msgstr ""
-
-#: templates/settings.html:121
-msgid "Facebook account is linked"
-msgstr ""
-
-#: templates/settings.html:122
-msgid "Connect Facebook account:"
-msgstr ""
-
-#: templates/settings.html:144
-msgid "Your language:"
-msgstr ""
-
-#: templates/settings.html:148
-msgid "Estonian"
-msgstr ""
-
-#: templates/settings.html:149
-msgid "English"
-msgstr ""
-
-#: templates/settings.html:157
-msgid "Your families:"
-msgstr ""
-
-#: templates/settings.html:186 templates/settings.html:239
-msgid "Change / Display"
-msgstr ""
-
-#: templates/settings.html:210
-msgid "Your groups:"
-msgstr ""
-
-#: templates/settings.html:214
+#: templates/index.html:27 templates/table_views/events.html:23
+#: templates/table_views/group_reminders.html:21
+#: templates/table_views/groups.html:26 templates/table_views/groups.html:76
+#: templates/table_views/shuffles.html:25
+#: templates/table_views/shuffles.html:56
 msgid "Group"
 msgstr ""
 
-#: templates/show_notes.html:9
-msgid "Here is"
-msgstr "Here's"
-
-#: templates/show_notes.html:10
-msgid "'s wishlist, you can change their wishlist items' statuses"
-msgstr "'s wishlist, you can change their wishlist items' statuses"
-
-#: templates/show_notes.html:21
-msgid "Status"
+#: templates/index.html:28 templates/settings.html:51
+#: templates/table_views/comments.html:27
+#: templates/table_views/families.html:50
+#: templates/table_views/families.html:75 templates/table_views/groups.html:30
+#: templates/table_views/groups.html:80
+#: templates/table_views/notes_public.html:26
+#: templates/table_views/notifications.html:21
+#: templates/table_views/notifications.html:52
+msgid "Action"
 msgstr ""
 
-#: templates/show_notes.html:22
-msgid "By whom"
+#: templates/index.html:52
+msgid "Shuffling has not yet been done for your group!"
 msgstr ""
 
-#: templates/show_notes.html:55
-msgid "Save"
+#: templates/index.html:54
+msgid "This web service is in Beta testing, please report any errors you see"
 msgstr ""
 
-#: templates/show_notes.html:59 templates/show_notes.html:61
-msgid "Bought!"
+#: templates/index.html:56
+msgid "NOTE: A few features are currently being rewritten!"
 msgstr ""
 
-#: templates/shuffle.html:10
+#: templates/settings.html:9
+msgid "Page for managing your account, families and groups"
+msgstr ""
+
+#: templates/settings.html:22
+msgid "Your ID:"
+msgstr ""
+
+#: templates/settings.html:26
+msgid "Your name:"
+msgstr ""
+
+#: templates/settings.html:32
+msgid "Your language:"
+msgstr ""
+
+#: templates/settings.html:36
+msgid "Estonian"
+msgstr ""
+
+#: templates/settings.html:37
+msgid "English"
+msgstr ""
+
+#: templates/settings.html:50
+msgid "Link Status"
+msgstr ""
+
+#: templates/settings.html:55
+msgid "Estonian ID card is linked"
+msgstr ""
+
+#: templates/settings.html:56
+msgid "Connect Estonian ID card:"
+msgstr ""
+
+#: templates/settings.html:66 templates/settings.html:89
+#: templates/settings.html:112 templates/settings.html:136
+msgid "Linked"
+msgstr ""
+
+#: templates/settings.html:68 templates/settings.html:91
+#: templates/settings.html:114 templates/settings.html:138
+msgid "Link"
+msgstr ""
+
+#: templates/settings.html:78
+msgid "Google account is linked"
+msgstr ""
+
+#: templates/settings.html:79
+msgid "Connect Google account:"
+msgstr ""
+
+#: templates/settings.html:101
+msgid "Github account is linked"
+msgstr ""
+
+#: templates/settings.html:102
+msgid "Connect Github account:"
+msgstr ""
+
+#: templates/settings.html:125
+msgid "Facebook account is linked"
+msgstr ""
+
+#: templates/settings.html:126
+msgid "Connect Facebook account:"
+msgstr ""
+
+#: templates/setup.html:12
+msgid "On this page you can create everything required for your event."
+msgstr ""
+
+#: templates/setup.html:13
+msgid ""
+"The system tries to avoid shuffles between families but does not exclude "
+"that possibility."
+msgstr ""
+
+#: templates/setup.html:14
+msgid "Enter each person only once in the shuffle."
+msgstr ""
+
+#: templates/setup.html:21
+msgid "Use these buttons to start creating your event"
+msgstr ""
+
+#: templates/setup.html:24
+msgid "Add family"
+msgstr ""
+
+#: templates/setup.html:27
+msgid "Reset"
+msgstr ""
+
+#: templates/setup.html:32
+msgid "Also make sure to enter the group's name:"
+msgstr ""
+
+#: templates/setup.html:36
+msgid "Group's name"
+msgstr ""
+
+#: templates/setup.html:37
+msgid "Make sure you enter a family name"
+msgstr ""
+
+#: templates/shuffle.html:10 templates/table_views/notes_private.html:28
 msgid "View wishlist"
 msgstr ""
 
@@ -626,68 +294,110 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: templates/terms_of_service.html:8
+#: templates/generic/contact.html:10
+msgid "You can contact the host via:"
+msgstr ""
+
+#: templates/generic/help.html:11
+msgid "This page is under construction, sorry"
+msgstr ""
+
+#: templates/generic/placeholder.html:11
+msgid "This page is under construction, sorry!"
+msgstr ""
+
+#: templates/generic/privacy_policy.html:9 views/static.py:152
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/generic/privacy_policy.html:12
+msgid ""
+"The service uses Google Analytics for analytics and Sentry for crash "
+"reporting, so by using this website you agree to them processing data "
+"given to them."
+msgstr ""
+
+#: templates/generic/privacy_policy.html:13
+msgid ""
+"Crash reporting data may consist of but is not limited to usernames, IP "
+"addresses, feedback given and e-mail."
+msgstr ""
+
+#: templates/generic/privacy_policy.html:14
+msgid ""
+"Analytics data consists of browser metadata, visited pages and IP "
+"addresses."
+msgstr ""
+
+#: templates/generic/privacy_policy.html:15
+msgid ""
+"In addition to those, using this service means that you agree that the "
+"host of this site processes your data for the functionality of the site. "
+"Wishlist data, shuffling data and connections between people are shared "
+"with no third party unless with your explicit consent."
+msgstr ""
+
+#: templates/generic/terms_of_service.html:8
 msgid "Terms and conditions"
 msgstr ""
 
-#: templates/terms_of_service.html:18
+#: templates/generic/terms_of_service.html:18
 msgid "By using Loosindus you agree to adhere to these terms and conditions."
 msgstr ""
 
-#: templates/terms_of_service.html:19
+#: templates/generic/terms_of_service.html:19
 msgid ""
 "Any violations of these terms are at minimum subject to termination of "
 "the account at fault."
 msgstr ""
 
-#: templates/terms_of_service.html:20
+#: templates/generic/terms_of_service.html:20
 msgid "You are definetly not allowed to:"
 msgstr ""
 
-#: templates/terms_of_service.html:21
+#: templates/generic/terms_of_service.html:21
 msgid ""
 "* Use any components of Loosindus without complying with the licenses of "
 "respective components"
 msgstr ""
 
-#: templates/terms_of_service.html:22
+#: templates/generic/terms_of_service.html:22
 msgid ""
 "* Cause excessive load on the system, regular use of the service does not"
 " fall under this"
 msgstr ""
 
-#: templates/terms_of_service.html:23
+#: templates/generic/terms_of_service.html:23
 msgid ""
 "* Use the system for other reasons than listed as the features of the "
 "service"
 msgstr ""
 
-#: templates/terms_of_service.html:24
+#: templates/generic/terms_of_service.html:24
 msgid ""
 "* Anything in violation of the law in the country of the host of the "
 "service"
 msgstr ""
 
-#: templates/terms_of_service.html:25
+#: templates/generic/terms_of_service.html:25
 msgid ""
 "But this list is not comprehensive, ask the host of this service if you "
 "have any doubts."
 msgstr ""
 
-#: templates/security/title_bar.html:7 templates/title_bar.html:20
-msgid "About"
+#: templates/security/_menu.html:2
+msgid "Other options"
 msgstr ""
 
-#: templates/security/title_bar.html:8 templates/title_bar.html:21
-msgid "Contact"
+#: templates/security/_menu.html:5
+#: templates/security/email/login_instructions.html:5
+#: templates/security/send_login.html:6 templates/security/send_login.html:11
+msgid "Log in"
 msgstr ""
 
-#: templates/title_bar.html:22
-msgid "Feedback"
-msgstr ""
-
-#: templates/title_bar.html:41
-msgid "Log out"
+#: templates/security/_menu.html:9 templates/security/register_user.html:7
+#: templates/security/register_user.html:11
+msgid "Register"
 msgstr ""
 
 #: templates/security/_menu.html:13
@@ -698,127 +408,127 @@ msgstr ""
 msgid "Confirm account"
 msgstr ""
 
-#: templates/security/change_password.html:4
-#: templates/security/change_password.html:9
+#: templates/security/change_password.html:6
+#: templates/security/change_password.html:11
 msgid "Change password"
 msgstr ""
 
-#: templates/security/change_password.html:20
+#: templates/security/change_password.html:22
 msgid "Password change page"
 msgstr ""
 
-#: templates/security/forgot_password.html:4
-#: templates/security/reset_password.html:4
-#: templates/security/reset_password.html:9
+#: templates/security/forgot_password.html:6
+#: templates/security/reset_password.html:6
+#: templates/security/reset_password.html:11
 msgid "Reset password"
 msgstr ""
 
-#: templates/security/forgot_password.html:9
+#: templates/security/forgot_password.html:11
 msgid "Send password reset instructions"
 msgstr ""
 
-#: templates/security/forgot_password.html:20
-#: templates/security/reset_password.html:22
+#: templates/security/forgot_password.html:22
+#: templates/security/reset_password.html:24
 msgid "Password reset page"
 msgstr ""
 
-#: templates/security/login_user.html:4 templates/security/login_user.html:8
+#: templates/security/login_user.html:6 templates/security/login_user.html:10
 msgid "Login"
 msgstr ""
 
-#: templates/security/login_user.html:22
+#: templates/security/login_user.html:24
 msgid "Log in using Estonian ID card"
 msgstr ""
 
-#: templates/security/login_user.html:28
+#: templates/security/login_user.html:30
 msgid "Log in using Github"
 msgstr ""
 
-#: templates/security/login_user.html:34
+#: templates/security/login_user.html:36
 msgid "Log in using Google"
 msgstr ""
 
-#: templates/security/login_user.html:40
+#: templates/security/login_user.html:42
 msgid "Log in using Facebook"
 msgstr ""
 
-#: templates/security/login_user.html:54
+#: templates/security/login_user.html:56
 msgid "Login page"
 msgstr ""
 
-#: templates/security/register_user.html:28
+#: templates/security/register_user.html:31
 msgid "Sign up using Github"
 msgstr ""
 
-#: templates/security/register_user.html:34
+#: templates/security/register_user.html:37
 msgid "Sign up using Google"
 msgstr ""
 
-#: templates/security/register_user.html:40
+#: templates/security/register_user.html:43
 msgid "Sign up using Facebook"
 msgstr ""
 
-#: templates/security/register_user.html:47
+#: templates/security/register_user.html:50
 msgid "Register page"
 msgstr ""
 
-#: templates/security/send_confirmation.html:4
+#: templates/security/send_confirmation.html:6
 msgid "Confirmation"
 msgstr ""
 
-#: templates/security/send_confirmation.html:8
+#: templates/security/send_confirmation.html:10
 msgid "Resend confirmation instructions"
 msgstr ""
 
-#: templates/security/send_confirmation.html:20
+#: templates/security/send_confirmation.html:22
 msgid "Confirmation resending page"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:6
+#: templates/security/two_factor_setup.html:8
 msgid "Two-factor authentication adds an extra layer of security to your account"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:7
+#: templates/security/two_factor_setup.html:9
 msgid ""
 "In addition to your username and password, you'll need to use a code that"
 " we will send you"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:18
+#: templates/security/two_factor_setup.html:20
 msgid "To complete logging in, please enter the code sent to your mail"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:21
+#: templates/security/two_factor_setup.html:23
 msgid ""
 "Open Google Authenticator on your device and scan the following qrcode to"
 " start receiving codes:"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:22
+#: templates/security/two_factor_setup.html:24
 msgid "Two factor authentication code"
 msgstr ""
 
-#: templates/security/two_factor_setup.html:26
+#: templates/security/two_factor_setup.html:28
 msgid "To Which Phone Number Should We Send Code To?"
 msgstr ""
 
-#: templates/security/two_factor_verify_code.html:6
+#: templates/security/two_factor_verify_code.html:8
 msgid "Two-factor Authentication"
 msgstr ""
 
-#: templates/security/two_factor_verify_code.html:7
+#: templates/security/two_factor_verify_code.html:9
 msgid "Please enter your authentication code"
 msgstr ""
 
-#: templates/security/two_factor_verify_code.html:18
+#: templates/security/two_factor_verify_code.html:20
 msgid "The code for authentication was sent to your email address"
 msgstr ""
 
-#: templates/security/two_factor_verify_code.html:21
+#: templates/security/two_factor_verify_code.html:23
 msgid "A mail was sent to us in order to reset your application account"
 msgstr ""
 
-#: templates/security/two_factor_verify_password.html:6
+#: templates/security/two_factor_verify_password.html:8
 msgid "Please Enter Your Password"
 msgstr ""
 
@@ -908,6 +618,666 @@ msgstr ""
 msgid "You can use the link below to confim your email account: "
 msgstr ""
 
+#: templates/subtemplates/base.html:38
+msgid "Information"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:26
+msgid "About"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:27
+msgid "Contact"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:28
+#: templates/subtemplates/title_bar.html:80
+msgid "Feedback"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:48
+msgid "Dashboard"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:51 views/views.py:444
+#: views/views.py:475
+msgid "My Wishlist"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:54
+msgid "Receiver's Wishlist"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:58 views/views.py:158
+msgid "Shuffles"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:60
+#: templates/table_views/families.html:44
+#: templates/table_views/families.html:69 views/views.py:395
+msgid "Families"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:62
+#: templates/table_views/groups.html:21
+msgid "Groups"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:64
+#: templates/table_views/events.html:14
+msgid "Events"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:66
+#: templates/table_views/group_reminders.html:16
+msgid "Reminders"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:68
+msgid "Notifications"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:70
+msgid "Subscriptions"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:73 views/views.py:785
+msgid "Settings"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:75
+msgid "Log out"
+msgstr ""
+
+#: templates/subtemplates/title_bar.html:78
+msgid "Help"
+msgstr ""
+
+#: templates/table_views/audits.html:7
+msgid "This page lists all audit events related to your account"
+msgstr ""
+
+#: templates/table_views/audits.html:14
+msgid "Event log"
+msgstr ""
+
+#: templates/table_views/audits.html:19 templates/table_views/comments.html:22
+#: templates/table_views/notes_private.html:43
+#: templates/table_views/notes_private_archived.html:35
+#: templates/table_views/notes_public.html:21
+#: templates/table_views/notifications.html:20
+#: templates/table_views/notifications.html:51
+#: templates/table_views/roles.html:21
+msgid "Description"
+msgstr ""
+
+#: templates/table_views/audits.html:20
+#: templates/table_views/notifications.html:22
+#: templates/table_views/notifications.html:53
+msgid "When"
+msgstr ""
+
+#: templates/table_views/comments.html:10
+#: templates/table_views/notes_public.html:9
+msgid "Here is"
+msgstr "Here's"
+
+#: templates/table_views/comments.html:11
+#: templates/table_views/notes_public.html:10
+msgid "'s wishlist, feel free to mark a gift bought :)"
+msgstr ""
+
+#: templates/table_views/comments.html:18
+#: templates/table_views/notes_public.html:17 views/views.py:604
+msgid "Wishlist"
+msgstr ""
+
+#: templates/table_views/comments.html:25
+#: templates/table_views/notes_public.html:24
+msgid "Status"
+msgstr ""
+
+#: templates/table_views/comments.html:26
+#: templates/table_views/notes_public.html:25
+msgid "By whom"
+msgstr ""
+
+#: templates/table_views/comments.html:58
+#: templates/table_views/notes_public.html:57
+msgid "Save"
+msgstr ""
+
+#: templates/table_views/comments.html:62
+#: templates/table_views/comments.html:64
+#: templates/table_views/notes_public.html:61
+#: templates/table_views/notes_public.html:63
+msgid "Bought!"
+msgstr ""
+
+#: templates/table_views/comments.html:73
+#: templates/table_views/notes_public.html:72
+msgid "There are no items in this wishlist"
+msgstr ""
+
+#: templates/table_views/emails.html:7
+msgid "This page lists all emails related to your account"
+msgstr ""
+
+#: templates/table_views/emails.html:14
+msgid "E-mails"
+msgstr ""
+
+#: templates/table_views/emails.html:19
+msgid "E-mail"
+msgstr ""
+
+#: templates/table_views/emails.html:20
+msgid "Verified"
+msgstr ""
+
+#: templates/table_views/emails.html:21
+msgid "Primary"
+msgstr ""
+
+#: templates/table_views/emails.html:22 views/edit.py:220 views/edit.py:222
+#: views/edit.py:294 views/edit.py:296 views/edit.py:437 views/edit.py:439
+#: views/edit.py:594 views/edit.py:596 views/login.py:469
+msgid "Added"
+msgstr ""
+
+#: templates/table_views/events.html:7
+msgid "This page lists all events you're participating in"
+msgstr ""
+
+#: templates/table_views/events.html:19 templates/table_views/groups.html:28
+#: templates/table_views/groups.html:78 templates/table_views/users.html:22
+msgid "ID"
+msgstr ""
+
+#: templates/table_views/events.html:21
+msgid "Created"
+msgstr ""
+
+#: templates/table_views/events.html:24
+#: templates/table_views/group_reminders.html:24
+#: templates/table_views/subscriptions.html:20
+#: templates/table_views/subscriptions.html:40
+msgid "Type"
+msgstr ""
+
+#: templates/table_views/families.html:8
+msgid "This page lists all the families in the "
+msgstr ""
+
+#: templates/table_views/families.html:8
+msgid " you've requested."
+msgstr ""
+
+#: templates/table_views/families.html:10
+msgid "This page lists all the families you're administering or just belong to."
+msgstr ""
+
+#: templates/table_views/families.html:12
+msgid "You can display specific families or if you administer this "
+msgstr ""
+
+#: templates/table_views/families.html:12
+msgid " you can edit its details."
+msgstr ""
+
+#: templates/table_views/families.html:22
+msgid "Event description"
+msgstr ""
+
+#: templates/table_views/families.html:25
+msgid "Name:"
+msgstr ""
+
+#: templates/table_views/families.html:26
+msgid "Date:"
+msgstr ""
+
+#: templates/table_views/families.html:27
+msgid "Has taken place:"
+msgstr ""
+
+#: templates/table_views/families.html:34
+msgid "Administration controls"
+msgstr ""
+
+#: templates/table_views/families.html:38
+msgid "Modify details"
+msgstr ""
+
+#: templates/table_views/families.html:49
+#: templates/table_views/families.html:74
+msgid "Family's name"
+msgstr ""
+
+#: templates/table_views/families.html:58
+#: templates/table_views/families.html:84 templates/table_views/groups.html:48
+#: templates/table_views/groups.html:95
+#: templates/table_views/notifications.html:30
+#: templates/table_views/notifications.html:61
+#: templates/table_views/users.html:56
+msgid "Display"
+msgstr ""
+
+#: templates/table_views/families.html:89
+msgid "Modify"
+msgstr ""
+
+#: templates/table_views/group_reminders.html:8
+msgid "This page lists all reminders every member in the group can receive"
+msgstr ""
+
+#: templates/table_views/group_reminders.html:9
+msgid "You can manually resend or configure the alerts"
+msgstr ""
+
+#: templates/table_views/group_reminders.html:22
+msgid "Last check"
+msgstr ""
+
+#: templates/table_views/group_reminders.html:23
+msgid "Last sent"
+msgstr ""
+
+#: templates/table_views/groups.html:8
+msgid "This page lists all groups you're in or just manage."
+msgstr ""
+
+#: templates/table_views/groups.html:11
+msgid "Add new family"
+msgstr ""
+
+#: templates/table_views/groups.html:13
+msgid "Manage events"
+msgstr ""
+
+#: templates/table_views/groups.html:55 templates/table_views/groups.html:102
+#: templates/table_views/users.html:69
+msgid "Remove"
+msgstr ""
+
+#: templates/table_views/groups.html:68
+msgid "Administered groups"
+msgstr ""
+
+#: templates/table_views/groups.html:71
+msgid "You might not belong to these groups but you can administer them"
+msgstr ""
+
+#: templates/table_views/notes_private.html:8
+msgid ""
+"Here is your personal wishlist, this can be viewed by anyone in your "
+"groups, including your personal santa"
+msgstr ""
+
+#: templates/table_views/notes_private.html:15
+#: templates/table_views/notes_private_archived.html:14
+msgid "Options"
+msgstr ""
+
+#: templates/table_views/notes_private.html:18
+msgid "You can add new wishes using the button below."
+msgstr ""
+
+#: templates/table_views/notes_private.html:22
+#: templates/table_views/notes_private_archived.html:21
+msgid "Add new"
+msgstr ""
+
+#: templates/table_views/notes_private.html:25
+msgid "View archive"
+msgstr ""
+
+#: templates/table_views/notes_private.html:39
+msgid "Your wishlist"
+msgstr ""
+
+#: templates/table_views/notes_private.html:45
+#: templates/table_views/notes_private.html:62
+#: templates/table_views/notes_private.html:66
+msgid "Delete"
+msgstr ""
+
+#: templates/table_views/notes_private.html:46
+#: templates/table_views/notes_private.html:72
+#: templates/table_views/notes_private.html:75
+msgid "Edit"
+msgstr ""
+
+#: templates/table_views/notes_private.html:79
+msgid "There's no wishlist items here"
+msgstr ""
+
+#: templates/table_views/notes_private_archived.html:7
+msgid "Here are your archived wishlist items"
+msgstr ""
+
+#: templates/table_views/notes_private_archived.html:31
+msgid "Archived wishlist items"
+msgstr ""
+
+#: templates/table_views/notifications.html:8
+msgid "This page lists all your notifications"
+msgstr ""
+
+#: templates/table_views/notifications.html:15
+msgid "Active notifications"
+msgstr ""
+
+#: templates/table_views/notifications.html:36
+#: templates/table_views/notifications.html:67
+msgid "You don't have any notifications"
+msgstr ""
+
+#: templates/table_views/notifications.html:46
+msgid "Dismissed notifications"
+msgstr ""
+
+#: templates/table_views/roles.html:8
+msgid "This page lists all your system roles"
+msgstr ""
+
+#: templates/table_views/roles.html:15
+msgid "Roles"
+msgstr ""
+
+#: templates/table_views/roles.html:20
+msgid "Role"
+msgstr ""
+
+#: templates/table_views/shuffles.html:10
+msgid "This page shows you all the people you should be making a gift"
+msgstr ""
+
+#: templates/table_views/shuffles.html:17
+msgid "Active shuffles"
+msgstr ""
+
+#: templates/table_views/shuffles.html:22
+#: templates/table_views/shuffles.html:53
+msgid "From"
+msgstr ""
+
+#: templates/table_views/shuffles.html:23
+#: templates/table_views/shuffles.html:54
+msgid "To"
+msgstr ""
+
+#: templates/table_views/shuffles.html:24
+#: templates/table_views/shuffles.html:55
+msgid "Event name"
+msgstr ""
+
+#: templates/table_views/shuffles.html:48
+msgid "Old shuffles"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:7
+msgid "This page lists all your subscriptions"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:15
+msgid "Your subscriptions"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:21
+#: templates/table_views/subscriptions.html:42
+msgid "Until"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:22
+#: templates/table_views/subscriptions.html:43
+msgid "Active"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:35
+msgid "Subscriptions you administer"
+msgstr ""
+
+#: templates/table_views/subscriptions.html:41
+msgid "Who"
+msgstr ""
+
+#: templates/table_views/users.html:7
+msgid "This page lists all the people in this family"
+msgstr ""
+
+#: templates/table_views/users.html:15
+msgid "Users"
+msgstr ""
+
+#: templates/table_views/users.html:20
+msgid "Member"
+msgstr ""
+
+#: templates/table_views/users.html:25
+msgid "Birthday"
+msgstr ""
+
+#: templates/table_views/users.html:27
+msgid "Actions"
+msgstr ""
+
+#: templates/table_views/users.html:48
+msgid "Unknown"
+msgstr ""
+
+#: templates/utility/error.html:18
+msgid "Error ID is: "
+msgstr ""
+
+#: templates/utility/error.html:22 templates/utility/success.html:12
+msgid "Back"
+msgstr ""
+
+#: views/edit.py:41 views/edit.py:80
+msgid "Your wish"
+msgstr ""
+
+#: views/edit.py:61
+msgid "Pls no hax "
+msgstr ""
+
+#: views/edit.py:71 views/edit.py:100 views/edit.py:114 views/static.py:34
+msgid "An error occured"
+msgstr ""
+
+#: views/edit.py:118 views/edit.py:120
+msgid "Changed"
+msgstr ""
+
+#: views/edit.py:146 views/edit.py:238 views/static.py:119 views/static.py:161
+msgid "Broken link"
+msgstr ""
+
+#: views/edit.py:155
+msgid ""
+"Can't find what you wanted to delete or some other error occured while "
+"deleting"
+msgstr ""
+
+#: views/edit.py:161 views/edit.py:163
+msgid "Removed"
+msgstr ""
+
+#: views/edit.py:182
+msgid "You're wishing for too much"
+msgstr ""
+
+#: views/edit.py:186
+msgid "Santa can't bring you nothing, "
+msgstr ""
+
+#: views/edit.py:202
+msgid "You're wishing for too much, "
+msgstr ""
+
+#: views/edit.py:268
+msgid "Edit family"
+msgstr ""
+
+#: views/edit.py:290 views/edit.py:300 views/edit.py:315
+msgid "Faulty input"
+msgstr ""
+
+#: views/edit.py:329
+msgid "Edit group"
+msgstr ""
+
+#: views/edit.py:346 views/edit.py:356 views/edit.py:363 views/edit.py:384
+#: views/edit.py:402 views/edit.py:416 views/edit.py:423 views/edit.py:447
+#: views/edit.py:454 views/edit.py:473 views/edit.py:487 views/edit.py:495
+#: views/edit.py:502 views/edit.py:521 views/edit.py:539 views/edit.py:551
+#: views/edit.py:558 views/edit.py:577 views/edit.py:591 views/edit.py:602
+#: views/edit.py:609 views/edit.py:627 views/edit.py:637 views/edit.py:645
+#: views/edit.py:682 views/edit.py:695
+msgid "An error has occured"
+msgstr ""
+
+#: views/edit.py:392 views/edit.py:529
+msgid "You can not delete an admin from your family"
+msgstr ""
+
+#: views/edit.py:406 views/edit.py:408 views/edit.py:468 views/edit.py:470
+#: views/edit.py:543 views/edit.py:545 views/edit.py:640 views/edit.py:642
+msgid "Deleted"
+msgstr ""
+
+#: views/edit.py:655 views/edit.py:664
+msgid "Group ID"
+msgstr ""
+
+#: views/edit.py:700
+msgid "Added to queue"
+msgstr ""
+
+#: views/edit.py:702
+msgid "Shuffling started"
+msgstr ""
+
+#: views/edit.py:756
+msgid "Could not edit"
+msgstr ""
+
+#: views/login.py:196 views/login.py:208 views/login.py:212 views/login.py:218
+msgid "Error logging in"
+msgstr ""
+
+#: views/login.py:239
+msgid ""
+"That account is not linked to any system account, check if you already "
+"have an account."
+msgstr ""
+
+#: views/login.py:260
+msgid "Error signing up, please try again"
+msgstr ""
+
+#: views/login.py:281 views/login.py:287 views/login.py:299 views/login.py:326
+#: views/login.py:355 views/login.py:366
+msgid "Error signing up"
+msgstr ""
+
+#: views/login.py:314
+msgid "You have no associated email addresses with your account"
+msgstr ""
+
+#: views/login.py:322
+msgid "You have no associated email addresses with that account"
+msgstr ""
+
+#: views/login.py:334
+msgid ""
+"This email address is in use, you must log in with your password to link "
+"{provider}"
+msgstr ""
+
+#: views/login.py:346
+msgid "Password is set randomly, use \"Forgot password\" to set another password"
+msgstr ""
+
+#: views/login.py:375
+msgid "You do not have an account"
+msgstr ""
+
+#: views/login.py:429 views/login.py:438 views/login.py:463 views/login.py:473
+msgid "Error!"
+msgstr ""
+
+#: views/login.py:468
+msgid "Added!"
+msgstr ""
+
+#: views/static.py:38
+msgid "Unfortunately this page was not found"
+msgstr ""
+
+#: views/static.py:54
+msgid "Here you go!"
+msgstr ""
+
+#: views/static.py:142
+msgid "Terms of Service"
+msgstr ""
+
+#: views/test.py:52 views/test.py:54
+msgid "Sent"
+msgstr ""
+
+#: views/views.py:132
+msgid "Home"
+msgstr ""
+
+#: views/views.py:169
+msgid "Setup"
+msgstr ""
+
+#: views/views.py:197
+msgid "Shuffle"
+msgstr ""
+
+#: views/views.py:235 views/views.py:263
+msgid "Event"
+msgstr ""
+
+#: views/views.py:278 views/views.py:291 views/views.py:298 views/views.py:323
+msgid "You do are not authorized to access this family"
+msgstr ""
+
+#: views/views.py:329
+msgid "Family"
+msgstr ""
+
+#: views/views.py:469
+msgid "Right now there's nothing in the Wishlist"
+msgstr ""
+
+#: views/views.py:499 views/views.py:517
+msgid "To view your own list use the sidebar"
+msgstr ""
+
+#: views/views.py:530 views/views.py:543
+msgid "Not authorized"
+msgstr ""
+
+#: views/views.py:628
+msgid "or with your own name"
+msgstr ""
+
+#: views/views.py:639
+msgid "Graph"
+msgstr ""
+
+#: views/views.py:643
+msgid ""
+"Shuffling has not yet been done for your group (or some other error "
+"occured)!"
+msgstr ""
+
 #~ msgid "This page lists all the families that the group contains"
 #~ msgstr ""
 
@@ -940,4 +1310,112 @@ msgstr ""
 
 #~ msgid "Your wish..."
 #~ msgstr ""
+
+#~ msgid "Eesnimi"
+#~ msgstr ""
+
+#~ msgid "Santa can't bring you nothin', "
+#~ msgstr ""
+
+#~ msgid "Can't find what you wanted to delete"
+#~ msgstr ""
+
+#~ msgid "Access to this list is forbidden"
+#~ msgstr ""
+
+#~ msgid "Forbidden"
+#~ msgstr ""
+
+#~ msgid "Right now there isn't anything on the list"
+#~ msgstr ""
+
+#~ msgid "Generated"
+#~ msgstr ""
+
+#~ msgid "Just send me an email (for ex. whois contains my email)"
+#~ msgstr ""
+
+#~ msgid "This page should pop up a feedback form you can fill"
+#~ msgstr ""
+
+#~ msgid "Jõulurakendus"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Simple and free web service for "
+#~ "managing secret santa shuffling, sharing "
+#~ "wishlists and reminding everyone"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Selle lehe puhul on tegu väga "
+#~ "lihtsa lehega enda jõulunimekirja koostamise"
+#~ " jaoks, selle\n"
+#~ "                enda\n"
+#~ "                \"jõuluvanaga\"\n"
+#~ "                jagamiseks 🎅, nimede loosimise"
+#~ " korraldamise jaoks. Töötab hästi nii "
+#~ "mobiilil kui arvutil! Katsetamiseks\n"
+#~ "                registreeru (või logi sisse)."
+#~ msgstr ""
+#~ "This website tries to make handling "
+#~ "everything Secret Santa related as easy"
+#~ " as possible. Creating shuffles, wishlists"
+#~ " and sharing them with each other "
+#~ "has never been this easy (if you"
+#~ " actually know of a service that "
+#~ "makes it easier, let me know).\n"
+#~ "Sign up or log in to test it"
+#~ " out, you may need more than "
+#~ "one user to test out full "
+#~ "functionality"
+
+#~ msgid ""
+#~ "Here is your personal wishlist, this "
+#~ "can be viewed by anyone in your"
+#~ " group, including your personal santa"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The service uses Google Analytics for"
+#~ " analytics and Sentry for crash "
+#~ "reporting, so by using this website "
+#~ "you agree to them processing your "
+#~ "data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Crash reporting data may consist of "
+#~ "but is not limited to usernames, "
+#~ "IP addresses, feedback given and "
+#~ "e-mails. This is simply because "
+#~ "otherwise problems occuring with the "
+#~ "service would be too hard for me"
+#~ " to debug, special arrangements can "
+#~ "in theory be made."
+#~ msgstr ""
+
+#~ msgid "Create new..."
+#~ msgstr ""
+
+#~ msgid "Use these buttons to start creating new families and groups"
+#~ msgstr ""
+
+#~ msgid "Create family"
+#~ msgstr ""
+
+#~ msgid "Create group"
+#~ msgstr ""
+
+#~ msgid "Your families:"
+#~ msgstr ""
+
+#~ msgid "Change / Display"
+#~ msgstr ""
+
+#~ msgid "Your groups:"
+#~ msgstr ""
+
+#~ msgid "'s wishlist, you can change their wishlist items' statuses"
+#~ msgstr "'s wishlist, you can change their wishlist items' statuses"
 
