@@ -640,9 +640,10 @@ def graph():
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
-                               message=_(
-                                   "Shuffling has not yet been done for your group (or some other error occured)!"),
-                               title=_("Error"),
+                               message=
+                               _("Shuffling has not yet been done for your group (or some other error occured)!"),
+                               title=
+                               _("Error"),
                                no_video=True)
 
 
@@ -717,10 +718,11 @@ def graph_js(graph_id, unhide):
     """
     Returns the JS required to graph one specific graph
     """
-    return render_template("grapher.js",
-                           graph_id=graph_id,
-                           unhide=unhide), \
-           200, {"content-type": "application/javascript"}
+    return render_template(
+        "grapher.js",
+        graph_id=graph_id,
+        unhide=unhide
+    ), 200, {"content-type": "application/javascript"}
 
 
 @main_page.route("/settings")
@@ -750,8 +752,9 @@ def settings():
     for family in user.families:
         for group_relationship in family.groups:
             if user in group_relationship.admins:
-                if GroupAdmin.query.get(user_id=user.id, group_id=group_relationship.id):
-                    user_groups[group_relationship.description] = (group_relationship.id, group_admin.admin)
+                curr_group = GroupAdmin.query.get(user_id=user.id, group_id=group_relationship.id)
+                if curr_group.admin:
+                    user_groups[group_relationship.description] = (group_relationship.id, True)
                     group_admin = True
                 else:
                     user_groups[group_relationship.description] = (group_relationship.id, False)

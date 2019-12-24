@@ -2,10 +2,21 @@
 """
 Celery worker that solves the graph problem given to it
 """
-from main import celery
+from datetime import datetime
+
+import sentry_sdk
+from flask import render_template
+from flask_security.utils import _
+from sqlalchemy import and_
+from sqlalchemy.orm.exc import NoResultFound
+
+import secretsanta
+from main import celery, db
+from models.family_model import Family, FamilyGroup
+from models.shuffles_model import Shuffle
 
 
-@celery.task(bind=True)
+@celery.task(bind=True, acks_late=True)
 def calculate_shuffle(self, people, connections):
     """
     Just calculates a shuffle based on the given parameters

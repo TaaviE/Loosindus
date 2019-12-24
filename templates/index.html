@@ -7,15 +7,15 @@
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
             <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
             {% if events|length == 1 %}
-            <h4>{{ _("Welcome back!") }}</h4>
-            <p>{{ _("You currently have one active event") }}</p>
-            {% if events|length > 1 %}
+                <h4>{{ _("Welcome back!") }}</h4>
+                <p>{{ _("You currently have one active event") }}</p>
+            {% elif events|length > 1 %}
                 <h4>{{ _("Hi, which event do you wish to see?") }}</h4>
             {% else %}
                 <h6>{{ _("You don't have any events you're participating in") }}</h6>
                 <p>{{ _("Do you want to create one?") }}</p>
                 <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                      href="/setup">Setup</a></p>
+                      href="{{ url_for("main_page.setup") }}">{{ _("Setup") }}</a></p>
             {% endif %}
         </div>
 
@@ -35,7 +35,7 @@
                         <td>{{ event["group_name"] }}</td>
                         <td>
                             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="/event/{{ event["id"] }}">Open</a></td>
+                               href="{{ url_for("main_page.event", event_id=event["id"]) }}">{{ _("Open") }}</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
