@@ -56,6 +56,7 @@ def test_mail():
 
 """
 @test_page.route("/testlogin/<user_id>")
+@roles_required("Superadmin")
 def test_login(user_id):
     login_user(User.query.get(int(user_id)))
     return ""

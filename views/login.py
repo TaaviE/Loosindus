@@ -16,7 +16,8 @@ from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.contrib.github import make_github_blueprint
 from flask_dance.contrib.google import make_google_blueprint
 from flask_login import current_user, login_required
-from flask_security import hash_password, login_user, logout_user, verify_password
+from flask_security import hash_password, login_user, logout_user
+from flask_security.utils import verify_password
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.utils import redirect
@@ -311,8 +312,9 @@ def oauth_handler(blueprint, token):
                                     user_email is None or \
                                     len(user_email) < len("a@b.cc") or \
                                     "@" not in user_email:
-                                flash(_("You have no associated email addresses with your account"))
-                                logger.error("User does not have any emails")
+                                flash(_(
+                                    "You have no associated email addresses with your account or none of them are valid"))
+                                logger.error("User does not have any emails or none of them are valid")
                                 return False
                             else:
                                 pass  # All is okay again
