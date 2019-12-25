@@ -98,13 +98,10 @@ def calculate_shuffle(self, event_id):
 
     # Store shuffle into the database
     for giver, getter in families_shuf_ids.items():
-        # The assumption is that one group shouldn't have more than one shuffle a year active
-        # at the same time, there can be multiple with different years
         db_entry_shuffle = Shuffle(
             giver=user_number_to_user_id[giver],
             getter=user_number_to_user_id[getter],
-            year=time_right_now.year,
-            group=event.group_id
+            event_id=event_id
         )
         try:
             db.session.add(db_entry_shuffle)
