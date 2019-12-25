@@ -3,39 +3,39 @@
 Celery worker that solves the graph problem given to it
 """
 from datetime import datetime
+from typing import List, Tuple, Dict
 
 import sentry_sdk
-from flask import render_template
-from flask_security.utils import _
+from celery.utils.log import get_task_logger
 from sqlalchemy import and_
-from sqlalchemy.orm.exc import NoResultFound
 
-import secretsanta
 from main import celery, db
-from models.family_model import Family, FamilyGroup
+from models.events_model import ShufflingEvent
+from models.family_model import Family
 from models.shuffles_model import Shuffle
+from models.users_model import User
+from secretsanta import connectiongraph, secretsantagraph
+
+logger = get_task_logger(__name__)
+
+from utility_standalone import set_recursionlimit
+
+set_recursionlimit()
 
 
 @celery.task(bind=True, acks_late=True)
-def calculate_shuffle(self, people, connections):
+def calculate_shuffle(self, event_id):
     """
     Just calculates a shuffle based on the given parameters
+    @warning Assumes permission has been checked
     """
-    family_obj = Family.query.get(family_id)
-    time_right_now = datetime.now()
+    event: ShufflingEvent = ShufflingEvent.query.get(event_id).one()
+    database_families: List[Family] = event.group.families
 
-    database_families = Family.query.filter(
-        Family.id.in_(
-            set([familygroup.family_id for familygroup in FamilyGroup.query.filter(
-                FamilyGroup.family_id == family_obj.id
-            ).all()])
-        )
-    ).all()
-    database_all_families_with_members = []
+    # Gather together a list of tuples that contain the family id and a list of all its members
+    database_all_families_with_members: List[Tuple[int, List[User]]] = []
     for db_family in database_families:
-        database_family_members = UserFamilyAdmin.query.filter(
-            UserFamilyAdmin.family_id == db_family.id).all()
-        database_all_families_with_members.append((db_family.id, database_family_members))
+        database_all_families_with_members.append((db_family.id, db_family.members))
 
     user_id_to_user_number = {}
     user_number_to_user_id = {}
@@ -46,51 +46,44 @@ def calculate_shuffle(self, people, connections):
             user_id_to_user_number[member.user_id] = start_id
             start_id += 1
 
-    try:
-        if not UserGroupAdmin.query.filter(
-                UserGroupAdmin.user_id == int(user_id) and UserGroupAdmin.admin == True).one():
-            return render_template("utility/error.html",
-                                   message=_("Access denied"),
-                                   title=_("Error"))
-    except NoResultFound:
-        return render_template("utility/error.html",
-                               message=_("Access denied"),
-                               title=_("Error"))
-    except Exception as e:
-        sentry_sdk.capture_exception(e)
-
     families = []
     family_ids_map = {}
+    # Give every family a new ID
     for family_index, (list_family_id, list_family) in enumerate(database_all_families_with_members):
         families.insert(family_index, {})
         for person_index, person in enumerate(list_family):
             family_ids_map[family_index] = list_family_id
-            families[family_index][get_person_name(person.user_id)] = user_id_to_user_number[person.user_id]
+            families[family_index][person.first_name] = user_id_to_user_number[person.user_id]
 
     families_shuf_ids = {}
     members_to_families = {}
+    # Create a lookup table for each person to family ID
     for family_id, family_members in enumerate(families):
         for person, person_id in family_members.items():
             members_to_families[person_id] = family_id
 
     families_to_members = {}
+    # Create a lookup table for each family to user ID
     for family_id, family_members in enumerate(families):
         families_to_members[family_id] = set()
         for person, person_id in family_members.items():
             currentset = families_to_members[family_id]
             currentset.update([person_id])
 
-    last_connections = secretsanta.connectiongraph.ConnectionGraph(members_to_families, families_to_members)
+    # Create a graph for last years' shuffle
+    last_connections = connectiongraph.ConnectionGraph(members_to_families, families_to_members)
 
-    family_group = FamilyGroup.query.filter(FamilyGroup.family_id == family_obj.id).one().group_id
-    for group_shuffle in Shuffle.query.filter(Shuffle.group == family_group).all():  # Get last previous shuffles
+    for group_shuffle in Shuffle.query.filter(Shuffle.group == event.group_id).all():  # Get last previous shuffles
         last_connections.add(user_id_to_user_number[group_shuffle.giver],
                              user_id_to_user_number[group_shuffle.getter],
                              group_shuffle.year)
 
+    # Get current year
+    time_right_now = datetime.now()
     logger.info("{} is the year of Linux Desktop".format(time_right_now.year))
 
-    santa = secretsanta.secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
+    # Create a graph for
+    santa = secretsantagraph.SecretSantaGraph(families_to_members, members_to_families, last_connections)
 
     shuffled_ids_str = {}
     for connection in santa.generate_connections(time_right_now.year):
@@ -99,6 +92,11 @@ def calculate_shuffle(self, people, connections):
 
     logger.info(shuffled_ids_str)
 
+    # Do sanity checking on the generated sequence
+    if not basic_shuffle_sanity_check(families_shuf_ids, len(user_id_to_user_number)):
+        return False
+
+    # Store shuffle into the database
     for giver, getter in families_shuf_ids.items():
         # The assumption is that one group shouldn't have more than one shuffle a year active
         # at the same time, there can be multiple with different years
@@ -106,7 +104,7 @@ def calculate_shuffle(self, people, connections):
             giver=user_number_to_user_id[giver],
             getter=user_number_to_user_id[getter],
             year=time_right_now.year,
-            group=family_group
+            group=event.group_id
         )
         try:
             db.session.add(db_entry_shuffle)
@@ -125,3 +123,57 @@ def calculate_shuffle(self, people, connections):
                 db.session.rollback()
                 sentry_sdk.capture_exception(e2)
     return
+
+
+def basic_shuffle_sanity_check(shuffle: Dict[int, int], len_people):
+    """
+    Performs basic shuffle sanity checking by checking for cyclicity,
+    if everyone has a shuffle and noone gets two gifts
+
+    @param shuffle: Given shuffle
+    @param len_people: Amount of people in the shuffle
+    @return: If the shuffle passes basic sanity checks
+    """
+    # If there's inequal amount of shuffles to people
+    if len(shuffle) != len_people:
+        logger.error("Not everyone was shuffled in the group")
+        return False
+
+    # If there's less different receivers than the amount of people
+    if len(set(shuffle.values())) != len_people:
+        return False
+
+    # Create a dictionary graph,
+    graph = {}
+    for giver, getter in shuffle.items():
+        graph[giver] = getter
+
+    if len(graph) <= 0:
+        return False
+
+    valid = True
+    while len(graph) != 0:
+        valid = traverse_graph(graph, getter, getter)
+        if not valid:
+            return False
+
+    return valid
+
+
+def traverse_graph(graph: Dict[int, int], location: int, beginning: int):
+    """
+    Traverses entire graph, checks if cyclic
+
+    @param graph: Complete graph
+    @param location: Current location
+    @param beginning: Where the iteration was started
+    @return: if the current graph is cyclic
+    """
+    if location in graph.keys():
+        if location != beginning:
+            traverse_graph(graph, graph[location], beginning)
+            graph.pop(location)
+        else:
+            return False
+    else:
+        return False

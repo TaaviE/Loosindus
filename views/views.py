@@ -81,8 +81,6 @@ main_page = Blueprint("main_page", __name__, template_folder="templates")
 from utility import *
 from utility_standalone import *
 
-set_recursionlimit()
-
 # Just for assigning members_to_families a few colors
 chistmasy_colors = ["#E5282A", "#DC3D2A", "#0DEF42", "#00B32C", "#0D5901"]
 
