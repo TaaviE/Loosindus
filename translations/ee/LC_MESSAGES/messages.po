@@ -845,7 +845,7 @@ msgstr ""
 
 #: templates/table_views/families.html:26
 msgid "Date:"
-msgstr ""
+msgstr "Kuupäev:"
 
 #: templates/table_views/families.html:27
 msgid "Has taken place:"
