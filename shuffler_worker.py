@@ -18,9 +18,9 @@ from secretsanta import connectiongraph, secretsantagraph
 
 logger = get_task_logger(__name__)
 
-from utility_standalone import set_recursionlimit
+from utility_standalone import set_recursion_limit
 
-set_recursionlimit()
+set_recursion_limit()
 
 
 @celery.task(bind=True, acks_late=True)
@@ -150,6 +150,7 @@ def basic_shuffle_sanity_check(shuffle: Dict[int, int], len_people):
 
     valid = True
     while len(graph) != 0:
+        getter = list(graph.keys())[0]
         valid = traverse_graph(graph, getter, getter)
         if not valid:
             return False

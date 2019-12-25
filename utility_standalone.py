@@ -95,7 +95,7 @@ def get_user_id() -> int:
     return int(session["user_id"])
 
 
-def set_recursionlimit() -> None:
+def set_recursion_limit() -> None:
     """
     Sets the recustion limit required by shuffling
     """
