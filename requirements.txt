@@ -3,7 +3,7 @@ Flask-SqlAlchemy==2.4.1
 Flask-Script==2.0.6
 Flask-Mail==0.9.1
 Flask-WTF==0.14.3
-Flask-Babelex==0.9.3
+Flask-Babelex==0.9.4
 Flask-Dance[sqla]==3.0.0
 Flask-Security-Too==3.3.2
 bcrypt --no-binary bcrypt==3.1.7
