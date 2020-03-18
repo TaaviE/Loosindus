@@ -9,10 +9,42 @@
         {% else %}
             <p>{{ _("This page lists all the families you're administering or just belong to.") }}</p>
         {% endif %}
-        <p>{{ _("You can display specific families or if you administer this ") + title.lower() + _(" you can edit its details.") }}</p>
+        <p>{{ _("You can look who are in the families, or if you administer this ") + title.lower() + _(" you can edit its details.") }}</p>
     </div>
 {% endblock %}
 
+{% block buttons %}
+    {% if is_group_admin and not is_edit_mode %}
+        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
+            <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="mdl-card__title-text">{{ _("Group tools") }}</h2>
+            </div>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.group_edit_get", group_id=group_id) }}">{{ _("Open administration page") }}</a>
+                </p>
+            </div>
+        </div>
+    {% elif is_edit_mode %}
+        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--4-col">
+            <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+                <h2 class="mdl-card__title-text">{{ _("Group tools") }}</h2>
+            </div>
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.group_rename", group_id=group_id) }}">{{ _("Rename group") }}</a></p>
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.group_delete", group_id=group_id) }}">{{ _("Delete group") }}</a></p>
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.group_create_shuffle", group_id=group_id) }}">{{ _("Create a new shuffle") }}</a>
+                </p>
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("edit_page.group_add_family", group_id=group_id) }}">{{ _("Add new family") }}</a>
+                </p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
@@ -57,41 +89,15 @@
                            href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
                             {{ _("Display") }}</a>
                     </td>
+                    {% if is_edit_mode %}
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="{{ url_for("edit_page.group_") }}">{{ _("Remove") }}</a>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-
-    {% if not event and administered_families %}
-        <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-            <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
-                <h2 class="mdl-card__title-text">{{ _("Families") }}</h2>
-            </div>
-            <table class="mdl-data-table mdl-js-data-table custom-fill">
-                <tbody>
-                <tr>
-                    <th>{{ _("Family's name") }}</th>
-                    <th>{{ _("Action") }}</th>
-                    <th></th>
-                </tr>
-                {% for family in administered_families %}
-                    <tr>
-                        <td>{{ family["name"] }}</td>
-                        <td>
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="/family/{% if group_id != None %}{{ group_id }}/{% endif %}{{ family["id"] }}">
-                                {{ _("Display") }}</a>
-                        </td>
-                        <td>
-                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="/edit/family/{{ family["id"] }}">
-                                {{ _("Modify") }}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
 {% endblock %}

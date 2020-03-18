@@ -105,8 +105,10 @@ def index():
     active_events: List[ShufflingEvent] = []
     inactive_events: List[ShufflingEvent] = []
 
+    has_groups = False
     for user_family in user.families:
         for family_group in user_family.groups:
+            has_groups = True
             for group_event in family_group.events:
                 group_event.group_name = family_group.name
                 if datetime.now() < group_event.event_at:  # If event has not taken place
@@ -126,6 +128,7 @@ def index():
                            auth=user.first_name,
                            events=active_events,
                            uid=user_id,
+                           has_groups=has_groups,
                            title=_("Home"))
 
 
@@ -207,9 +210,9 @@ def event(event_id: str):
     if not requested_event:
         return render_template("utility/error.html")
 
-    requested_group = Group.query.get(requested_event.group_id)
-
+    requested_group: Group = Group.query.get(requested_event.group_id)
     authorized = False
+
     for group_family in requested_group.families:
         for member in group_family.members:
             if member.id == user_id:
@@ -245,16 +248,25 @@ def group(group_id: str):
         return render_template("utility/error.html")
 
     authorized = False
-    for family in group.families:
-        for member in family.members:
-            if member.id == user_id:
-                authorized = True
-                break
+    is_group_admin = False
+    for group_admin in group.admins:
+        if group_admin.id == user_id:
+            is_group_admin = True
+            authorized = True
+            break
+
+    if not authorized:
+        for family in group.families:
+            for member in family.members:
+                if member.id == user_id:
+                    authorized = True
+                    break
 
     if not authorized:
         return render_template("utility/error.html")
 
     return render_template("table_views/families.html",
+                           is_group_admin=is_group_admin,
                            families=group.families,
                            group_id=group.id,
                            title=_("Event"))
