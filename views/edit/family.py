@@ -10,6 +10,7 @@ from flask_babelex import gettext as _
 from flask_login import login_required
 from sqlalchemy import and_
 
+from config import Config
 from main import db
 from models.family_model import Family
 from models.users_model import User, UserFamily
@@ -238,12 +239,3 @@ def editfam_with_action():
             return render_template("utility/error.html",
                                    message=_("An error has occured"),
                                    title=_("Error"))
-
-
-@edit_page.route("/family/add", methods=["GET"])
-@login_required
-def add_family():
-    return render_template("creatething.html",
-                           row_count=1,
-                           endpoint="editfam",
-                           label=_("Group ID"))

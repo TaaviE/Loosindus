@@ -202,15 +202,3 @@ def group_edit(group_id: str):
             return render_template("utility/error.html",
                                    message=_("An error has occured"),
                                    title=_("Error"))
-
-
-@edit_page.route("/group/add", methods=["GET"])
-@login_required
-def add_group():
-    """
-    Allows creating a single empty group with the given name
-    """
-    return render_template("creatething.html",
-                           row_count=1,
-                           endpoint="editgroup",
-                           label=_("Group ID"))
