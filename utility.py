@@ -10,6 +10,8 @@ from functools import lru_cache
 
 import pyximport
 
+from utility_standalone import get_user_id
+
 pyximport.install()
 
 from models.family_model import Family, FamilyGroup
@@ -20,6 +22,13 @@ from datetime import datetime
 from sqlalchemy import and_
 
 import sentry_sdk
+
+
+def get_user() -> User:
+    """
+    @return: Returns the user from session as User
+    """
+    return User.query.get(get_user_id())
 
 
 def get_person(user_id: int) -> User:

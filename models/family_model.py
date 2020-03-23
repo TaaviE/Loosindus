@@ -40,8 +40,7 @@ class Group(db.Model):
 
     events: List[ShufflingEvent] = relationship("ShufflingEvent")
 
-    def __init__(self, group_id: int, group_name: str):
-        self.id = group_id
+    def __init__(self, group_name: str):
         self.name = group_name
 
     def __repr__(self):
@@ -116,8 +115,13 @@ class GroupAdmin(db.Model):
     __tablename__ = "groups_admins"
     user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, unique=True, nullable=False)
     group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False)
+    admin: bool = Column(Boolean, nullable=False, default=True)  # TODO: Unused
     confirmed: bool = Column(Boolean, nullable=False, default=False)
+
+    def __init__(self, user_id, group_id, confirmed=False):
+        self.user_id = user_id
+        self.group_id = group_id
+        self.confirmed = confirmed
 
     def __repr__(self):
         return "<user_id {}, group_id {}, admin {}>".format(self.user_id, self.group_id, self.admin)

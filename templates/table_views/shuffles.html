@@ -16,32 +16,47 @@
         <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
             <h2 class="mdl-card__title-text">{{ _("Active shuffles") }}</h2>
         </div>
-        <table class="mdl-data-table mdl-js-data-table custom-fill">
-            <tbody>
-            <tr>
-                <th>{{ _("From") }}</th>
-                <th>{{ _("To") }}</th>
-                <th>{{ _("Event name") }}</th>
-                <th>{{ _("Group") }}</th>
-                <th></th>
-            </tr>
-            {% for shuffle in active_shuffles %}
+        {% if active_shuffles %}
+            <table class="mdl-data-table mdl-js-data-table custom-fill">
+                <tbody>
                 <tr>
-                    <td>{{ shuffle["giver_name"] }}</td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="/wishlist/{{ shuffle["getter"] }}">
-                        {{ shuffle["getter_name"] }}</a></td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                           href="/event/{{ shuffle["event_id"] }}">
-                        {{ shuffle["event_name"] }}</a></td>
-                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                           href="/group/{{ shuffle["group_id"] }}">
-                        {{ shuffle["group_name"] }}</a></td>
-                    <td></td>
+                    <th>{{ _("From") }}</th>
+                    <th>{{ _("To") }}</th>
+                    <th>{{ _("Event name") }}</th>
+                    <th>{{ _("Group") }}</th>
+                    <th></th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                {% for shuffle in active_shuffles %}
+                    <tr>
+                        <td>{{ shuffle["giver_name"] }}</td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="/wishlist/{{ shuffle["getter"] }}">
+                                {{ shuffle["getter_name"] }}</a></td>
+                        <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                               href="/event/{{ shuffle["event_id"] }}">
+                            {{ shuffle["event_name"] }}</a></td>
+                        <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                               href="/group/{{ shuffle["group_id"] }}">
+                            {{ shuffle["group_name"] }}</a></td>
+                        <td></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                {{ _("There are no active shuffles") }}
+                <p>{{ _("Do you want to create one?") }}</p>
+                <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                      href="{{ url_for("main_page.setup") }}">{{ _("Create a new group and shuffle") }}</a></p>
+
+                {% if administers_groups %}
+                    <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                          href="{{ url_for("main_page.groups") }}">{{ _("Use an existing group") }}</a></p>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
     <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">

@@ -281,6 +281,7 @@ def family(group_id: str, family_id: str):
     """
     user_id = get_user_id()
     family_id = int(family_id)
+
     requested_family = Family.query.get(family_id)
     if not requested_family:
         return render_template("utility/error.html",
@@ -344,8 +345,7 @@ def events():
     """
     Displays all the events of a person
     """
-    user_id = int(session["user_id"])
-    user: User = User.query.get(user_id)
+    user = get_user()
 
     events: List[ShufflingEvent] = []
     for family in user.families:
@@ -397,8 +397,7 @@ def families():
     Displays all the families of a person
     """
 
-    user_id = int(session["user_id"])
-    user = User.query.get(user_id)
+    user = get_user()
 
     return render_template("table_views/families.html",
                            group_id=None,
@@ -412,17 +411,25 @@ def groups():
     """
     Displays all the groups of a person
     """
-
-    user_id = int(session["user_id"])
-    user = User.query.get(user_id)
+    user = get_user()
 
     groups = []
     for family in user.families:
         for group in family.groups:
             groups.append(group)
 
+    # There's probably a better way to get all groups
+    admined_groups: List[GroupAdmin] = GroupAdmin.query.filter(GroupAdmin.user_id == user.id).all()
+    if len(admined_groups) <= 0:
+        admined_groups = None
+
+    admined_groups_objects: List[Group] = []
+    for admined_group in admined_groups:
+        admined_groups_objects.append(Group.query.get(admined_group.group_id))
+
     return render_template("table_views/groups.html",
-                           groups=groups)
+                           groups=groups,
+                           administered_groups=admined_groups_objects)
 
 
 @main_page.route("/notes")

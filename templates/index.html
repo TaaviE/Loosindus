@@ -15,7 +15,7 @@
                 <h6>{{ _("You don't have any events you're participating in") }}</h6>
                 <p>{{ _("Do you want to create one?") }}</p>
                 <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                      href="/setup">{{ _("Setup") }}</a></p>
+                      href="{{ url_for("main_page.setup") }}">{{ _("Setup") }}</a></p>
                 {% if has_groups %}
                     <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                           href="{{ url_for("main_page.groups") }}">{{ _("Use an existing group") }}</a></p>

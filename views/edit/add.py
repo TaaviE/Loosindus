@@ -11,6 +11,7 @@ from flask_login import login_required
 
 from config import Config
 from main import db
+from models.family_model import Group, GroupAdmin
 from models.users_model import User
 from models.wishlist_model import Wishlist
 from utility_standalone import get_user_id
@@ -22,14 +23,14 @@ logger = getLogger()
 
 @edit_page.route("/note/add", methods=["GET"])
 @login_required
-def createnote():
+def add_note():
     """
     :return: Displays the form required to add a note
     """
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
-                           endpoint=url_for("edit_page.note_add_new"),
+                           endpoint=url_for("edit_page.add_note_post"),
                            row_count=3,
                            label=_("Your wish"),
                            placeholder="")
@@ -37,7 +38,7 @@ def createnote():
 
 @edit_page.route("/note/add", methods=["POST"])
 @login_required
-def note_add_new():
+def add_note_post():
     """
     Allows submitting new notes to a wishlist
     """
@@ -47,6 +48,11 @@ def note_add_new():
     username = user.first_name
     logger.debug("Found user: {username} with id: {id}".format(username=username, id=user_id))
     currentnotes = {}
+    if "textfield" not in request.form.keys():
+        return render_template("utility/error.html",
+                               message=_("Error, no form content"),
+                               title=_("Error"))
+
     addednote = request.form["textfield"]
 
     if len(addednote) > 1024:
@@ -99,8 +105,15 @@ def note_add_new():
 def add_family():
     return render_template("creatething.html",
                            row_count=1,
-                           endpoint="editfam",
+                           endpoint=url_for("edit_page.add_family_post"),
                            label=_("Group ID"))
+
+
+@edit_page.route("/family/add", methods=["POST"])
+@login_required
+def add_family_post():
+    # TODO:
+    return ""
 
 
 @edit_page.route("/group/add", methods=["GET"])
@@ -111,5 +124,67 @@ def add_group():
     """
     return render_template("creatething.html",
                            row_count=1,
-                           endpoint="editgroup",
+                           endpoint=url_for("edit_page.add_group_post"),
+                           label=_("Group name"))
+
+
+@edit_page.route("/group/add", methods=["POST"])
+@login_required
+def add_group_post():
+    """
+    Creates a group with the given name
+    """
+    if "textfield" not in request.form.keys():
+        return render_template("utility/error.html",
+                               message=_("No form content"),
+                               title=_("Error"))
+
+    group_name = request.form["textfield"]
+
+    group = Group(group_name=group_name)
+
+    try:
+        db.session.add(group)
+        db.session.commit()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+        logger.error("Failed adding group")
+        return render_template("utility/error.html",
+                               message=_("Error adding"),
+                               title=_("Error"))
+
+    group_admin = GroupAdmin(group_id=group.id, user_id=get_user_id(), confirmed=True)
+
+    try:
+        db.session.add(group_admin)
+        db.session.commit()
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+        logger.error("Failed setting user as the admin")
+        return render_template("utility/error.html",
+                               message=_("Error adding"),
+                               title=_("Error"))
+
+    return render_template("utility/success.html",
+                           action=_("Added"),
+                           link=url_for("main_page.groups"),
+                           title=_("Added"))
+
+
+@edit_page.route("/event/add", methods=["GET"])
+@login_required
+def add_event():
+    """
+    Allows creating an event with the given name
+    """
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint=url_for("edit_page.add_event_post"),
                            label=_("Group ID"))
+
+
+@edit_page.route("/event/add", methods=["POST"])
+@login_required
+def add_event_post():
+    # TODO:
+    return ""

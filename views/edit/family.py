@@ -116,9 +116,9 @@ def editfam_with_action():
                                        message=_("An error has occured"),
                                        title=_("Error"))
 
-            target_relationship = UserFamily.query.filter(and_(UserFamily.user_id == target_id,
-                                                               UserFamily.family_id == family_id))
-
+            target_relationship: UserFamily = UserFamily.query.filter(and_(UserFamily.user_id == target_id,
+                                                                           UserFamily.family_id == family_id))
+            # TODO: Check if user is admin in family
             if target_relationship.admin:
                 return render_template("utility/error.html",
                                        message=_("You can not delete an admin from your family"),

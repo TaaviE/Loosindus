@@ -83,14 +83,14 @@ def auto_pad_urlsafe_b64(input_base64: str) -> str:
 
 def get_timestamp() -> str:
     """
-    Returns the current timestamp
+    @return: Returns the current timestamp
     """
     return str(datetime.isoformat(datetime.now()))
 
 
 def get_user_id() -> int:
     """
-    Returns the user ID from session as int
+    @return: Returns the user ID from session as int
     """
     return int(session["user_id"])
 
