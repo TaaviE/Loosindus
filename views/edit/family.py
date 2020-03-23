@@ -21,6 +21,22 @@ getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
 
 
+@edit_page.route("/family/add", methods=["POST"])
+@login_required
+def add_family_post():
+    # TODO:
+    return ""
+
+
+@edit_page.route("/family/add", methods=["GET"])
+@login_required
+def add_family():
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint=url_for("edit_page.add_family_post"),
+                           label=_("Group ID"))
+
+
 @edit_page.route("/family/<family_id>", methods=["GET"])
 @login_required
 def editfamily(family_id: str):

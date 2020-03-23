@@ -2,12 +2,31 @@
 """
 Routes to edit events
 """
-from flask import render_template, request
+from flask import render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_login import login_required
 
 from utility_standalone import get_user_id
 from views.edit.blueprint import edit_page
+
+
+@edit_page.route("/event/add", methods=["GET"])
+@login_required
+def add_event():
+    """
+    Allows creating an event with the given name
+    """
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint=url_for("edit_page.add_event_post"),
+                           label=_("Group ID"))
+
+
+@edit_page.route("/event/add", methods=["POST"])
+@login_required
+def add_event_post():
+    # TODO:
+    return ""
 
 
 @edit_page.route("/event/<event_id>/graph/regenerate", methods=["GET"])

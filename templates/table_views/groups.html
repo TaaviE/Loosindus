@@ -79,7 +79,7 @@
                         </td>
                         <td>
                             <form method="post" action="{{ url_for("edit_page.group_edit", group_id=group["id"]) }}">
-                                <input name="action" type="hidden" value="REMOVEGROUP">
+                                <input name="action" type="hidden" value="DELETEGROUP">
                                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
                                         name="id" type="submit">{{ _("Delete") }}</button>
                             </form>
