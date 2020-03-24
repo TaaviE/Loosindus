@@ -1,6 +1,6 @@
 {% extends "subtemplates/base.html" %}
 
-{% block title %}🎄 {{ title }}{% endblock %}
+{% block title %}🎄{{ title }}{% endblock %}
 
 {% block updates %}
     <div class="mdl-card__supporting-text mdl-color-text--grey-600">
@@ -68,13 +68,13 @@
                     <td>{{ family["name"] }}</td>
                     <td>
                         <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                           href="{{ url_for("", group_id=group_id, family_id=family_id) }}">
+                           href="{{ url_for("main_page.family", group_id=group_id, family_id=family["id"]) }}">
                             {{ _("Display") }}</a>
                     </td>
                     {% if is_edit_mode %}
                         <td>
                             <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                               href="{{ url_for("edit_page.group_remove_fam", group_id=group_id, family_id=family_id) }}">{{ _("Remove from group") }}</a>
+                               href="{{ url_for("edit_page.group_remove_fam", group_id=group_id, family_id=family["id"]) }}">{{ _("Remove from group") }}</a>
                         </td>
                     {% endif %}
                 </tr>

@@ -78,6 +78,7 @@ security = Security(app,
                     send_confirmation_form=ExtendedConfirmationForm,
                     forgot_password_form=ExtendedForgotPasswordForm)
 
+# Initialize enums from DB for nicer code
 # noinspection PyUnresolvedReferences
 from models.enums import event_type_to_id, subscription_type_to_id, audit_event_type_to_id, wishlist_status_to_id
 
