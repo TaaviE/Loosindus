@@ -47,7 +47,7 @@ def add_note_post():
     user_id = get_user_id()
     user: User = User.query.get(user_id)
     username = user.first_name
-    logger.debug("Found user: {username} with id: {id}".format(username=username, id=user_id))
+    logger.debug(f"Found user: {username} with id: {user_id}")
     currentnotes = {}
     if "textfield" not in request.form.keys():
         return render_template("utility/error.html",
@@ -65,9 +65,9 @@ def add_note_post():
                                message=_("Santa can't bring you nothing, ") + username + "!",
                                title=_("Error"))
 
-    logger.info("Trying to add a note: {}".format(addednote))
+    logger.debug(f"Trying to add a note: {addednote}")
     try:
-        logger.info("Opening file: {}".format(user_id))
+        logger.info(f"Opening file: {user_id}")
         db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
         for note in db_notes:
             currentnotes[note.item] = note.id
@@ -76,7 +76,7 @@ def add_note_post():
         raise e
 
     if len(currentnotes) >= 200:
-        logger.info("User {user_id} wanted to add too many notes".format(user_id=user_id))
+        logger.info(f"User {user_id} wanted to add too many notes")
         return render_template("utility/error.html",
                                message=_("You're wishing for too much, ") + username + ".",
                                title=_("Error"))
@@ -90,11 +90,11 @@ def add_note_post():
         db.session.add(db_entry_notes)
         db.session.commit()
     except Exception as e:
-        logger.error("User {user_id} caused an error adding a note to database".format(user_id=user_id))
+        logger.error(f"User {user_id} caused an error adding a note to database")
         sentry_sdk.capture_exception(e)
         raise e
 
-    logger.info("User {user_id} successfully added a note to database".format(user_id=user_id))
+    logger.info(f"User {user_id} successfully added a note to database")
     return render_template("utility/success.html",
                            action=_("Added"),
                            link="/notes",
@@ -112,7 +112,7 @@ def note_edit_get(request_id: str):
     username = user.first_name
     try:
         request_id = int(request_id)
-        logger.info("{} is trying to remove a note {}".format(user_id, request_id))
+        logger.info(f"{user_id} is trying to remove a note {request_id}")
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
@@ -120,7 +120,7 @@ def note_edit_get(request_id: str):
                                title=_("Error"))
 
     try:
-        logger.info("{} is editing notes of {}".format(user_id, request_id))
+        logger.info(f"{user_id} is editing notes of {request_id}")
         db_note = Wishlist.query.get(request_id)
     except Exception as e:
         logger.error(e)
@@ -151,7 +151,7 @@ def note_edit(request_id: str):
     Allows submitting textual edits to notes
     """
     user_id = get_user_id()
-    logger.debug("Got a post request to edit a note by user id: {}".format(user_id))
+    logger.debug("Got a post request to edit a note by user id: {user_id}")
 
     addednote = request.form["textfield"]
     try:
@@ -202,7 +202,7 @@ def note_remove(request_id: str):
 
     try:
         request_id = int(request_id)
-        logger.info("{} is trying to remove a note {}".format(user_id, request_id))
+        logger.info(f"{user_id} is trying to remove a note {request_id}")
     except Exception as e:
         sentry_sdk.capture_exception(e)
         return render_template("utility/error.html",
@@ -219,7 +219,7 @@ def note_remove(request_id: str):
                                    "Can't find what you wanted to delete or some other error occured while deleting"),
                                title=_("Error"))
 
-    logger.info("Removed {} note with ID {}".format(username, request_id))
+    logger.info(f"Removed {username} note with ID {request_id}")
     return render_template("utility/success.html",
                            action=_("Removed"),
                            link="/notes",
@@ -263,7 +263,7 @@ def update_note_status(id: str):
             raise Exception("Invalid status code")
     except Exception as e:
         sentry_sdk.capture_exception(e)
-        logger.info("Failed toggling: {}".format(e))
+        logger.info(f"Failed toggling: {e}")
         return render_template("utility/error.html",
                                message=_("Could not edit"),
                                title=_("Error"),

@@ -100,8 +100,15 @@ class FamilyAdmin(db.Model):
     __tablename__ = "families_admins"
     user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, nullable=False)
     family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False)
+    creator: bool = Column(Boolean, nullable=False, default=False)
+    """
+    Used to check if the user created the family, the creator can't be de-admined and is the only one
+    who can do more destructive actions such as deletion
+    """
     confirmed: bool = Column(Boolean, nullable=False, default=False)
+    """
+    If the person has accepted the administration right
+    """
 
     def __repr__(self):
         return "<user_id {}>".format(self.user_id)
@@ -115,8 +122,15 @@ class GroupAdmin(db.Model):
     __tablename__ = "groups_admins"
     user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, unique=True, nullable=False)
     group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
-    admin: bool = Column(Boolean, nullable=False, default=True)  # TODO: Unused
+    admin: bool = Column(Boolean, nullable=False, default=True)
+    """
+    Used to check if the user created the group, the creator can't be de-admined and is the only one
+    who can do more destructive actions such as deletion
+    """
     confirmed: bool = Column(Boolean, nullable=False, default=False)
+    """
+    If the person has accepted the administration right
+    """
 
     def __init__(self, user_id, group_id, confirmed=False):
         self.user_id = user_id

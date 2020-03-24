@@ -681,7 +681,7 @@ def graph_json(event_id, unhide):
                                                                 UserGroupAdmin.group_id == int(group_id),
                                                                 UserGroupAdmin.confirmed == True)
                                                            ).one()
-            if user_group_admin is not None and user_group_admin.admin:
+            if user_group_admin is not None and user_group_admin.creator:
                 unhide = True
             else:
                 unhide = False
@@ -760,7 +760,7 @@ def settings():
     family_admin = False
     for family in user.families:
         if user in family.admins:
-            if FamilyAdmin.query.get(user_id=user.id, family_id=family.id).admin:
+            if FamilyAdmin.query.get(user_id=user.id, family_id=family.id).creator:
                 family_admin = True
 
     user_groups = {}
@@ -770,7 +770,7 @@ def settings():
         for group_relationship in family.groups:
             if user in group_relationship.admins:
                 curr_group = GroupAdmin.query.get(user_id=user.id, group_id=group_relationship.id)
-                if curr_group.admin:
+                if curr_group.creator:
                     user_groups[group_relationship.description] = (group_relationship.id, True)
                     group_admin = True
                 else:

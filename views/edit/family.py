@@ -57,16 +57,16 @@ def editfamily(family_id: str):
     db_family_members = UserFamily.query.filter(UserFamily.family_id == family_id).all()
 
     family = []
-    show_admin_column = False
+    authorized = False
     for member in db_family_members:
         is_admin = False
         is_person = False
         if member.user_id == user_id:
             is_person = True
-            if member.admin:
-                show_admin_column = True
+            if member.creator:
+                authorized = True
 
-        if member.admin:
+        if member.creator:
             is_admin = True
 
         birthday = None
@@ -78,10 +78,15 @@ def editfamily(family_id: str):
         family.append(
             (User.query.get(member.user_id).first_name, member.user_id, is_admin, is_person, birthday))
 
+    if not authorized:
+        return render_template("utility/error.html",
+                               message=_("Not authorized"),
+                               title=_("Error"))
+
     return render_template("editfam.html",
                            family=family,
                            title=_("Edit family"),
-                           admin=show_admin_column,
+                           admin=authorized,
                            family_id=family_id)
 
 
@@ -93,6 +98,8 @@ def editfam_with_action():
     """
     user_id = get_user_id()
     endpoint = url_for("edit_page.editfam_with_action")
+    # TODO: check if allow
+
     if "action" not in request.form.keys():
         return render_template("utility/error.html",
                                message=_("An error has occured"),
@@ -126,7 +133,7 @@ def editfam_with_action():
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == family_id)).one()
 
-            if not admin_relationship.admin:
+            if not admin_relationship.creator:
                 logger.warning("User {} is trying to forge requests".format(user_id))
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),
@@ -182,7 +189,7 @@ def editfam_with_action():
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == family_id)).one()
 
-            if not admin_relationship.admin:
+            if not admin_relationship.creator:
                 logger.warning("User {} is trying to forge requests".format(user_id))
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),
@@ -232,7 +239,7 @@ def editfam_with_action():
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == target_id)).one()
 
-            if not admin_relationship.admin:
+            if not admin_relationship.creator:
                 logger.warning("User {} is trying to forge requests".format(user_id))
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),

@@ -33,6 +33,34 @@ def add_group():
                            label=_("Group name"))
 
 
+@edit_page.route("/group/<group_id>/removefamily/<family_id>", methods=["GET"])
+@login_required
+def group_remove_fam(group_id: str, family_id: str):
+    """
+    Displays a page for removing a family from a group
+    """
+    # TODO: display confirmation
+    try:
+        group_id = int(group_id)
+        family_id = int(family_id)
+    except ValueError:
+        logger.warning("Invalid value provided for group_id")
+        return render_template("utility/error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
+    except Exception as e:
+        logger.error(e)
+        sentry_sdk.capture_exception(e)
+        return render_template("utility/error.html",
+                               message=_("An error has occured"),
+                               title=_("Error"))
+
+    return render_template("creatething.html",
+                           row_count=1,
+                           endpoint=url_for("edit_page.add_group_post"),
+                           label=_("Group name"))
+
+
 @edit_page.route("/group/add", methods=["POST"])
 @login_required
 def add_group_post():
@@ -240,7 +268,7 @@ def group_edit(group_id: str):
             target_relationship = GroupAdmin.query.filter(and_(GroupAdmin.group_id == group_id,
                                                                GroupAdmin.family_id == family_id)).one()
 
-            if target_relationship.admin:
+            if target_relationship.creator:
                 return render_template("utility/error.html",
                                        message=_("You can not delete an admin from your family"),
                                        title=_("Error"))
