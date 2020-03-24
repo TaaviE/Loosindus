@@ -1,4 +1,6 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2017-2020
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 Contains all the models related to shuffles made between people
 """

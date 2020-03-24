@@ -17,6 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.7.0\n"
+"SPDX-License-Identifier: AGPL-3.0-only"
 
 #: forms.py:15
 msgid "First name"

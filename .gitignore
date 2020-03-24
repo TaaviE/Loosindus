@@ -114,6 +114,7 @@ config.py
 *.swp
 *.br
 *.gz
+.ipynb_checkpoints
 
 # IntelliJ and PyCharm
 .idea

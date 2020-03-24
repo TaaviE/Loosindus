@@ -1,3 +1,5 @@
+-- Copyright: Taavi Eomäe 2017-2020
+-- SPDX-License-Identifier: AGPL-3.0-only
 create or replace function deal_with_wishlist_changes() returns trigger as
 $update_wishlists$
 begin

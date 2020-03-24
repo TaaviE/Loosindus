@@ -1,7 +1,9 @@
+{# Copyright: Taavi Eomäe 2017-2020 #}
+{# SPDX-License-Identifier: AGPL-3.0-only #}
 {% extends "subtemplates/base.html" %}
 
 {% if not no_sidebar == False %}
-{% set no_sidebar = True %}
+    {% set no_sidebar = True %}
 {% endif %}
 
 {% block title %}🎄{{ title }}{% endblock %}

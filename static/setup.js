@@ -1,3 +1,7 @@
+/*
+ Copyright: Taavi Eomäe 2017-2020
+ SPDX-License-Identifier: AGPL-3.0-only
+ */
 let add_family_button;
 let reset_button;
 let submit_button;

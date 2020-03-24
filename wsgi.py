@@ -1,4 +1,9 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2018-2020
+# SPDX-License-Identifier: AGPL-3.0-only
+"""
+Helps with starting a wsgi worker
+"""
 import logging
 from logging import basicConfig, getLogger
 
@@ -10,7 +15,7 @@ from main import app
 getLogger().setLevel(logging.DEBUG)
 logger = getLogger()
 logger.info("Started with proxyfix")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)  # Assume one proxy
 basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":

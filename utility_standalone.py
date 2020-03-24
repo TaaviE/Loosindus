@@ -2,7 +2,7 @@
 """
 Utility functions that aren't super specific to Loosindus
 """
-# Copyright: Taavi Eomäe 2017-2019
+# Copyright: Taavi Eomäe 2017-2020
 # SPDX-License-Identifier: AGPL-3.0-only
 import re
 

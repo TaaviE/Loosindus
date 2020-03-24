@@ -1,9 +1,11 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2018-2020
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 Celery worker that solves the graph problem given to it
 """
 from datetime import datetime
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 import sentry_sdk
 from celery.utils.log import get_task_logger

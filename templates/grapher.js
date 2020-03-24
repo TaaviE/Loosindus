@@ -1,3 +1,6 @@
+// Copyright: Taavi Eomäe 2017-2020
+// SPDX-License-Identifier: AGPL-3.0-only
+
 let svgelement = document.getElementById("viz");
 let computedsvgelementstyle = getComputedStyle(svgelement);
 let width = parseInt(computedsvgelementstyle.width.match(/\d+/), 10);
