@@ -1,3 +1,6 @@
+// Copyright: Taavi Eomäe 2017-2020
+// SPDX-License-Identifier: AGPL-3.0-only
+
 {% if no_ads != true and config.GOOGLE_ADS %}
 try {
     (adsbygoogle = window.adsbygoogle || []).push({
