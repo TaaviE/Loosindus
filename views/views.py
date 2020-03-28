@@ -401,10 +401,17 @@ def families():
 
     user = get_user()
 
+    admins: List[FamilyAdmin] = FamilyAdmin.query.filter(FamilyAdmin.user_id == user.id).all()
+
+    administered_families: List[Family] = []
+    for admin in admins:
+        administered_families.append(Family.query.get(admin.family_id))
+
     return render_template("table_views/families.html",
                            group_id=None,
                            title=_("Families"),
-                           families=user.families)
+                           families=user.families,
+                           administered_families=administered_families)
 
 
 @main_page.route("/groups")
@@ -699,7 +706,7 @@ def graph_json(event_id, unhide):
                                                                 UserGroupAdmin.group_id == int(group_id),
                                                                 UserGroupAdmin.confirmed == True)
                                                            ).one()
-            if user_group_admin is not None and user_group_admin.creator:
+            if user_group_admin is not None and user_group_admin.admin:
                 unhide = True
             else:
                 unhide = False
@@ -778,7 +785,7 @@ def settings():
     family_admin = False
     for family in user.families:
         if user in family.admins:
-            if FamilyAdmin.query.get(user_id=user.id, family_id=family.id).creator:
+            if FamilyAdmin.query.get(user_id=user.id, family_id=family.id).admin:
                 family_admin = True
 
     user_groups = {}
@@ -788,7 +795,7 @@ def settings():
         for group_relationship in family.groups:
             if user in group_relationship.admins:
                 curr_group = GroupAdmin.query.get(user_id=user.id, group_id=group_relationship.id)
-                if curr_group.creator:
+                if curr_group.admin:
                     user_groups[group_relationship.description] = (group_relationship.id, True)
                     group_admin = True
                 else:

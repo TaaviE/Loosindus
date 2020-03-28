@@ -304,7 +304,7 @@ def group_edit(group_id: str):
             target_relationship = GroupAdmin.query.filter(and_(GroupAdmin.group_id == group_id,
                                                                GroupAdmin.family_id == family_id)).one()
 
-            if target_relationship.creator:
+            if target_relationship.admin:
                 return render_template("utility/error.html",
                                        message=_("You can not delete an admin from your family"),
                                        title=_("Error"))

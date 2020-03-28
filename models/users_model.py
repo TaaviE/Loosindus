@@ -16,6 +16,7 @@ from sqlalchemy.orm import backref, relationship
 
 from main import db
 from models.audit_events_model import AuditEvent
+from models.enums import audit_event_type_to_id
 
 
 class Role(db.Model, RoleMixin):

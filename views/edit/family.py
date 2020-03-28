@@ -5,6 +5,7 @@
 Routes to edit families
 """
 from logging import getLogger
+from typing import List
 
 import sentry_sdk
 from flask import render_template, request, url_for
@@ -14,8 +15,9 @@ from sqlalchemy import and_
 
 from config import Config
 from main import db
-from models.family_model import Family
+from models.family_model import Family, FamilyAdmin
 from models.users_model import User, UserFamily
+from utility import get_user
 from utility_standalone import get_user_id
 from views.edit.blueprint import edit_page
 
@@ -41,7 +43,7 @@ def add_family():
 
 @edit_page.route("/family/<family_id>", methods=["GET"])
 @login_required
-def editfamily(family_id: str):
+def family_edit(family_id: str):
     """
     :param family_id: The family to modify
     """
@@ -65,10 +67,10 @@ def editfamily(family_id: str):
         is_person = False
         if member.user_id == user_id:
             is_person = True
-            if member.creator:
+            if member.admin:
                 authorized = True
 
-        if member.creator:
+        if member.admin:
             is_admin = True
 
         birthday = None
@@ -92,15 +94,22 @@ def editfamily(family_id: str):
                            family_id=family_id)
 
 
-@edit_page.route("/editfam", methods=["POST"])
+@edit_page.route("/family/<family_id>", methods=["POST"])
 @login_required
-def editfam_with_action():
+def family_edit_post(family_id: str):
     """
     Deals with all the possible modifications to a family
     """
-    user_id = get_user_id()
-    endpoint = url_for("edit_page.editfam_with_action")
-    # TODO: check if allow
+    family_id = int(family_id)
+    endpoint = url_for("edit_page.family_edit_post", family_id=family_id)
+
+    user = get_user()
+    admin_families: List[FamilyAdmin] = FamilyAdmin.query.filter(and_(FamilyAdmin.user_id == user.id,
+                                                                      FamilyAdmin.family_id == family_id)).first()
+    if not admin_families:
+        return render_template("utility/error.html",
+                               message=_("Not authorized"),
+                               title=_("Error"))
 
     if "action" not in request.form.keys():
         return render_template("utility/error.html",
@@ -108,13 +117,6 @@ def editfam_with_action():
                                title=_("Error"))
     else:
         if request.form["action"] == "REMOVEMEMBER" and "confirm" not in request.form.keys():
-            if "extra_data" in request.form.keys():
-                extra_data = request.form["extra_data"]
-            else:
-                return render_template("utility/error.html",
-                                       message=_("An error has occured"),
-                                       title=_("Error"))
-
             if "id" in request.form.keys():
                 form_id = request.form["id"]
             else:
@@ -129,14 +131,13 @@ def editfam_with_action():
                                    extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "REMOVEMEMBER" and request.form["confirm"] == "True":
-            family_id = int(request.form["extra_data"])
             target_id = int(request.form["id"])
 
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == family_id)).one()
 
-            if not admin_relationship.creator:
-                logger.warning("User {} is trying to forge requests".format(user_id))
+            if not admin_relationship.admin:
+                logger.warning(f"User {user.id} is trying to forge requests")
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),
                                        title=_("Error"))
@@ -164,13 +165,6 @@ def editfam_with_action():
                                    link="/",
                                    title=_("Deleted"))
         elif request.form["action"] == "ADDMEMBER" and "confirm" not in request.form.keys():
-            if "extra_data" in request.form.keys():
-                extra_data = request.form["extra_data"]
-            else:
-                return render_template("utility/error.html",
-                                       message=_("An error has occured"),
-                                       title=_("Error"))
-
             if "id" in request.form.keys():
                 form_id = request.form["id"]
             else:
@@ -182,16 +176,14 @@ def editfam_with_action():
                                    action="ADDMEMBER",
                                    endpoint=endpoint,
                                    id=form_id,
-                                   extra_data=extra_data,
                                    confirm=True)
         elif request.form["action"] == "ADDMEMBER" and request.form["confirm"] == "True":
-            family_id = int(request.form["extra_data"])
             target_id = int(request.form["id"])
 
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == family_id)).one()
 
-            if not admin_relationship.creator:
+            if not admin_relationship.admin:
                 logger.warning("User {} is trying to forge requests".format(user_id))
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),
@@ -241,8 +233,8 @@ def editfam_with_action():
             admin_relationship = UserFamily.query.filter(and_(UserFamily.user_id == user_id,
                                                               UserFamily.family_id == target_id)).one()
 
-            if not admin_relationship.creator:
-                logger.warning("User {} is trying to forge requests".format(user_id))
+            if not admin_relationship.admin:
+                logger.warning("User {user.id} is trying to forge requests")
                 return render_template("utility/error.html",
                                        message=_("An error has occured"),
                                        title=_("Error"))

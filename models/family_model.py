@@ -102,9 +102,9 @@ class FamilyAdmin(db.Model):
     __tablename__ = "families_admins"
     user_id: int = Column(Integer, ForeignKey("users.id"), primary_key=True, nullable=False)
     family_id: int = Column(Integer, ForeignKey(Family.id), primary_key=True, nullable=False)
-    creator: bool = Column(Boolean, nullable=False, default=False)
+    admin: bool = Column(Boolean, nullable=False, default=False)
     """
-    Used to check if the user created the family, the creator can't be de-admined and is the only one
+    Used to check if the user created the family, the admin can't be de-admined and is the only one
     who can do more destructive actions such as deletion
     """
     confirmed: bool = Column(Boolean, nullable=False, default=False)
@@ -126,7 +126,7 @@ class GroupAdmin(db.Model):
     group_id: int = Column(Integer, ForeignKey(Group.id), primary_key=True, nullable=False)
     admin: bool = Column(Boolean, nullable=False, default=True)
     """
-    Used to check if the user created the group, the creator can't be de-admined and is the only one
+    Used to check if the user created the group, the admin can't be de-admined and is the only one
     who can do more destructive actions such as deletion
     """
     confirmed: bool = Column(Boolean, nullable=False, default=False)
