@@ -7,6 +7,8 @@ Flask-Babelex==0.9.4
 Flask-Dance[sqla]==3.0.0
 Flask-Security-Too==3.3.3
 Flask-SocketIO==4.2.1
+eventlet==0.25.1
+redis==3.3.11
 bcrypt --no-binary bcrypt==3.1.7
 psycopg2 --no-binary psycopg2==2.8.3
 pycryptodomex==3.9.7
@@ -21,4 +23,3 @@ sqlalchemy-utils==0.36.3
 sentry-sdk[flask]==0.14.3
 passlib==1.7.2
 cython==0.29.15
-kombu==4.6.8
