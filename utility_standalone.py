@@ -1,9 +1,9 @@
 # coding=utf-8
+# Copyright: Taavi Eomäe 2017-2020
+# SPDX-License-Identifier: AGPL-3.0-only
 """
 Utility functions that aren't super specific to Loosindus
 """
-# Copyright: Taavi Eomäe 2017-2020
-# SPDX-License-Identifier: AGPL-3.0-only
 import re
 
 import pyximport
@@ -24,7 +24,6 @@ from config import Config
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
-
 
 shuffler = Random(Config.SHUFFLE_SEED)
 christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
