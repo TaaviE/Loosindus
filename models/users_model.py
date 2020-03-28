@@ -19,6 +19,9 @@ from models.audit_events_model import AuditEvent
 
 
 class Role(db.Model, RoleMixin):
+    """
+    Described how roles are assigned to users
+    """
     __tablename__ = "roles"
     id: int = Column(Integer(), server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(80), unique=True)

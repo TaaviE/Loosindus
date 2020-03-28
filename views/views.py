@@ -310,6 +310,8 @@ def family(group_id: str, family_id: str):
         authorized = False
         for member in requested_family.members:
             if member.id == user_id:
+                member.self = True
+                # This is required to hide the display button that would show an access denied page
                 authorized = True
                 break
 
@@ -445,13 +447,29 @@ def notes():
     try:
         # noinspection PyComparisonWithNone
         # SQLAlchemy doesn't like "is None"
-        db_notes = Wishlist.query.filter(Wishlist.user_id == user_id).all()
+        db_notes: List[Wishlist] = Wishlist.query.filter(Wishlist.user_id == user_id).all()
     except Exception as e:
         sentry_sdk.capture_exception(e)
         raise e
 
     if len(db_notes) <= 0:
         empty = True
+
+    now = datetime.now()
+    for db_note in db_notes:
+        db_note.allow_modify = True
+
+        if now - db_note.when > timedelta(days=30):
+            db_note.allow_modify = False
+
+        if now - db_note.when > timedelta(days=90) and \
+                (db_note.status == wishlist_status_to_id["default"] or
+                 db_note.status == wishlist_status_to_id["modified"]):
+            db_note.allow_modify = True
+
+        if db_note.status == wishlist_status_to_id["purchased"] or \
+                db_note.status == wishlist_status_to_id["booked"]:
+            db_note.allow_modify = False
 
     return render_template("table_views/notes_private.html",
                            list=db_notes,

@@ -5,8 +5,8 @@ $update_wishlists$
 begin
     if (tg_op = 'DELETE') then
         -- wishlist item was deleted
-        insert into "archived_wishlists" ("id", "item", "status", "purchased_by", "user_id", "event_id",
-                                          "original_creation")
+        insert into wishlists_archived ("id", "item", "status", "purchased_by", "user_id", "event_id",
+                                        "original_creation")
         values (old."id", old."item", old."status", old."purchased_by", old."user_id", old."event_id", old."when");
         return old;
     elsif (tg_op = 'UPDATE') then

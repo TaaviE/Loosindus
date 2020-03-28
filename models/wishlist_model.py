@@ -62,7 +62,7 @@ class ArchivedWishlist(db.Model):
     @param status: status of the item
     @param purchased_by: item has been claimed by whom
     """
-    __tablename__ = "archived_wishlists"
+    __tablename__ = "wishlists_archived"
 
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     user_id: int = Column(Integer, ForeignKey(User.id), nullable=False)

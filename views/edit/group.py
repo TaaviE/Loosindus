@@ -14,7 +14,7 @@ from sqlalchemy import and_
 
 from config import Config
 from main import db
-from models.family_model import Group, GroupAdmin
+from models.family_model import FamilyGroup, Group, GroupAdmin
 from models.users_model import User
 from utility_standalone import get_user_id
 from views.edit.blueprint import edit_page
@@ -41,7 +41,7 @@ def group_remove_fam(group_id: str, family_id: str):
     """
     Displays a page for removing a family from a group
     """
-    # TODO: display confirmation
+
     try:
         group_id = int(group_id)
         family_id = int(family_id)
@@ -58,9 +58,43 @@ def group_remove_fam(group_id: str, family_id: str):
                                title=_("Error"))
 
     return render_template("creatething.html",
-                           row_count=1,
-                           endpoint=url_for("edit_page.add_group_post"),
-                           label=_("Group name"))
+                           endpoint=url_for("edit_page.group_remove_fam_post",
+                                            family_id=family_id,
+                                            group_id=group_id),
+                           confirm=True)
+
+
+@edit_page.route("/group/<group_id>/removefamily/<family_id>", methods=["POST"])
+@login_required
+def group_remove_fam_post(group_id: str, family_id: str):
+    """
+    Removes a page from a group
+    """
+    group_id = int(group_id)
+    family_id = int(family_id)
+    user_id = get_user_id()
+
+    group_admin: GroupAdmin = GroupAdmin.query.filter(GroupAdmin.user_id == user_id).first()
+    if not group_admin:
+        return render_template("utility/error.html",
+                               message=_("Permission denied"),
+                               title=_("Error"))
+
+    try:
+        FamilyGroup.query.filter(and_(FamilyGroup.group_id == group_id,
+                                      FamilyGroup.family_id == family_id)).delete()
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        logger.warning(e)
+        return render_template("utility/error.html",
+                               message=_("Failed deleting family from group"),
+                               title=_("Error"))
+
+    return render_template("utility/success.html",
+                           action=_("Deleted"),
+                           link=url_for("main_page.groups"),
+                           title=_("Deleted"))
 
 
 @edit_page.route("/group/add", methods=["POST"])

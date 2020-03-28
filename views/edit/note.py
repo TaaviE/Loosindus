@@ -16,7 +16,7 @@ from config import Config
 from main import db
 from models.enums import wishlist_status_to_id
 from models.users_model import User
-from models.wishlist_model import Wishlist
+from models.wishlist_model import ArchivedWishlist, Wishlist
 from utility_standalone import get_user_id
 from views.edit.blueprint import edit_page
 
@@ -26,14 +26,14 @@ logger = getLogger()
 
 @edit_page.route("/note/add", methods=["GET"])
 @login_required
-def add_note():
+def note_add():
     """
     :return: Displays the form required to add a note
     """
     return render_template("creatething.html",
                            action="ADD",
                            confirm=False,
-                           endpoint=url_for("edit_page.add_note_post"),
+                           endpoint=url_for("edit_page.note_add_post"),
                            row_count=3,
                            label=_("Your wish"),
                            placeholder="")
@@ -41,7 +41,7 @@ def add_note():
 
 @edit_page.route("/note/add", methods=["POST"])
 @login_required
-def add_note_post():
+def note_add_post():
     """
     Allows submitting new notes to a wishlist
     """
@@ -224,7 +224,7 @@ def note_remove(request_id: str):
     logger.info(f"Removed {username} note with ID {request_id}")
     return render_template("utility/success.html",
                            action=_("Removed"),
-                           link="/notes",
+                           link=url_for("main_page.notes"),
                            title=_("Removed"))
 
 
@@ -237,6 +237,7 @@ def update_note_status(id: str):
     user_id = get_user_id()
 
     # TODO: Check if they should be able to change?
+
     try:
         requested_status = int(request.form["status"])
         note = Wishlist.query.get(id)
@@ -272,3 +273,41 @@ def update_note_status(id: str):
                                back=True)
 
     return redirect(url_for("main_page.wishlist", person_id=note.user_id), code=303)
+
+
+@edit_page.route("/note/restore/<note_id>", methods=["GET"])
+@login_required
+def note_restore(note_id: str):
+    """
+    @param note_id: The archived note to restore and place into the wishlist
+    """
+    user_id = get_user_id()
+    note_id = int(note_id)
+
+    note: ArchivedWishlist = ArchivedWishlist.query.get(note_id)
+    if note.user_id != user_id:
+        return render_template("utility/error.html",
+                               message=_("Could not restore"),
+                               title=_("Error"),
+                               back=True)
+
+    db_entry_notes = Wishlist(
+        user_id=note.user_id,
+        item=note.item
+    )
+
+    try:
+        db.session.add(db_entry_notes)
+        db.session.commit()
+    except Exception as e:
+        logger.debug(f"User {user_id} caused an error \"{e}\" restoring a note")
+        sentry_sdk.capture_exception(e)
+        return render_template("utility/error.html",
+                               message=_("Could not restore"),
+                               title=_("Error"),
+                               back=True)
+
+    return render_template("utility/success.html",
+                           action=_("Restored"),
+                           link=url_for("main_page.notes"),
+                           title=_("Restored"))

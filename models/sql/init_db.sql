@@ -540,18 +540,18 @@ create table archived_wishlists
     received     timestamp default now()
 );
 
-alter table archived_wishlists
+alter table wishlists_archived
     owner to jolod;
 
 create unique index archived_wishlists_note_id_uindex
-    on archived_wishlists (id);
+    on wishlists_archived (id);
 
 create index archived_wishlists_user_id_index
-    on archived_wishlists (user_id);
+    on wishlists_archived (user_id);
 
 create index archived_wishlists_purchased_user_id
-    on archived_wishlists (purchased_by);
+    on wishlists_archived (purchased_by);
 
 create index archived_wishlists_event_id
-    on archived_wishlists (event_id);
+    on wishlists_archived (event_id);
 

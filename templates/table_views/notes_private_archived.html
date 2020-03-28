@@ -20,7 +20,7 @@
         </div>
         <div class="mdl-card__actions mdl-card--border">
             <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-               href="{{ url_for("edit_page.createnote") }}">{{ _("Add new") }}</a>
+               href="{{ url_for("edit_page.note_add") }}">{{ _("Add new") }}</a>
         </div>
     </div>
 {% endblock %}
@@ -38,7 +38,9 @@
             {% for item, id in list.items() %}
                 <tr>
                     <td class="custom-white-space mdl-data-table__cell--non-numeric">{{ item }}</td>
-                    <td></td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                           href="{{ url_for("edit_page.note_restore", note_id=id) }}">{{ _("Restore") }}</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
