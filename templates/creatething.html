@@ -19,6 +19,8 @@
         <div class="mdl-card__supporting-text mdl-color-text--grey-600">
             <form method="post" action="{{ endpoint }}">
                 <div class="mdl-textfield mdl-js-textfield">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                     {% if action %}
                         <input name="action" type="hidden" value="{{ action }}">
                     {% endif %}
