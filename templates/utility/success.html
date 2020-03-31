@@ -10,7 +10,7 @@
             <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
             {# {{ additional_text }} #}
             <h1>{{ title }}</h1>
-            <a href="/"
+            <a href="{% if not link %}/{% else %}{{ link }}{% endif %}"
                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">{{ _("Back") }}</a>
         </div>
     </div>
