@@ -34,21 +34,13 @@ class ShufflingEvent(db.Model):
                                       backref="events_administered")
 
     def __str__(self):
-        return "{" \
-               "\"id\": {id}, " \
-               "\"created_at\": \"{created_at}\", " \
-               "\"name\": \"{name}\", " \
-               "\"event_at\": \"{event_at}\", " \
-               "\"group_id\": {group_id}, " \
-               "\"event_type\": {event_type}" \
-               "}".format(
-            id=self.id,
-            created_at=self.created_at,
-            name=self.name,
-            event_at=self.year,
-            group_id=self.group,
-            event_type=self.event_type
-        )
+        return f"""{{"id": {self.id},""" \
+               f""" "created_at": "{self.created_at}", """ \
+               f""" "name": "{self.name}", """ \
+               f""" "event_at": "{self.year}", """ \
+               f""" "group_id": {self.group}, """ \
+               f""" "event_type": {self.event_type}""" \
+               f"""}}"""
 
     def as_dict(self):
         """
