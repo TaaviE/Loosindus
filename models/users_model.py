@@ -9,9 +9,11 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List
 
+import sentry_sdk
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_security import RoleMixin, UserMixin
 from sqlalchemy import Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, VARCHAR, and_
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import backref, relationship
 
 from main import db
@@ -46,6 +48,7 @@ class User(db.Model, UserMixin):
 
     birthday: datetime = Column(DateTime())
     language: str = Column(VARCHAR(5), default="en", nullable=False)
+    uuid: str = Column(UUID, nullable=False, server_default=FetchedValue(), unique=True)
 
     roles: List[Role] = relationship(
         Role,
@@ -77,7 +80,8 @@ class User(db.Model, UserMixin):
         try:
             return AuditEvent.query.filter(and_(AuditEvent.type_id == audit_event_type_to_id["last_login"],
                                                 AuditEvent.user_id == self.id)).order_by("when").limit(1).one().when
-        except Exception:
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
             return ""
 
     @last_login_at.setter

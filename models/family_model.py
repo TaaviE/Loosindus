@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, FetchedValue, ForeignKey, Integer, String, VARCHAR
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import backref, relationship
 
 from main import db
@@ -19,7 +20,6 @@ class Group(db.Model):
     """
     Specifies how groups are modeled in the database
 
-    @param group_id: group's ID
     @param group_name: 255 letter name of the group
     """
     __tablename__ = "groups"
@@ -27,6 +27,7 @@ class Group(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(VARCHAR(255), nullable=True)
     description: str = Column(VARCHAR(255), nullable=True)
+    uuid: str = Column(UUID, nullable=False, server_default=FetchedValue(), unique=True)
 
     families: List[Family] = relationship(
         "Family",
@@ -58,6 +59,7 @@ class Family(db.Model):
     id: int = Column(BigInteger, server_default=FetchedValue(), primary_key=True, unique=True, nullable=False)
     name: str = Column(String(255), nullable=False)
     creation: datetime = Column(DateTime, nullable=False, default=datetime.now())
+    uuid: str = Column(UUID, nullable=False, server_default=FetchedValue(), unique=True)
 
     groups: List[Group] = relationship(
         Group,
