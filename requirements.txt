@@ -8,7 +8,7 @@ Flask-Dance[sqla]==3.0.0
 Flask-Security-Too==3.3.3
 Flask-SocketIO==4.2.1
 eventlet==0.25.1
-redis==3.3.11
+redis==3.4.1
 bcrypt --no-binary bcrypt==3.1.7
 psycopg2 --no-binary psycopg2==2.8.3
 pycryptodomex==3.9.7
