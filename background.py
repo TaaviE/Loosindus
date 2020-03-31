@@ -3,10 +3,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 # Background tasks
-from main import celery, mail
+from datetime import timedelta
+
+from flask_mail import Message
+
+from main import app, celery, mail, security
 from utility import *
 from utility_standalone import *
-from views import Message, app, security
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
@@ -26,7 +29,7 @@ def send_security_email(message):
             msg.sender = message["sender"]
             mail.send(msg)
         except Exception:
-            sentry.captureException()
+            sentry_sdk.capture_exception()
 
 
 # Override security email sender
@@ -44,18 +47,18 @@ def delay_security_email(msg):
              "sender": msg.sender}
         )
     except Exception:
-        sentry.captureException()
+        sentry_sdk.capture_exception()
 
 
 def remind_to_add(rate_limit=True):
     logger.info("Started sending adding reminders")
-    now = datetime.datetime.now()
+    now = datetime.now()
     try:
         with open("remind_to_add", "r+") as timer_file:
             lastexec = timer_file.read()
-            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+            lastexec = datetime(*map(int, reversed(lastexec.split("/"))))
 
-            if now - lastexec < datetime.timedelta(days=30):
+            if now - lastexec < timedelta(days=30):
                 logger.info(" Adding reminders were rate-limited")
                 if rate_limit:
                     return
@@ -69,7 +72,7 @@ def remind_to_add(rate_limit=True):
 
     for user in User.query:
         if user.last_activity_at:
-            if now - datetime.datetime(*map(int, user.last_activity_at.split("/"))) < datetime.timedelta(days=15):
+            if now - datetime(*map(int, user.last_activity_at.split("/"))) < timedelta(days=15):
                 continue
 
         email_to_send = "Tere,\n"
@@ -87,13 +90,13 @@ def remind_to_add(rate_limit=True):
 
 def remind_to_buy(rate_limit=True):
     logger.info("Started sending purchase reminders")
-    now = datetime.datetime.now()
+    now = datetime.now()
     try:
         with open("remind_to_buy", "r+") as timer_file:
             lastexec = timer_file.read()
-            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+            lastexec = datetime(*map(int, reversed(lastexec.split("/"))))
 
-            if now - lastexec < datetime.timedelta(days=15):
+            if now - lastexec < timedelta(days=15):
                 logger.info("Buying reminders were rate-limited")
                 if rate_limit:
                     return
@@ -139,13 +142,13 @@ def remind_to_buy(rate_limit=True):
 
 def remind_about_change(rate_limit=True):
     logger.info(" Started sending change reminders")
-    now = datetime.datetime.now()
+    now = datetime.now()
     try:
         with open("remind_about_change", "r+") as timer_file:
             lastexec = timer_file.read()
-            lastexec = datetime.datetime(*map(int, reversed(lastexec.split("/"))))
+            lastexec = datetime(*map(int, reversed(lastexec.split("/"))))
 
-            if now - lastexec < datetime.timedelta(hours=6):
+            if now - lastexec < timedelta(hours=6):
                 logger.info(" Changing reminders were rate-limited")
                 if rate_limit:
                     return
