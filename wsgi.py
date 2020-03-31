@@ -14,13 +14,15 @@ from main import app
 
 getLogger().setLevel(logging.DEBUG)
 logger = getLogger()
-logger.info("Started with proxyfix")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)  # Assume one proxy
+logger.debug("Started with proxyfix")
+
+# Assume one proxy using provided NGINX config
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
     if Config.DEBUG:
-        logger.info("Starting in debug!")
+        logger.warning("Starting in debug!")
         app.run(debug=True, use_evalex=True, host="0.0.0.0", port=5000)
     else:
         logger.info("Starting in production")
