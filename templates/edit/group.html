@@ -1,0 +1,83 @@
+{# Copyright: Taavi Eomäe 2017-2020 #}
+{# SPDX-License-Identifier: AGPL-3.0-only #}
+{% extends "subtemplates/base.html" %}
+
+{% block title %}🎄 {{ title }}{% endblock %}
+
+{% block updates %}
+    <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+        <p>{{ _("Group administration page") }}</p>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <noscript>{{ _("Your browser does not support JavaScript, certain functionality might be limited") }}</noscript>
+
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">{{ _("Group tools") }}</h2>
+        </div>
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="{{ url_for("edit_page.group_rename", group_id=group_id) }}">{{ _("Rename group") }}</a></p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="{{ url_for("edit_page.group_delete", group_id=group_id) }}">{{ _("Delete group") }}</a></p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="{{ url_for("edit_page.add_event", group_id=group_id) }}">{{ _("Create a new shuffle") }}</a>
+            </p>
+            <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                  href="{{ url_for("edit_page.group_add_family", group_id=group_id) }}">{{ _("Add new family") }}</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">{{ _("Group information") }}</h2>
+        </div>
+        <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+            <p>{{ _("Here you can see the families in the group and remove any if you wish") }}</p>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table custom-fill">
+            <tbody>
+            <tr>
+                <th>{{ _("Family") }}</th>
+                <th>{{ _("ID") }}</th>
+                <th>{{ _("Action") }}</th>
+                <th></th>
+            </tr>
+            {% if families|length <= 0 %}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ _("No families in this group") }}</td>
+                </tr>
+            {% else %}
+                {% for family in families %}
+                    <tr>
+                        <td>{{ family["name"] }}</td>
+                        <td>
+                            <div class="mdl-textfield mdl-js-textfield">
+                                <input class="mdl-textfield__input" disabled value="{{ family["id"] }}" type="text">
+                            </div>
+                        </td>
+                        <td>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="{{ url_for("main_page.family", family_id=family["id"]) }}">{{ _("Display") }}</a>
+                        </td>
+                        <td>
+                            <form method="post"
+                                  action="{{ url_for("edit_page.family_edit_post", family_id=family["id"]) }}">
+                                <input name="action" type="hidden" value="DELETEFAMILY">
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                                        name="id" type="submit">{{ _("Remove") }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
