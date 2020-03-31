@@ -24,6 +24,7 @@ from flask import Flask
 from flask_babelex import Babel
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import CSRFProtect
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.flask import FlaskIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
@@ -48,6 +49,7 @@ def use_identity(element, compiler, **kw):
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config.from_object(Config)
+csrf = CSRFProtect(app)
 mail = Mail(app)
 db = SQLAlchemy(app)
 babel = Babel(app)
