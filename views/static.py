@@ -31,11 +31,13 @@ def error_500(err):
     """
     Displays the nice error handling page
     """
-    message = _("An error occured")
 
     logger.info(str(err))
     if "404" in str(err):
         message = _("Unfortunately this page was not found")
+        logger.debug(f"Route for URL {request.url} was not found")
+    else:
+        message = _("An error occured")
 
     return render_template("utility/error.html",
                            no_video=True,
