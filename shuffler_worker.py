@@ -175,5 +175,6 @@ def traverse_graph(graph: Dict[int, int], location: int, beginning: int):
             graph.pop(location)
         else:
             return False
+        # TODO: Test this
     else:
         return False
