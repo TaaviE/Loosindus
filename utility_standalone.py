@@ -5,6 +5,7 @@
 Utility functions that aren't super specific to Loosindus
 """
 import re
+from uuid import UUID
 
 import pyximport
 from flask import session
@@ -99,3 +100,18 @@ def set_recursion_limit() -> None:
     Sets the recustion limit required by shuffling
     """
     setrecursionlimit(2000)
+
+
+@lru_cache(maxsize=64)
+def valid_uuid(uuid: str) -> bool:
+    """
+    Checks if the UUID is sane
+    """
+    if len(uuid) != 36:
+        return False
+
+    try:
+        UUID(uuid)
+        return True
+    except Exception:
+        return False

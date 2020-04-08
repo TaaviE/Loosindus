@@ -85,11 +85,12 @@ security = Security(app,
 # noinspection PyUnresolvedReferences
 from models.enums import event_type_to_id, subscription_type_to_id, audit_event_type_to_id, wishlist_status_to_id
 
-from views import static, login, views, user_specific, edit, test
+from views import static_page, login_page, main_page, user_specific, edit_page, test_page, graph_page
 
-app.register_blueprint(edit)
-app.register_blueprint(login)
-app.register_blueprint(static)
-app.register_blueprint(test)
+app.register_blueprint(static_page)
+app.register_blueprint(login_page)
+app.register_blueprint(main_page)
 app.register_blueprint(user_specific)
-app.register_blueprint(views)
+app.register_blueprint(edit_page)
+app.register_blueprint(test_page)
+app.register_blueprint(graph_page)

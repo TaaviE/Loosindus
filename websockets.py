@@ -4,13 +4,16 @@
 """
 Contains websocket related code
 """
-import eventlet
+from eventlet import monkey_patch
 from flask import Flask
-from flask_socketio import SocketIO
+from flask_login import current_user
+from flask_socketio import SocketIO, emit
 
 from config import Config
+from socketio_helper import authenticated_only
 
-eventlet.monkey_patch()
+# Do eventlet monkey patching
+monkey_patch()
 
 app = Flask(__name__)
 app.config.from_object(Config)

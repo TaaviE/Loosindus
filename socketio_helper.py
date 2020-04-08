@@ -10,7 +10,7 @@ from flask_login import current_user
 from flask_socketio import disconnect
 
 
-def authenticated_only(func: Callable[[Any], Any]) -> Callable[[Any], Any]:
+def authenticated_only(func: Callable[[Any], Any]):
     """
     @param func: function to decorate
     @return: wrapped function

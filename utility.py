@@ -22,6 +22,10 @@ from datetime import datetime
 from sqlalchemy import and_
 
 import sentry_sdk
+from logging import getLogger
+
+getLogger().setLevel(Config.LOGLEVEL)
+logger = getLogger()
 
 
 def get_user() -> User:
@@ -86,3 +90,18 @@ def get_person_language_code(user_id: int) -> str:
         return "ee"
     else:
         return user.language
+
+
+def commit_object(obj: object) -> bool:
+    """
+    Commits an object to the DB and catches the potential error
+    """
+    try:
+        db.session.add(obj)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        sentry_sdk.capture_exception(e)
+        logger.error("Failed adding group")
+        return False
