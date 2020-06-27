@@ -120,3 +120,19 @@ config.py
 
 # Syncthing
 **/*.sync-conflict-*-*-*.*
+
+# Linux
+vim_settings.xml
+.*.kate-swp
+.swp.*
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+[._]*.un~
+.org-id-locations
+*_archive
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
