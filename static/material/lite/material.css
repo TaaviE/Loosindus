@@ -3843,7 +3843,7 @@ ul, ol {
 .mdl-button {
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 15px;
   color: rgb(0,0,0);
   position: relative;
   height: 36px;
@@ -4212,7 +4212,7 @@ input.mdl-button[type="submit"] {
   z-index: 1;
   position: relative;
   background: rgb(255,255,255);
-  border-radius: 2px;
+  border-radius: 15px;
   box-sizing: border-box; }
 
 .mdl-card__media {
