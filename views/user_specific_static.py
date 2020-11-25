@@ -16,8 +16,9 @@ def custom_js():
     """
     User-specific JS for custom functionality
     """
-    return render_template("custom.js",
-                           user_id=int(session["user_id"])), 200, {"content-type": "application/javascript"}
+    return render_template("custom.js", user_id=int(session["user_id"])), \
+        200, \
+        {"content-type": "application/javascript"}
 
 
 @user_specific.route("/worker.js")
@@ -26,4 +27,6 @@ def worker_js():
     """
     Returns serviceworker JS
     """
-    return render_template("worker.js"), 200, {"content-type": "application/javascript"}
+    return render_template("worker.js"), \
+        200, \
+        {"content-type": "application/javascript"}
