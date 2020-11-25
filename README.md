@@ -8,8 +8,8 @@ Features:
   * Very simple to use
   * Possibility to share gift wishlists with people to avoid duplicate gifts and other hassle coordinating gifts
   * Best possible gift target and receiver generation to avoid combinations that would ruin the surprise
-  * Mobile, Chromebook and Kindle-friendly - no massive JS dependencies, minimal or no Javascript on pages. All critical pages also work without JS.
-  * Supports multiple events at the same time, with optional advanced features
+  * Responsive design - desktops, tablets, phones and even Kindles are supported - no massive JS dependencies, minimal or no Javascript on pages. All critical pages should also work without JS.
+  * Supports multiple events, multiple groups and multiple families at the same time, with optional advanced features
   * Supports Estonian ID card authentication
 
 
@@ -33,21 +33,22 @@ Minu hallatud [instants](https://jolod.aegrel.ee) on aktiivses kasutuses, kuid m
 
 My aim is to keep this project as simple as possible in every aspect, including deploying.
 
- 1. Install Python 3.8
+ 1. Install Python 3.8 (No, older versions do not work)
  2. Make a virtual environment (`python3 -m venv .venv && source .venv/bin/activate`)
  3. Install wheel with pip (`python3 -m pip install wheel`)
  4. Install requirements (`python3 -m pip install -r requirements.txt`)
- 5. Set up PostgreSQL with the script in `init_db.sql`, I can't promise flask-sqlalchemy's schema creation will be perfect
- 6. Set up uwsgi/gunicorn and nginx as you wish (to provide TLS), this app won't work without TLS, it's hardcoded
+ 5. Set up PostgreSQL with the script in `init_db.sql`
+ 6. Set up uwsgi/gunicorn and nginx
  7. **UPDATE THE CONFIGURATION** - this is so critical that everything will break if you don't, not kidding
- 8. Estonian ID card support requires a subdomain and additional nginx configuration, if you don't configure it the option will just not work
- 9. You're done. Use `/profile` or `/settings` to configure your account. `/recreategraph` to regenerate the gifting graph. Configuring groups and families currently has to be done manually in the database (trivial many-to-many relationship) but UI is actively being developed. 
+ 8. Estonian ID card support requires a subdomain and additional nginx configuration, if you don't configure it, it will just not work
+ 9. You're done. Use the setup wizard to begin.
 
 In case this above was too complex you can just use the version hosted by me and ask if you need any help.
 
 ## Planned development
 
   * Check the GitHub Projects tab
+  * If you have requests or issues, open an issue on GitHub
 
 ## Donations
 
