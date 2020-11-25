@@ -13,34 +13,35 @@
 
 
 {% block content %}
-    <div class="mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
-    <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
-        <h2 class="mdl-card__title-text">{{ _("Events") }}</h2>
-    </div>
-    <table class="mdl-data-table mdl-js-data-table custom-fill">
-        <tbody>
-        <tr>
-            <th>{{ _("ID") }}</th>
-            <th>{{ _("Name") }}</th>
-            <th>{{ _("Created") }}</th>
-            <th>{{ _("Takes place") }}</th>
-            <th>{{ _("Group") }}</th>
-            <th>{{ _("Type") }}</th>
-        </tr>
-        {% for event in events %}
+    <div class="mdl-card mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+        <div class="custom-white-text mdl-card__title mdl-card--expand mdl-color--teal-300">
+            <h2 class="mdl-card__title-text">{{ _("Events") }}</h2>
+        </div>
+        <table class="mdl-data-table mdl-js-data-table custom-fill">
+            <tbody>
             <tr>
-                <td>{{ event["id"] }}</td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                       href="/event/{{ event["id"] }}">
-                    {{ event["name"] }}</a></td>
-                <td>{{ event["created_at"] }}</td>
-                <td>{{ event["event_at"] }}</td>
-                <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                       href="/group/{{ event["group_id"] }}">
-                    {{ event["group_id"] }}</a></td>
-                <td>{{ event["event_type"] }}</td>
+                <th>{{ _("ID") }}</th>
+                <th>{{ _("Name") }}</th>
+                <th>{{ _("Created") }}</th>
+                <th>{{ _("Takes place") }}</th>
+                <th>{{ _("Group") }}</th>
+                <th>{{ _("Type") }}</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event["id"] }}</td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                           href="/event/{{ event["id"] }}">
+                        {{ event["name"] }}</a></td>
+                    <td>{{ event["created_at"] }}</td>
+                    <td>{{ event["event_at"] }}</td>
+                    <td><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+                           href="/group/{{ event["group_id"] }}">
+                        {{ event["group_id"] }}</a></td>
+                    <td>{{ event["event_type"] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
