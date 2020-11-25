@@ -27,8 +27,11 @@ getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
 
 shuffler = Random(Config.SHUFFLE_SEED)
-christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟", "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️", "🔥", "🥶", "🧣", "🧥",
-                     "🌲", "🌁", "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"]
+christmasy_emojis = ["🎄", "🎅", "🤶", "🦌", "🍪", "🌟",
+                     "❄️", "☃️", "⛄", "🎁", "🎶", "🕯️",
+                     "🔥", "🥶", "🧣", "🧥", "🌲", "🌁",
+                     "🌬️", "🎿", "🏔️", "🌨️", "🏂", "⛷️"
+                     ]
 christmasy_emojis_len = len(christmasy_emojis)
 shuffler.shuffle(christmasy_emojis)  # Shuffle them based on each instance
 

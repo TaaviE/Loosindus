@@ -140,6 +140,7 @@ def shuffles():
     """
     user_id = get_user_id()
     all_shuffles = list(Shuffle.query.filter(Shuffle.giver == user_id).all())
+
     active_shuffles: List[ShufflingEvent] = []
     inactive_shuffles: List[ShufflingEvent] = []
     for shuffle_pair in all_shuffles:
@@ -149,6 +150,7 @@ def shuffles():
         shuffle_pair.group_name = Group.query.get(shuffle_event.group_id).name
         shuffle_pair.giver_name = User.query.get(shuffle_pair.giver).first_name
         shuffle_pair.getter_name = User.query.get(shuffle_pair.getter).first_name
+
         if datetime.now() < shuffle_event.event_at:
             active_shuffles.append(shuffle_pair)
         else:
