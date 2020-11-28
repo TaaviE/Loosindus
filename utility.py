@@ -5,24 +5,21 @@
 Contains functions that abstracts a few queries
 This file requires database being initialized
 """
+from datetime import datetime
 # Cython
 from functools import lru_cache
+from logging import getLogger
 
-import pyximport
+import sentry_sdk
+from sqlalchemy import and_
 
-from utility_standalone import get_user_id
-
-pyximport.install()
-
+from config import Config
+from main import db
 from models.family_model import Family, FamilyGroup
 from models.names_model import Name
 from models.shuffles_model import Shuffle
 from models.users_model import User
-from datetime import datetime
-from sqlalchemy import and_
-
-import sentry_sdk
-from logging import getLogger
+from utility_standalone import get_user_id
 
 getLogger().setLevel(Config.LOGLEVEL)
 logger = getLogger()
@@ -95,6 +92,8 @@ def get_person_language_code(user_id: int) -> str:
 def commit_object(obj: object) -> bool:
     """
     Commits an object to the DB and catches the potential error
+
+    :param obj: The object to commit to the DB
     """
     try:
         db.session.add(obj)
@@ -103,5 +102,5 @@ def commit_object(obj: object) -> bool:
     except Exception as e:
         db.session.rollback()
         sentry_sdk.capture_exception(e)
-        logger.error("Failed adding group")
+        logger.error("Failed adding an object to database")
         return False
