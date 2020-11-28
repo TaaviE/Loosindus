@@ -9,15 +9,15 @@
                 {% else %}
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 {% endif %}
-                {% set _dummy = kwargs.update({"id": field.id}) %}
-                {% if field.widget.input_type == "checkbox" %}
-                    {{ field.label(class_="mdl-checkbox__label", **{"for": field.id}) }}
-                    {{ field(class_="mdl-checkbox__input", **kwargs)|safe }}
-                {% else %}
-                    {{ field.label(class_="mdl-textfield__label", **{"for": field.id}) }}
-                    {{ field(class_="mdl-textfield__input", **kwargs)|safe }}
-                {% endif %}
-                </div>
+            {% set _dummy = kwargs.update({"id": field.id}) %}
+            {% if field.widget.input_type == "checkbox" %}
+                {{ field.label(class_="mdl-checkbox__label", **{"for": field.id}) }}
+                {{ field(class_="mdl-checkbox__input", **kwargs)|safe }}
+            {% else %}
+                {{ field.label(class_="mdl-textfield__label", **{"for": field.id}) }}
+                {{ field(class_="mdl-textfield__input", **kwargs)|safe }}
+            {% endif %}
+            </div>
             {% endif %}
         </td>
         {% if field.errors %}

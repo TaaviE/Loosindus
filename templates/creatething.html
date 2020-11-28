@@ -9,7 +9,8 @@
         {% if not confirm %}
             <p>{{ _("Enter what is required into the box") }}</p>
         {% else %}
-            <p>{{ _("Do you really want to do this? You won't be asked again.") }}</p>
+            <h4>{{ _("Do you really want to do this?") }}
+            <h4>{{ _("You won't be asked again.") }}</h4>
         {% endif %}
     </div>
 {% endblock %}
@@ -42,7 +43,11 @@
                     {% endif %}
 
                     {% if label %}
-                        <label class="mdl-textfield__label" for="textfield">{{ label }}</label>
+                        {% if not confirm %}
+                            <label class="mdl-textfield__label" for="textfield">{{ label }}</label>
+                        {% else %}
+                            <h4>{{ label }}</h4>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <br>
