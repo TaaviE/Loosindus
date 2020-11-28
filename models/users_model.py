@@ -137,11 +137,6 @@ class AuthLinks(db.Model, OAuthConsumerMixin):
     token = Column(VARCHAR(255), nullable=True)
     provider = Column(VARCHAR(255), nullable=False)
 
-    def __init__(self, provider, provider_user_id, token):
-        self.provider = provider
-        self.provider_user_id = provider_user_id
-        self.token = token
-
     def __init__(self, user_id, provider, provider_user_id, token):
         self.user_id = user_id
         self.provider = provider
@@ -186,4 +181,9 @@ class UserFamily(db.Model):
     confirmed: bool = Column(Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return "<user_id {}, family_id {}>".format(self.user_id, self.group_id)
+        return f"<user_id {self.user_id}, family_id {self.family_id}>"
+
+    def __init__(self, user_id, family_id, confirmed=False):
+        self.user_id = user_id
+        self.family_id = family_id
+        self.confirmed = confirmed
