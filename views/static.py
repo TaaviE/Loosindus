@@ -176,7 +176,7 @@ def success_page():
     return render_template("utility/success.html",
                            message=message,
                            action=(action if action != "" else title),
-                           link="./" + link,
+                           link=link,
                            no_sidebar=not current_user.is_authenticated,
                            title=title)
 
