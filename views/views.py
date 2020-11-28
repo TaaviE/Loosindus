@@ -156,10 +156,15 @@ def shuffles():
         else:
             inactive_shuffles.append(shuffle_pair)
 
+    administers_groups = False
+    if len(GroupAdmin.query.filter(GroupAdmin.user_id == user_id).all()) > 0:
+        administers_groups = True
+
     return render_template("table_views/shuffles.html",
                            title=_("Shuffles"),
                            active_shuffles=active_shuffles,
-                           inactive_shuffles=inactive_shuffles)
+                           inactive_shuffles=inactive_shuffles,
+                           administers_groups=administers_groups)
 
 
 @main_page.route("/setup", methods=["GET"])
