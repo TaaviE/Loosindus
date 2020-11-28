@@ -17,7 +17,6 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from json import dumps
 from typing import List
 
 # Cython
@@ -534,7 +533,6 @@ def wishlist(person_id: str, group_id: str = None):
     user_id = int(session["user_id"])
     user = User.query.get(user_id)
     invalid_notes = False
-
     if not person_id.isnumeric():
         return render_template("utility/error.html",
                                no_sidebar=False,
