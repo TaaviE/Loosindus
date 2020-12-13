@@ -24,3 +24,4 @@ sqlalchemy-utils==0.36.8
 sentry-sdk[flask]==0.19.4
 passlib==1.7.4
 cython==0.29.21
+coverage
