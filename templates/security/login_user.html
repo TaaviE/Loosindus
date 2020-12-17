@@ -6,7 +6,7 @@
 {% block title %}{{ _("Login") }}{% endblock %}
 
 {% block content %}
-    <div class="mdl-shadow--2dp mdl-card__supporting-text mdl-color-text--grey-600 mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
+    <div class="mdl-card mdl-shadow--2dp mdl-card__supporting-text mdl-color-text--grey-600 mdl-color--white mdl-cell mdl-cell--6-col-tablet mdl-cell--8-col-desktop mdl-cell--4-col-phone mdl-cell--6-col">
         <h1>{{ _("Login") }}</h1>
         <p><b>{% include "security/_messages.html" %}</b></p>
         <form action="{{ url_for_security("login") }}" method="POST" name="login_user_form">
