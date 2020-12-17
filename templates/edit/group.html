@@ -23,11 +23,9 @@
             <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
                   href="{{ url_for("edit_page.group_delete", group_id=group_id) }}">{{ _("Delete group") }}</a></p>
             <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                  href="{{ url_for("edit_page.add_event", group_id=group_id) }}">{{ _("Create a new shuffle") }}</a>
-            </p>
+                  href="{{ url_for("edit_page.add_event", group_id=group_id) }}">{{ _("Create a new shuffle") }}</a></p>
             <p><a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-                  href="{{ url_for("edit_page.group_add_family", group_id=group_id) }}">{{ _("Add new family") }}</a>
-            </p>
+                  href="{{ url_for("edit_page.group_add_family", group_id=group_id) }}">{{ _("Add new family") }}</a></p>
         </div>
     </div>
 
@@ -67,12 +65,9 @@
                                href="{{ url_for("main_page.family", family_id=family["id"]) }}">{{ _("Display") }}</a>
                         </td>
                         <td>
-                            <form method="post"
-                                  action="{{ url_for("edit_page.family_edit_post", family_id=family["id"]) }}">
-                                <input name="action" type="hidden" value="DELETEFAMILY">
-                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
-                                        name="id" type="submit">{{ _("Remove") }}</button>
-                            </form>
+                            <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                               href="{{ url_for("edit_page.group_remove_fam", group_id=group_id, family_id=family["id"]) }}">
+                                {{ _("Remove") }}</a>
                         </td>
                     </tr>
                 {% endfor %}

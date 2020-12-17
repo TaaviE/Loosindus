@@ -2,7 +2,7 @@
 {# SPDX-License-Identifier: AGPL-3.0-only #}
 <header class="mdl-layout__header {% if scroll_header %}mdl-layout__header--scroll {% else %}mdl-layout--fixed-header {% endif %}">
     <div class="mdl-layout__header-row">
-        <span class="mdl-layout-title">{{ title }}</span>
+        <a class="mdl-layout-title custom-white-text custom-no-decoration" href="/">{{ title }}</a>
         <div class="mdl-layout-spacer"></div>
         {# <!--<div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
           <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
@@ -35,10 +35,10 @@
 
     {% if tabs_bar %}
         <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
-            <a href="#overview" class="mdl-layout__tab is-active">Overview</a>
-            <a href="#personal" class="mdl-layout__tab">Personal</a>
-            <a href="#security" class="mdl-layout__tab">Account & Security</a>
-            <a href="#manage" class="mdl-layout__tab">Management</a>
+            <a href="#overview" class="mdl-layout__tab is-active">{{ _("Overview") }}</a>
+            <a href="#personal" class="mdl-layout__tab">{{ _("Personal") }}</a>
+            <a href="#security" class="mdl-layout__tab">{{ _("Account & Security") }}</a>
+            <a href="#manage" class="mdl-layout__tab">{{ _("Management") }}</a>
         </div>
     {% endif %}
 </header>
@@ -48,14 +48,14 @@
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="{{ url_for("static_page.home") }}">
                 <i class="material-icons">list</i> {{ _("Dashboard") }}</a>
-            <div class="mdl-layout-spacer mdl-card__supporting-text">Shortcuts</div>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">{{ _("Shortcuts") }}</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.notes") }}">
                 <i class="material-icons">list</i> {{ _("My Wishlist") }}</a>
             {% if target %}
                 <a class="mdl-navigation__link" href="/wishlist/{{ target["group_id"] }}/{{ target["user_id"] }}">
                     <i class="material-icons">list</i> {{ _("Receiver's Wishlist") }}</a>
             {% endif %}
-            <div class="mdl-layout-spacer mdl-card__supporting-text">Overview</div>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">{{ _("Overview") }}</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.shuffles") }}">
                 <i class="material-icons">cached</i> {{ _("Shuffles") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.families") }}">
@@ -70,12 +70,12 @@
                 <i class="material-icons">notification_important</i> {{ _("Notifications") }}</a>
             <a class="mdl-navigation__link custom-disable-link" href="{{ url_for("main_page.subscriptions") }}">
                 <i class="material-icons">attach_money</i> {{ _("Subscriptions") }}</a>
-            <div class="mdl-layout-spacer mdl-card__supporting-text">Personal</div>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">{{ _("Personal") }}</div>
             <a class="mdl-navigation__link" href="{{ url_for("main_page.settings") }}">
                 <i class="material-icons">settings</i> {{ _("Settings") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("login_page.logout") }}">
                 <i class="material-icons">exit_to_app</i> {{ _("Log out") }}</a>
-            <div class="mdl-layout-spacer mdl-card__supporting-text">Help & Support</div>
+            <div class="mdl-layout-spacer mdl-card__supporting-text">{{ _("Help & Support") }}</div>
             <a class="mdl-navigation__link custom-disable-link" href="{{ url_for("static_page.help_page") }}">
                 <i class="material-icons">help</i> {{ _("Help") }}</a>
             <a class="mdl-navigation__link" href="{{ url_for("static_page.feedback") }}">
