@@ -10,6 +10,10 @@
     color: #ffffff;
 }
 
+.custom-no-decoration {
+    text-decoration: none;
+}
+
 .custom-height-500 {
     height: 500px;
 }
@@ -66,6 +70,15 @@
 
 .custom-fill {
     width: 100%;
+}
+
+.custom-loading-button {
+    margin-top: 5%;
+    position: absolute;
+}
+
+.custom-hide-text {
+    color: rgba(0, 0, 0, 0);
 }
 
 .mdl-layout__tab-bar-button.mdl-layout__tab-bar-left-button {
