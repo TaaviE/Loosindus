@@ -213,9 +213,11 @@ def note_remove(request_id: str):
 
     try:  # Let's try to delete it now
         Wishlist.query.filter_by(id=request_id).delete()
+
         db.session.commit()
     except Exception as e:
         sentry_sdk.capture_exception(e)
+        logger.error(e)
         return render_template("utility/error.html",
                                message=_(
                                    "Can't find what you wanted to delete or some other error occured while deleting"),
