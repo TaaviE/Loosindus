@@ -17,7 +17,7 @@ For self-hosters:
   * Works very well with Content Security Policy - no need for 'inline'-anything
   * The app is intended to be used with multiple families, but it is okay if there's only one family in the group or one-person families in the group
   * The amount of groups an user can be in is not limited (multiple secret santa events at the same time)
-  * The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I field-test my changes so it might sometimes break
+  * The [version hosted by me](https://jolod.aegrel.ee) (TaaviE) is being actively used, but is the place where I beta-test my changes so it might sometimes break
   * Estonian (and other client TLS cert) authentication with Flask-Security requires extra configuration
 
 ## Eesti keeles
