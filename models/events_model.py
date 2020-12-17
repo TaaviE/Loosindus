@@ -34,7 +34,8 @@ class ShufflingEvent(db.Model):
                                       backref="events_administered")
 
     def __str__(self):
-        return f"""{{"id": {self.id},""" \
+        return f"""{{""" \
+               f""" "id": {self.id}, """ \
                f""" "created_at": "{self.created_at}", """ \
                f""" "name": "{self.name}", """ \
                f""" "event_at": "{self.year}", """ \

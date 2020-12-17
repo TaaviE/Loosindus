@@ -19,7 +19,7 @@ class Name(db.Model):
     genitive: str = Column(VARCHAR(255), nullable=False)
 
     def __repr__(self):
-        return "<id {}>".format(self.id)
+        return f"<id {self.name}>"
 
     def __str__(self):
-        return "{\"name\": \"{name}\", \"genitive\": \"{genitive}\"}".format(name=self.name, genitive=self.genitive)
+        return f"{{\"name\": \"{self.name}\", \"genitive\": \"{self.genitive}\"}}"
