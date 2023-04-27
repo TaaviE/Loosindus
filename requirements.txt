@@ -13,7 +13,7 @@ redis==4.5.4
 bcrypt --no-binary bcrypt==3.1.7
 psycopg2 --no-binary psycopg2==2.8.3
 pycryptodomex==3.17
-sqlalchemy==2.0.9
+sqlalchemy==2.0.11
 wtforms==3.0.1
 werkzeug==2.2.3
 pycryptodomex==3.17
