@@ -5,7 +5,7 @@ Flask-Mail==0.9.1
 Flask-WTF==1.1.1
 Flask-Babelex==0.9.4
 Flask-Dance[sqla]==6.2.0
-Flask-Security-Too==5.1.2
+Flask-Security-Too==5.3.0
 Flask-SocketIO==5.3.3
 Flask-Accept==0.0.6
 eventlet==0.33.3
