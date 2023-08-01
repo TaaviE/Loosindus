@@ -21,7 +21,7 @@ raven==6.10.0
 celery[redis]==5.2.7
 gunicorn==20.1.0
 sqlalchemy-utils==0.40.0
-sentry-sdk[flask]==1.19.1
+sentry-sdk[flask]==1.29.2
 passlib==1.7.4
 cython==0.29.34
 coverage
